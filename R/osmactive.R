@@ -82,7 +82,7 @@ get_travel_network = function(
 }
 get_driving_network = function(
   osm,
-  ex_d = exclude_highwaydriving()
+  ex_d = exclude_highway_driving()
 ) {
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))

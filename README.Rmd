@@ -34,8 +34,48 @@ usethis::use_package("dplyr")
 usethis::use_package("stringr")
 # Ignore README.Rmd in build ignore
 usethis::use_build_ignore("README.Rmd")
+usethis::use_mit_license("Robin Lovelace")
+
+# Add pkgdown site
+usethis::use_pkgdown()
+# pkgdown pages
+usethis::use_pkgdown_github_pages()
+
 
 devtools::check()
-
 ```
 
+Install the package with:
+
+```{r, eval=FALSE}
+remotes::install_github("nptscot/osmactive")
+```
+
+```{r, include=FALSE}
+devtools::load_all()
+```
+
+## Example
+
+
+```{r}
+#| label: edinburgh
+library(dplyr)
+library(tmap)
+edinburgh = zonebuilder::zb_zone("Edinburgh")
+edinburgh_3km = edinburgh |> 
+  filter(circle_id <= 2)
+osm = get_travel_network("Scotland")
+cycle_network = get_cycling_network(osm)
+driving_network = get_driving_network(osm)
+edinburgh_cycle = cycle_network[edinburgh_3km, , op = sf::st_within]
+edinburgh_driving = driving_network[edinburgh_3km, , op = sf::st_within]
+edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
+edinburgh_segregated = segregation_levels(edinburgh_cycle_with_distance)
+table(edinburgh_segregated$cycle_segregation)
+m = edinburgh_segregated |> 
+  arrange(cycle_segregation) |> 
+  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+m
+# tmap_save(m, "segregation_levels_edinburgh.html")
+```
