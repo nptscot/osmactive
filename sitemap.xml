@@ -16,6 +16,9 @@
     <loc>https://nptscot.github.io/osmactive/index.html</loc>
   </url>
   <url>
+    <loc>https://nptscot.github.io/osmactive/reference/classify_cycleways.html</loc>
+  </url>
+  <url>
     <loc>https://nptscot.github.io/osmactive/reference/distance_to_road.html</loc>
   </url>
   <url>
@@ -32,8 +35,5 @@
   </url>
   <url>
     <loc>https://nptscot.github.io/osmactive/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/segregation_levels.html</loc>
   </url>
 </urlset>

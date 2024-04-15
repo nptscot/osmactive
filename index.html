@@ -109,7 +109,7 @@
 <span><span class="co">#&gt; Warning: st_point_on_surface assumes attributes are constant over geometries</span></span>
 <span><span class="co">#&gt; Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not</span></span>
 <span><span class="co">#&gt; give correct results for longitude/latitude data</span></span>
-<span><span class="va">leeds_categorized</span> <span class="op">=</span> <span class="fu"><a href="reference/segregation_levels.html">segregation_levels</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
+<span><span class="va">leeds_categorized</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycleways.html">classify_cycleways</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">=</span> <span class="va">leeds_categorized</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cycle_segregation</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tm_shape</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tm_lines</span><span class="op">(</span><span class="st">"cycle_segregation"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, palette <span class="op">=</span> <span class="st">"-Blues"</span>, popup.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"cycle_segregation"</span>, <span class="st">"distance_to_road"</span>, <span class="st">"maxspeed"</span>, <span class="st">"highway"</span>, <span class="st">"other_tags"</span><span class="op">)</span><span class="op">)</span></span>
@@ -117,8 +117,8 @@
 <span><span class="va">m</span></span></code></pre></div>
 <p><img src="README_files/figure-gfm/leeds-1.png"><!-- --></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"segregation_levels_leeds.html"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"segregation_levels_leeds.html"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"classify_cycleways_leeds.html"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"classify_cycleways_leeds.html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="edinburgh-example">Edinburgh example<a class="anchor" aria-label="anchor" href="#edinburgh-example"></a>
@@ -147,7 +147,7 @@
 <span><span class="co">#&gt; Warning: st_point_on_surface assumes attributes are constant over geometries</span></span>
 <span><span class="co">#&gt; Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not</span></span>
 <span><span class="co">#&gt; give correct results for longitude/latitude data</span></span>
-<span><span class="va">edinburgh_segregated</span> <span class="op">=</span> <span class="fu"><a href="reference/segregation_levels.html">segregation_levels</a></span><span class="op">(</span><span class="va">edinburgh_cycle_with_distance</span><span class="op">)</span></span>
+<span><span class="va">edinburgh_segregated</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycleways.html">classify_cycleways</a></span><span class="op">(</span><span class="va">edinburgh_cycle_with_distance</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">edinburgh_segregated</span><span class="op">$</span><span class="va">cycle_segregation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        offroad_track roadside_cycle_track        mixed_traffic </span></span>
@@ -159,11 +159,11 @@
 <span><span class="va">m</span></span></code></pre></div>
 <p><img src="README_files/figure-gfm/edinburgh-1.png"><!-- --></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># tmap_save(m, "segregation_levels_edinburgh.html")</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># tmap_save(m, "classify_cycleways_edinburgh.html")</span></span></code></pre></div>
 <p>Save an interactive version of the map to check the results as follows:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"segregation_levels_edinburgh.html"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"segregation_levels_edinburgh.html"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"classify_cycleways_edinburgh.html"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"classify_cycleways_edinburgh.html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="lisbon-example">Lisbon example<a class="anchor" aria-label="anchor" href="#lisbon-example"></a>
@@ -190,14 +190,14 @@
 <span><span class="va">cycle_network</span> <span class="op">=</span> <span class="fu"><a href="reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">driving_network</span> <span class="op">=</span> <span class="fu"><a href="reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">cycle_network_with_distance</span> <span class="op">=</span> <span class="fu"><a href="reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_network</span>, <span class="va">driving_network</span><span class="op">)</span></span>
-<span><span class="va">lisbon_categorized</span> <span class="op">=</span> <span class="fu"><a href="reference/segregation_levels.html">segregation_levels</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
+<span><span class="va">lisbon_categorized</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycleways.html">classify_cycleways</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">=</span> <span class="va">lisbon_categorized</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cycle_segregation</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tm_shape</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tm_lines</span><span class="op">(</span><span class="st">"cycle_segregation"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, palette <span class="op">=</span> <span class="st">"-Blues"</span>, popup.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"cycle_segregation"</span>, <span class="st">"distance_to_road"</span>, <span class="st">"maxspeed"</span>, <span class="st">"highway"</span>, <span class="st">"other_tags"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"segregation_levels_lisbon.html"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"segregation_levels_lisbon.html"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"classify_cycleways_lisbon.html"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"classify_cycleways_lisbon.html"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
