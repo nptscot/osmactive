@@ -88,7 +88,7 @@ get_travel_network = function(
 #' 
 #' @inheritParams get_cycling_network
 #' @return A sf object with the OSM driving network
-#' @export
+#' @export``
 get_driving_network = function(
   osm,
   ex_d = exclude_highway_driving()
@@ -115,6 +115,10 @@ get_cycling_network = function(
     # Remove highway=path without bicycle values of yes, designated, or permissive:
     dplyr::filter(
       !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+    ) |>
+    # Remove links with highway == "pedestrian" and no bicycle == "yes" etc
+    dplyr::filter(
+      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
     )
 }
 
@@ -135,14 +139,13 @@ distance_to_road = function(cycleways, roads) {
 segregation_levels = function(cycleways) {
   cycleways |> 
     dplyr::mutate(type = dplyr::case_when(
-      grepl("Path", name, fixed = TRUE) ~ "detached_track",
-      grepl("Towpath", name, fixed = TRUE) ~ "detached_track",
-      distance_to_road > 10 ~ "detached_track",
+      grepl("Path", name, fixed = TRUE) ~ "offroad_track",
+      grepl("Towpath", name, fixed = TRUE) ~ "offroad_track",
       TRUE ~ "mixed_traffic"
     )) |> 
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       # Where highway == cycleway
-      type == "detached_track" ~ "detached_track",
+      type == "offroad_track" ~ "offroad_track",
       type == "level_track" ~ "level_track",
       # Cycleways on road
       cycleway == "lane" ~ "cycle_lane",
@@ -177,9 +180,14 @@ segregation_levels = function(cycleways) {
       cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
       TRUE ~ cycle_segregation
     )) |>
+    # When distance to road is more than 10 m and cycleway type is stepped_or_footway, change to offroad_track
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      distance_to_road > 10 & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
+      TRUE ~ cycle_segregation
+    )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("detached_track", "roadside_cycle_track", "mixed_traffic"),
+      levels = c("offroad_track", "roadside_cycle_track", "mixed_traffic"),
       ordered = TRUE
     ))
 }
