@@ -76,12 +76,10 @@ get_travel_network = function(
         extra_tags = extra_tags,
         ...
     )
-    res = osm_highways |>
+    osm_highways |>
         dplyr::filter(!is.na(highway)) |>
         # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
         dplyr::filter(is.na(service))
-
-    return(res)
 }
 
 #' Get the OSM driving network
