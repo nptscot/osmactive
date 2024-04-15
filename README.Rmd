@@ -18,3 +18,24 @@ knitr::opts_chunk$set(
 
 The goal of osmactive is to provide functions, example datasets and documentation for extracting active travel infrastructure from OpenStreetMap data.
 
+```{r, eval=FALSE, echo=FALSE}
+# Setup instructions
+# Create the README.Rmd with usethis:
+usethis::use_readme_rmd()
+# Add description:
+usethis::use_description()
+# Add package dependencies
+usethis::use_package("osmextract")
+# Create the R directory
+usethis::use_r("osmactive")
+usethis::use_package("geos")
+usethis::use_package("sf")
+usethis::use_package("dplyr")
+usethis::use_package("stringr")
+# Ignore README.Rmd in build ignore
+usethis::use_build_ignore("README.Rmd")
+
+devtools::check()
+
+```
+

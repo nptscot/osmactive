@@ -62,7 +62,9 @@ exclude_highway_driving = function() {
 #' Get the OSM network functions
 #' 
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
-#' 
+#' @param extra_tags A vector of extra tags to be included in the OSM extract
+#' @return A sf object with the OSM network
+#' @export
 get_travel_network = function(
     place,
     extra_tags = et_active()
@@ -72,9 +74,9 @@ get_travel_network = function(
         extra_tags = extra_tags
     )
     res = osm_highways |>
-        filter(!is.na(highway)) |>
+        dplyr::filter(!is.na(highway)) |>
         # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
-        filter(is.na(service))
+        dplyr::filter(is.na(service))
 
     return(res)
 }
@@ -83,7 +85,7 @@ get_driving_network = function(
   ex_d = exclude_highwaydriving()
 ) {
   osm |> 
-    filter(!str_detect(string = highway, pattern = ex_d))
+    dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
 
 get_cycling_network = function(
@@ -92,9 +94,9 @@ get_cycling_network = function(
   ex_b = exclude_bicycle_cycling()
 ) {
   osm |> 
-    filter(!str_detect(string = highway, pattern = ex_c)) |>
+    dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude mtb paths and related tags
-    filter(is.na(bicycle)|!str_detect(string = bicycle, pattern = ex_b))
+    dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b))
 }
 
 # Distance to the nearest road function
@@ -113,13 +115,13 @@ distance_to_road = function(cycleways, roads) {
 # Segregation levels function
 segregation_levels = function(cycleways) {
   cycleways |> 
-    mutate(type = case_when(
+    dplyr::mutate(type = dplyr::case_when(
       grepl("Path", name, fixed = TRUE) ~ "detached_track",
       grepl("Towpath", name, fixed = TRUE) ~ "detached_track",
       distance_to_road > 10 ~ "detached_track",
       TRUE ~ "mixed_traffic"
     )) |> 
-    mutate(cycle_segregation = case_when(
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
       # Where highway == cycleway
       type == "detached_track" ~ "detached_track",
       type == "level_track" ~ "level_track",
@@ -151,14 +153,17 @@ segregation_levels = function(cycleways) {
       # Default mixed traffic
       .default = "mixed_traffic"
     )) |>
-    mutate(cycle_segregation = case_when(
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
       cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
       cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
       TRUE ~ cycle_segregation
     )) |>
-    mutate(cycle_segregation = factor(
+    dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
       levels = c("detached_track", "roadside_cycle_track", "mixed_traffic"),
       ordered = TRUE
     ))
 }
+
+# Ignore globals:
+utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving"))
