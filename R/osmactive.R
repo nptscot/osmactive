@@ -83,6 +83,12 @@ get_travel_network = function(
 
     return(res)
 }
+
+#' Get the OSM driving network
+#' 
+#' @inheritParams get_cycling_network
+#' @return A sf object with the OSM driving network
+#' @export
 get_driving_network = function(
   osm,
   ex_d = exclude_highway_driving()
@@ -90,7 +96,13 @@ get_driving_network = function(
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
-
+#' Get the OSM cycling network
+#' 
+#' @param osm An OSM network object
+#' @param ex_c A vector of highway values to exclude
+#' @param ex_b A vector of bicycle values to exclude
+#' @return A sf object with the OSM cycling network
+#' @export
 get_cycling_network = function(
   osm,
   ex_c = exclude_highway_cycling(),
