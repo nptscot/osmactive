@@ -40,7 +40,8 @@ usethis::use_mit_license("Robin Lovelace")
 usethis::use_pkgdown()
 # pkgdown pages
 usethis::use_pkgdown_github_pages()
-
+# Add actions
+usethis::use_github_action("pkgdown")
 
 devtools::check()
 ```
@@ -63,13 +64,14 @@ devtools::load_all()
 library(dplyr)
 library(tmap)
 edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km = edinburgh |> 
-  filter(circle_id <= 2)
+edinburgh_1km = edinburgh |> 
+  # Change number in next line to change zone size:
+  filter(circle_id <= 1)
 osm = get_travel_network("Scotland")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
-edinburgh_cycle = cycle_network[edinburgh_3km, , op = sf::st_within]
-edinburgh_driving = driving_network[edinburgh_3km, , op = sf::st_within]
+edinburgh_cycle = cycle_network[edinburgh_1km, , op = sf::st_within]
+edinburgh_driving = driving_network[edinburgh_1km, , op = sf::st_within]
 edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
 edinburgh_segregated = segregation_levels(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
@@ -78,4 +80,12 @@ m = edinburgh_segregated |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
 m
 # tmap_save(m, "segregation_levels_edinburgh.html")
+```
+
+Save an interactive version of the map to check the results as follows:
+
+```{r}
+#| eval: false
+tmap_save(m, "segregation_levels_edinburgh.html")
+browseURL("segregation_levels_edinburgh.html")
 ```

@@ -36,7 +36,7 @@ et_active = function() {
 exclude_highway_cycling = function() {
   to_exclude = paste0(
     "motorway|bridleway|disused|emergency|escap",
-    "|far|foot|rest|road|track"
+    "|far|foot|rest|road|track|steps"
   )
   return(to_exclude)
 }
@@ -96,7 +96,11 @@ get_cycling_network = function(
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude mtb paths and related tags
-    dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b))
+    dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b)) |>
+    # Remove highway=path without bicycle values of yes, designated, or permissive:
+    dplyr::filter(
+      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+    )
 }
 
 # Distance to the nearest road function
