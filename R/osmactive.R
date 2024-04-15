@@ -1,6 +1,8 @@
-# Extra tags function
-et <- function() {
-  et <- c(
+#' This function returns OSM keys that are relevant for active travel
+#'
+#' @export
+et_active = function() {
+  c(
     "maxspeed",
     "oneway",
     "bicycle",
@@ -16,29 +18,40 @@ et <- function() {
     "lanes:bus:conditional",
     "oneway",
     "width",      # useful to ensure width of cycleways is at least 1.5m
-    "segregated"  # classifies whether cycles and pedestrians are segregated on shared paths
+    "segregated",  # classifies whether cycles and pedestrians are segregated on shared paths
+    "sidewalk",    # useful to ensure width of cycleways is at least 1.5m
+    "footway",
+    # "highway", # included by default
+    # "name", # included by default
+    "service", 
+    "surface", 
+    "tracktype",
+    "surface",
+    "smoothness",
+    "access"    
   )
-  return(et)
 }
 
-# Exclude functions
-exclude_cycling <- function() {
-  to_exclude <- paste0(
+# Exclude highway values for utility cycling
+exclude_highway_cycling = function() {
+  to_exclude = paste0(
     "motorway|bridleway|disused|emergency|escap",
     "|far|foot|rest|road|track"
   )
   return(to_exclude)
 }
 
-exclude_bicycle <- function() {
-  to_exclude <- paste0(
+# Exclude bicycle values for utility cycling
+exclude_bicycle_cycling = function() {
+  to_exclude = paste0(
     "mtb|discouraged|unknown"
   )
   return(to_exclude)
 }
 
-exclude_driving <- function() {
-  to_exclude <- paste0(
+# Exclude highway values for driving
+exclude_highway_driving = function() {
+  to_exclude = paste0(
     "crossing|disused|emergency|escap|far|raceway|rest|track",
     # Paths that cannot be driven on:
     "|bridleway|cycleway|footway|path|pedestrian|steps|track|proposed|construction"
@@ -46,31 +59,48 @@ exclude_driving <- function() {
   return(to_exclude)
 }
 
-# Get the OSM network functions
-get_driving_network <- function(
-  place,
-  ex_d = exclude_driving()
+#' Get the OSM network functions
+#' 
+#' @param place A place name or a bounding box passed to `osmextract::oe_get()`
+#' 
+get_travel_network = function(
+    place
 ) {
-  osm_highways <- osmextract::oe_get(
+    osm_highways = osmextract::oe_get(
+        place = place,
+        extra_tags = et_active()
+    )
+    res = osm_highways |>
+        filter(!is.na(highway)) |>
+        # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
+        filter(is.na(service))
+
+    return(res)
+}
+get_driving_network = function(
+  place,
+  ex_d = exclude_highwaydriving()
+) {
+  osm_highways = osmextract::oe_get(
     place = place,
-    extra_tags = et()
+    extra_tags = et_active()
   )
-  res <- osm_highways |> 
+  res = osm_highways |> 
     filter(!is.na(highway)) |>
     filter(!str_detect(string = highway, pattern = ex_d))
   return(res)
 }
 
-get_cycling_network <- function(
+get_cycling_network = function(
   place,
-  ex_c = exclude_cycling(),
-  ex_b = exclude_bicycle()
+  ex_c = exclude_highway_cycling(),
+  ex_b = exclude_bicycle_cycling()
 ) {
-  osm_cycleways <- osmextract::oe_get(
+  osm_cycleways = osmextract::oe_get(
     place = place,
-    extra_tags = et()
+    extra_tags = et_active()
   )
-  res <- osm_cycleways |> 
+  res = osm_cycleways |> 
     filter(!is.na(highway)) |> 
     filter(!str_detect(string = highway, pattern = ex_c)) |>
     # Exclude mtb paths and related tags
@@ -79,20 +109,20 @@ get_cycling_network <- function(
 }
 
 # Distance to the nearest road function
-distance_to_road <- function(cycleways, roads) {
-  segregated_points <- sf::st_point_on_surface(cycleways)
-  roads_union <- roads |> 
+distance_to_road = function(cycleways, roads) {
+  segregated_points = sf::st_point_on_surface(cycleways)
+  roads_union = roads |> 
     sf::st_union() |> 
     sf::st_transform(27700)
-  roads_geos <- geos::as_geos_geometry(roads_union)
-  points_geos <- geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
-  points_distances <- geos::geos_distance(points_geos, roads_geos)
-  cycleways$distance_to_road <- points_distances
+  roads_geos = geos::as_geos_geometry(roads_union)
+  points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
+  points_distances = geos::geos_distance(points_geos, roads_geos)
+  cycleways$distance_to_road = points_distances
   return(cycleways)
 }
 
 # Segregation levels function
-segregation_levels <- function(cycleways) {
+segregation_levels = function(cycleways) {
   cycleways |> 
     mutate(type = case_when(
       grepl("Path", name, fixed = TRUE) ~ "detached_track",
