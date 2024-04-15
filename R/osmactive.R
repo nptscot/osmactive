@@ -84,6 +84,10 @@ get_travel_network = function(
 
 #' Get the OSM driving network
 #' 
+#' This function returns the OSM driving network by excluding certain highway values.
+#' 
+#' `get_driving_network_major` returns only the major roads.
+#' 
 #' @inheritParams get_cycling_network
 #' @param ex_d A character string of highway values to exclude in the form `value1|value2` etc
 #' @return A sf object with the OSM driving network
@@ -94,6 +98,16 @@ get_driving_network = function(
 ) {
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
+}
+#' @export
+#' @rdname get_driving_network
+get_driving_network_major = function(
+  osm,
+  ex_d = exclude_highway_driving()
+) {
+  osm |> 
+    dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
+    dplyr::filter(stringr::str_detect(string = highway, pattern = "motorway|trunk|primary|secondary|tertiary"))
 }
 #' Get the OSM cycling network
 #' 
@@ -151,17 +165,15 @@ distance_to_road = function(rnet, roads) {
 #' @param min_distance The minimum distance to the road for a cycleway to be considered off-road.
 #' @return A an sf object with the new column `cycle_segregation` that contains the segregation levels.
 #' @export
-segregation_levels = function(cycleways, min_distance = 10) {
+classify_cycleways = function(cycleways, min_distance = 10) {
   cycleways |> 
-    dplyr::mutate(type = dplyr::case_when(
-      grepl("Path", name, fixed = TRUE) ~ "offroad_track",
-      grepl("Towpath", name, fixed = TRUE) ~ "offroad_track",
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      # highways named towpaths or paths are assumed to be off-road
+      stringr::str_detect(name, "Path|Towpath") ~ "offroad_track",
+      stringr::str_detect(name, "Track") ~ "level_track",
       TRUE ~ "mixed_traffic"
     )) |> 
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      # Where highway == cycleway
-      type == "offroad_track" ~ "offroad_track",
-      type == "level_track" ~ "level_track",
       # Cycleways on road
       cycleway == "lane" ~ "cycle_lane",
       cycleway_right == "lane" ~ "cycle_lane",
@@ -188,11 +200,16 @@ segregation_levels = function(cycleways, min_distance = 10) {
       cycleway_right == "segregated" ~ "stepped_or_footway",
       cycleway_both == "segregated" ~ "stepped_or_footway",
       # Default mixed traffic
-      .default = "mixed_traffic"
+      TRUE ~ cycle_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
       cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
+      TRUE ~ cycle_segregation
+    )) |>
+    # If highway == cycleway, cycle_segregation is roadside_cycle_track in most cases
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      highway == "cycleway" ~ "roadside_cycle_track",
       TRUE ~ cycle_segregation
     )) |>
     # When distance to road is more than min_distance m and cycleway type is stepped_or_footway, change to offroad_track
@@ -206,6 +223,11 @@ segregation_levels = function(cycleways, min_distance = 10) {
       ordered = TRUE
     ))
 }
+
+#' Remove columns rarely used in active travel analysis
+#' 
+#' @param osm An OSM network object
+#' @param 
 
 # Ignore globals:
 utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving", "highway"))

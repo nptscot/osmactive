@@ -2,9 +2,12 @@
 % Please edit documentation in R/osmactive.R
 \name{get_driving_network}
 \alias{get_driving_network}
+\alias{get_driving_network_major}
 \title{Get the OSM driving network}
 \usage{
 get_driving_network(osm, ex_d = exclude_highway_driving())
+
+get_driving_network_major(osm, ex_d = exclude_highway_driving())
 }
 \arguments{
 \item{osm}{An OSM network object}
@@ -15,5 +18,8 @@ get_driving_network(osm, ex_d = exclude_highway_driving())
 A sf object with the OSM driving network
 }
 \description{
-Get the OSM driving network
+This function returns the OSM driving network by excluding certain highway values.
+}
+\details{
+\code{get_driving_network_major} returns only the major roads.
 }
