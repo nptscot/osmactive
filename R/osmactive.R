@@ -87,8 +87,9 @@ get_travel_network = function(
 #' Get the OSM driving network
 #' 
 #' @inheritParams get_cycling_network
+#' @param ex_d A character string of highway values to exclude in the form `value1|value2` etc
 #' @return A sf object with the OSM driving network
-#' @export``
+#' @export
 get_driving_network = function(
   osm,
   ex_d = exclude_highway_driving()
@@ -122,21 +123,37 @@ get_cycling_network = function(
     )
 }
 
-# Distance to the nearest road function
-distance_to_road = function(cycleways, roads) {
-  segregated_points = sf::st_point_on_surface(cycleways)
+#' Calculate distance from route network segments to roads
+#' 
+#' This function approximates the distance from the route network to the nearest road.
+#' It does this by first computing the `sf::st_point_on_surface` of the route network segments
+#' and then calculating the distance to the nearest road using the `geos::geos_distance` function.
+#' 
+#' @param rnet The route network for which the distance to the road needs to be calculated.
+#' @param roads The road network to which the distance needs to be calculated.
+#' @return An sf object with the new column `distance_to_road` that contains the distance to the road.
+#' @export
+distance_to_road = function(rnet, roads) {
+  segregated_points = sf::st_point_on_surface(rnet)
   roads_union = roads |> 
     sf::st_union() |> 
     sf::st_transform(27700)
   roads_geos = geos::as_geos_geometry(roads_union)
   points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
   points_distances = geos::geos_distance(points_geos, roads_geos)
-  cycleways$distance_to_road = points_distances
-  return(cycleways)
+  rnet$distance_to_road = points_distances
+  return(rnet)
 }
 
-# Segregation levels function
-segregation_levels = function(cycleways) {
+#' Segregation levels
+#'
+#' This function calculates the segregation levels for a given dataset.
+#'
+#' @param cycleways The input dataset for which segregation levels need to be calculated.
+#' @param min_distance The minimum distance to the road for a cycleway to be considered off-road.
+#' @return A an sf object with the new column `cycle_segregation` that contains the segregation levels.
+#' @export
+segregation_levels = function(cycleways, min_distance = 10) {
   cycleways |> 
     dplyr::mutate(type = dplyr::case_when(
       grepl("Path", name, fixed = TRUE) ~ "offroad_track",
@@ -180,9 +197,9 @@ segregation_levels = function(cycleways) {
       cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
       TRUE ~ cycle_segregation
     )) |>
-    # When distance to road is more than 10 m and cycleway type is stepped_or_footway, change to offroad_track
+    # When distance to road is more than min_distance m and cycleway type is stepped_or_footway, change to offroad_track
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      distance_to_road > 10 & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
+      distance_to_road > min_distance & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
       TRUE ~ cycle_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
@@ -193,4 +210,4 @@ segregation_levels = function(cycleways) {
 }
 
 # Ignore globals:
-utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving"))
+utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving", "highway"))

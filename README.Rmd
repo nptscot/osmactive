@@ -50,20 +50,44 @@ Install the package with:
 
 ```{r, eval=FALSE}
 remotes::install_github("nptscot/osmactive")
+library(osmactive)
 ```
 
 ```{r, include=FALSE}
 devtools::load_all()
 ```
 
+## Leeds example
+
+```{r leeds}
+library(dplyr)
+library(tmap)
+leeds = zonebuilder::zb_zone("Leeds")
+leeds = leeds |>
+  filter(circle_id == 1)
+osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
+cycle_network = get_cycling_network(osm)
+driving_network = get_driving_network(osm)
+cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
+leeds_categorized = segregation_levels(cycle_network_with_distance)
+m = leeds_categorized |>
+  arrange(cycle_segregation) |>
+  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+m
+```
+
+```{r}
+#| eval: false
+tmap_save(m, "segregation_levels_leeds.html")
+browseURL("segregation_levels_leeds.html")
+```
+
 ## Edinburgh example
 
 
 ```{r edinburgh}
-library(dplyr)
-library(tmap)
 edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_1km = edinburgh |> 
+edinburgh_1km = edinburgh |>
   # Change number in next line to change zone size:
   filter(circle_id <= 1)
 osm = get_travel_network("Scotland")
@@ -74,8 +98,8 @@ edinburgh_driving = driving_network[edinburgh_1km, , op = sf::st_within]
 edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
 edinburgh_segregated = segregation_levels(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
-m = edinburgh_segregated |> 
-  arrange(cycle_segregation) |> 
+m = edinburgh_segregated |>
+  arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
 m
 # tmap_save(m, "segregation_levels_edinburgh.html")
@@ -92,33 +116,37 @@ browseURL("segregation_levels_edinburgh.html")
 ## Lisbon example
 
 ```{r lisbon}
+#| eval: false
 lisbon = zonebuilder::zb_zone("Lisbon")
 lisbon = sf::st_sf(
   lisbon |> sf::st_drop_geometry() |> select(-centroid),
   geometry = sf::st_geometry(lisbon)
 )
-# plot(lisbon)
-# # From GitHub:
-# u = "https://objects.githubusercontent.com/github-production-release-asset-2e65be/624478482/23975e12-8fb3-45df-8a42-7354811057f0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240415%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240415T120942Z&X-Amz-Expires=300&X-Amz-Signature=55acff30e944fbed3da59629252fef7033213db9f8c0a25951faaa72d7d73f46&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=624478482&response-content-disposition=attachment%3B%20filename%3DCAOP_municipios.gpkg&response-content-type=application%2Foctet-stream"
-# f = "lisbon_municipalities.gpkg"
-# if (!file.exists(f)) download.file(u, f)
-# lisbon_region = sf::st_read(f)
-# names(lisbon_region)
-# lisbon = lisbon |>
-#   filter(city = "Lisboa") 
-lisbon_1km = lisbon |> 
-  # Change number in next line to change zone size:
-  filter(circle_id <= 1) |>
-  sf::st_union()
-# ?oe_get
-osm = get_travel_network("Portugal", boundary = lisbon_1km, boundary_type = "clipsrc")
-osm = osm[lisbon_1km, , op = sf::st_within]
+lisbon = lisbon |>
+  filter(circle_id == 1)
+u = "https://github.com/U-Shift/SiteSelection/releases/download/0.1/CAOP_municipios.gpkg"
+f = basename(f)
+if (!file.exists(f)) download.file(u, f)
+PTcities = sf::read_sf(f) # Portugal
+lisbon = PTcities |> filter(Concelho == "Lisboa")
+lisbon = lisbon |>
+  sf::st_convex_hull()
+f = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
+osm = sf::read_sf(f, query = "select * from lines where highway is not null")
+osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
+list.files("~/data/osm", pattern = "portugal")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 lisbon_categorized = segregation_levels(cycle_network_with_distance)
-m = lisbon_categorized |> 
-  arrange(cycle_segregation) |> 
+m = lisbon_categorized |>
+  arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
 m
+```
+
+```{r}
+#| eval: false
+tmap_save(m, "segregation_levels_lisbon.html")
+browseURL("segregation_levels_lisbon.html")
 ```

@@ -14,9 +14,10 @@ Install the package with:
 
 ``` r
 remotes::install_github("nptscot/osmactive")
+library(osmactive)
 ```
 
-## Edinburgh example
+## Leeds example
 
 ``` r
 library(dplyr)
@@ -34,8 +35,56 @@ library(tmap)
 #> The following object is masked from 'package:datasets':
 #> 
 #>     rivers
+leeds = zonebuilder::zb_zone("Leeds")
+leeds = leeds |>
+  filter(circle_id == 1)
+osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
+#> No exact match found for place = Leeds and provider = geofabrik. Best match is Laos. 
+#> Checking the other providers.
+#> An exact string match was found using provider = bbbike.
+#> The chosen file was already detected in the download directory. Skip downloading.
+#> Starting with the vectortranslate operations on the input file!
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
+#> GDAL Message 1: A geometry of type MULTILINESTRING is inserted into layer lines
+#> of geometry type LINESTRING, which is not normally allowed by the GeoPackage
+#> specification, but the driver will however do it. To create a conformant
+#> GeoPackage, if using ogr2ogr, the -nlt option can be used to override the layer
+#> geometry type. This warning will no longer be emitted for this combination of
+#> layer and feature geometry type.
+#> Finished the vectortranslate operations on the input file!
+#> Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'
+#> Simple feature collection with 4163 features and 31 fields
+#> Geometry type: MULTILINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639
+#> Geodetic CRS:  WGS 84
+cycle_network = get_cycling_network(osm)
+driving_network = get_driving_network(osm)
+cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
+#> Warning: st_point_on_surface assumes attributes are constant over geometries
+#> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
+#> give correct results for longitude/latitude data
+leeds_categorized = segregation_levels(cycle_network_with_distance)
+m = leeds_categorized |>
+  arrange(cycle_segregation) |>
+  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+#> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
+m
+```
+
+![](README_files/figure-gfm/leeds-1.png)<!-- -->
+
+``` r
+tmap_save(m, "segregation_levels_leeds.html")
+browseURL("segregation_levels_leeds.html")
+```
+
+## Edinburgh example
+
+``` r
 edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_1km = edinburgh |> 
+edinburgh_1km = edinburgh |>
   # Change number in next line to change zone size:
   filter(circle_id <= 1)
 osm = get_travel_network("Scotland")
@@ -60,10 +109,10 @@ edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driv
 edinburgh_segregated = segregation_levels(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
 #> 
-#>       detached_track roadside_cycle_track        mixed_traffic 
-#>                   27                   63                  880
-m = edinburgh_segregated |> 
-  arrange(cycle_segregation) |> 
+#>        offroad_track roadside_cycle_track        mixed_traffic 
+#>                    5                   63                  888
+m = edinburgh_segregated |>
+  arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
 #> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
 m
@@ -90,45 +139,30 @@ lisbon = sf::st_sf(
   lisbon |> sf::st_drop_geometry() |> select(-centroid),
   geometry = sf::st_geometry(lisbon)
 )
-# plot(lisbon)
-# # From GitHub:
-# u = "https://objects.githubusercontent.com/github-production-release-asset-2e65be/624478482/23975e12-8fb3-45df-8a42-7354811057f0?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240415%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240415T120942Z&X-Amz-Expires=300&X-Amz-Signature=55acff30e944fbed3da59629252fef7033213db9f8c0a25951faaa72d7d73f46&X-Amz-SignedHeaders=host&actor_id=0&key_id=0&repo_id=624478482&response-content-disposition=attachment%3B%20filename%3DCAOP_municipios.gpkg&response-content-type=application%2Foctet-stream"
-# f = "lisbon_municipalities.gpkg"
-# if (!file.exists(f)) download.file(u, f)
-# lisbon_region = sf::st_read(f)
-# names(lisbon_region)
-# lisbon = lisbon |>
-#   filter(city = "Lisboa") 
-lisbon_1km = lisbon |> 
-  # Change number in next line to change zone size:
-  filter(circle_id <= 1) |>
-  sf::st_union()
-# ?oe_get
-osm = get_travel_network("Portugal", boundary = lisbon_1km, boundary_type = "clipsrc")
-#> The input place was matched with: Portugal
-#> The chosen file was already detected in the download directory. Skip downloading.
-#> Starting with the vectortranslate operations on the input file!
-#> 0...10...20...30...40...50...60...70...80...90...
-#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
-#> GDAL Error 1: An error occurred during the parsing of data around byte 30351040
-#> 100 - done.
-#> Finished the vectortranslate operations on the input file!
-#> Reading layer `lines' from data source 
-#>   `/home/robin/data/osm/geofabrik_portugal-latest.gpkg' using driver `GPKG'
-#> Simple feature collection with 0 features and 31 fields
-#> Bounding box:  xmin: NA ymin: NA xmax: NA ymax: NA
-#> Geodetic CRS:  WGS 84
-osm = osm[lisbon_1km, , op = sf::st_within]
+lisbon = lisbon |>
+  filter(circle_id == 1)
+u = "https://github.com/U-Shift/SiteSelection/releases/download/0.1/CAOP_municipios.gpkg"
+f = basename(f)
+if (!file.exists(f)) download.file(u, f)
+PTcities = sf::read_sf(f) # Portugal
+lisbon = PTcities |> filter(Concelho == "Lisboa")
+lisbon = lisbon |>
+  sf::st_convex_hull()
+f = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
+osm = sf::read_sf(f, query = "select * from lines where highway is not null")
+osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
+list.files("~/data/osm", pattern = "portugal")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-#> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
-#> give correct results for longitude/latitude data
 lisbon_categorized = segregation_levels(cycle_network_with_distance)
-m = lisbon_categorized |> 
-  arrange(cycle_segregation) |> 
+m = lisbon_categorized |>
+  arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
-#> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
 m
-#> Nothing to show
+```
+
+``` r
+tmap_save(m, "segregation_levels_lisbon.html")
+browseURL("segregation_levels_lisbon.html")
 ```

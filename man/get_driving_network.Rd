@@ -8,6 +8,8 @@ get_driving_network(osm, ex_d = exclude_highway_driving())
 }
 \arguments{
 \item{osm}{An OSM network object}
+
+\item{ex_d}{A character string of highway values to exclude in the form \code{value1|value2} etc}
 }
 \value{
 A sf object with the OSM driving network
