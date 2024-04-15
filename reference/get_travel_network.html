@@ -42,7 +42,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_travel_network</span><span class="op">(</span><span class="va">place</span>, extra_tags <span class="op">=</span> <span class="fu"><a href="et_active.html">et_active</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_travel_network</span><span class="op">(</span><span class="va">place</span>, extra_tags <span class="op">=</span> <span class="fu"><a href="et_active.html">et_active</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -53,6 +53,10 @@
 
 <dt>extra_tags</dt>
 <dd><p>A vector of extra tags to be included in the OSM extract</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional arguments passed to <code><a href="https://docs.ropensci.org/osmextract/reference/oe_get.html" class="external-link">osmextract::oe_get()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">
