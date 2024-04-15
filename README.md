@@ -1,2 +1,11 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
 # osmactive
-Extract active travel infrastructure from OSM
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of osmactive is to provide functions, example datasets and
+documentation for extracting active travel infrastructure from
+OpenStreetMap data.
