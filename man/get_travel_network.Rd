@@ -4,12 +4,14 @@
 \alias{get_travel_network}
 \title{Get the OSM network functions}
 \usage{
-get_travel_network(place, extra_tags = et_active())
+get_travel_network(place, extra_tags = et_active(), ...)
 }
 \arguments{
 \item{place}{A place name or a bounding box passed to \code{osmextract::oe_get()}}
 
 \item{extra_tags}{A vector of extra tags to be included in the OSM extract}
+
+\item{...}{Additional arguments passed to \code{osmextract::oe_get()}}
 }
 \value{
 A sf object with the OSM network

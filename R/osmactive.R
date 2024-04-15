@@ -63,15 +63,18 @@ exclude_highway_driving = function() {
 #' 
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
 #' @param extra_tags A vector of extra tags to be included in the OSM extract
+#' @param ... Additional arguments passed to `osmextract::oe_get()`
 #' @return A sf object with the OSM network
 #' @export
 get_travel_network = function(
     place,
-    extra_tags = et_active()
+    extra_tags = et_active(),
+    ...
 ) {
     osm_highways = osmextract::oe_get(
         place = place,
-        extra_tags = extra_tags
+        extra_tags = extra_tags,
+        ...
     )
     res = osm_highways |>
         dplyr::filter(!is.na(highway)) |>
