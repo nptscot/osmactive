@@ -64,11 +64,12 @@ exclude_highway_driving = function() {
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
 #' 
 get_travel_network = function(
-    place
+    place,
+    extra_tags = et_active()
 ) {
     osm_highways = osmextract::oe_get(
         place = place,
-        extra_tags = et_active()
+        extra_tags = extra_tags
     )
     res = osm_highways |>
         filter(!is.na(highway)) |>
@@ -78,34 +79,22 @@ get_travel_network = function(
     return(res)
 }
 get_driving_network = function(
-  place,
+  osm,
   ex_d = exclude_highwaydriving()
 ) {
-  osm_highways = osmextract::oe_get(
-    place = place,
-    extra_tags = et_active()
-  )
-  res = osm_highways |> 
-    filter(!is.na(highway)) |>
+  osm |> 
     filter(!str_detect(string = highway, pattern = ex_d))
-  return(res)
 }
 
 get_cycling_network = function(
-  place,
+  osm,
   ex_c = exclude_highway_cycling(),
   ex_b = exclude_bicycle_cycling()
 ) {
-  osm_cycleways = osmextract::oe_get(
-    place = place,
-    extra_tags = et_active()
-  )
-  res = osm_cycleways |> 
-    filter(!is.na(highway)) |> 
+  osm |> 
     filter(!str_detect(string = highway, pattern = ex_c)) |>
     # Exclude mtb paths and related tags
     filter(is.na(bicycle)|!str_detect(string = bicycle, pattern = ex_b))
-  return(res)
 }
 
 # Distance to the nearest road function
