@@ -1,22 +1,25 @@
 Package: osmactive
-Title: What the Package Does (One Line, Title Case)
+Title: Extract Active Travel Infrastructure from OpenStreetMap
 Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+Authors@R: c(
+    person("Robin", "Lovelace", email = "rob00x@gmail.com",      role = c("aut","cre"),
+      comment = c(ORCID = "0000-0001-5679-6536")),
+    person("Joey", "Talbot", email = "j.d.talbot@leeds.ac.uk", role = c("aut"), 
+      comment = c(ORCID = "0000-0002-6520-4560"))
+    )
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
-Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+URL: https://nptscot.github.io/osmactive/
 Imports: 
     dplyr,
     geos,
     osmextract,
     sf,
     stringr
-URL: https://nptscot.github.io/osmactive/
 Suggests: 
-    tmap
+    tmap (>= 3.9)
 Remotes: 
     r-tmap/tmap
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
