@@ -65,20 +65,7 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-tmap.github.io/tmap/" class="external-link">tmap</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'tmap'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:datasets':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     rivers</span></span>
 <span><span class="va">leeds</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Leeds"</span><span class="op">)</span></span>
 <span><span class="va">leeds</span> <span class="op">=</span> <span class="va">leeds</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">circle_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -104,18 +91,18 @@
 <span><span class="co">#&gt; Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639</span></span>
 <span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
 <span><span class="va">cycle_network</span> <span class="op">=</span> <span class="fu"><a href="reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
-<span><span class="va">driving_network</span> <span class="op">=</span> <span class="fu"><a href="reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
+<span><span class="va">driving_network</span> <span class="op">=</span> <span class="fu"><a href="reference/get_driving_network.html">get_driving_network_major</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">cycle_network_with_distance</span> <span class="op">=</span> <span class="fu"><a href="reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_network</span>, <span class="va">driving_network</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: st_point_on_surface assumes attributes are constant over geometries</span></span>
 <span><span class="co">#&gt; Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not</span></span>
 <span><span class="co">#&gt; give correct results for longitude/latitude data</span></span>
-<span><span class="va">leeds_categorized</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycleways.html">classify_cycleways</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
-<span><span class="va">m</span> <span class="op">=</span> <span class="va">leeds_categorized</span> <span class="op">|&gt;</span></span>
+<span><span class="va">cycle_network_classified</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycleways.html">classify_cycleways</a></span><span class="op">(</span><span class="va">cycle_network_with_distance</span><span class="op">)</span></span>
+<span><span class="va">m</span> <span class="op">=</span> <span class="va">cycle_network_classified</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cycle_segregation</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tm_shape</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tm_lines</span><span class="op">(</span><span class="st">"cycle_segregation"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, palette <span class="op">=</span> <span class="st">"-Blues"</span>, popup.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"cycle_segregation"</span>, <span class="st">"distance_to_road"</span>, <span class="st">"maxspeed"</span>, <span class="st">"highway"</span>, <span class="st">"other_tags"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tm_lines: Deprecated tmap v3 code detected. Code translated to v4</span></span>
 <span><span class="va">m</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/leeds-1.png"><!-- --></p>
+<p><img src="reference/figures/README-leeds-1.png"><!-- --></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">tmap_save</span><span class="op">(</span><span class="va">m</span>, <span class="st">"classify_cycleways_leeds.html"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"classify_cycleways_leeds.html"</span><span class="op">)</span></span></code></pre></div>
@@ -151,13 +138,13 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">edinburgh_segregated</span><span class="op">$</span><span class="va">cycle_segregation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;        offroad_track roadside_cycle_track        mixed_traffic </span></span>
-<span><span class="co">#&gt;                    5                   63                  888</span></span>
+<span><span class="co">#&gt;                    6                   87                  863</span></span>
 <span><span class="va">m</span> <span class="op">=</span> <span class="va">edinburgh_segregated</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">cycle_segregation</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">tm_shape</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">tm_lines</span><span class="op">(</span><span class="st">"cycle_segregation"</span>, lwd <span class="op">=</span> <span class="fl">4</span>, palette <span class="op">=</span> <span class="st">"-Blues"</span>, popup.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"cycle_segregation"</span>, <span class="st">"distance_to_road"</span>, <span class="st">"maxspeed"</span>, <span class="st">"highway"</span>, <span class="st">"other_tags"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tm_lines: Deprecated tmap v3 code detected. Code translated to v4</span></span>
 <span><span class="va">m</span></span></code></pre></div>
-<p><img src="README_files/figure-gfm/edinburgh-1.png"><!-- --></p>
+<p><img src="reference/figures/README-edinburgh-1.png"><!-- --></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># tmap_save(m, "classify_cycleways_edinburgh.html")</span></span></code></pre></div>
 <p>Save an interactive version of the map to check the results as follows:</p>
