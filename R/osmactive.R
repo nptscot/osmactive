@@ -148,8 +148,15 @@ get_cycling_network = function(
 #' @param roads The road network to which the distance needs to be calculated.
 #' @return An sf object with the new column `distance_to_road` that contains the distance to the road.
 #' @export
+#' @examples
+#' osm = osm_edinburgh
+#' cycle_network = get_cycling_network(osm)
+#' driving_network = get_driving_network(osm)
+#' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
+  suppressWarnings({
   segregated_points = sf::st_point_on_surface(rnet)
+  })
   roads_union = roads |> 
     sf::st_union() |> 
     sf::st_transform(27700)
@@ -182,9 +189,10 @@ distance_to_road = function(rnet, roads) {
 #' osm = osm_edinburgh
 #' cycle_network = get_cycling_network(osm)
 #' driving_network = get_driving_network(osm)
-#' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
-#' cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
-#' plot_osm_tmap(cycleways_classified)
+#' netd = distance_to_road(cycle_network, driving_network)
+#' netc = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+#' library(sf)
+#' plot(netc["distance_to_road"])
 classify_cycle_infrastructure = function(osm, min_distance = 10, classification_type = "Scotland") {
   if (classification_type == "Scotland") {
     return(classify_cycle_infrastructure_scotland(osm, min_distance))

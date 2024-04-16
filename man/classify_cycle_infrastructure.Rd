@@ -37,7 +37,8 @@ tmap_mode("plot")
 osm = osm_edinburgh
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
-edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
-cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
-plot_osm_tmap(cycleways_classified)
+netd = distance_to_road(cycle_network, driving_network)
+netc = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+library(sf)
+plot(netc["distance_to_road"])
 }

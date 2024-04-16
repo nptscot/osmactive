@@ -24,38 +24,12 @@ library(osmactive)
 
 ``` r
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(tmap)
-#> 
-#> Attaching package: 'tmap'
-#> The following object is masked from 'package:datasets':
-#> 
-#>     rivers
-leeds = zonebuilder::zb_zone("Leeds")
-leeds = leeds |>
+leeds_zb = zonebuilder::zb_zone("Leeds")
+leeds = leeds_zb |>
   filter(circle_id == 1)
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
-#> No exact match found for place = Leeds and provider = geofabrik. Best match is Laos. 
-#> Checking the other providers.
-#> An exact string match was found using provider = bbbike.
-#> The chosen file was already detected in the download directory. Skip downloading.
-#> Starting with the vectortranslate operations on the input file!
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
-#> Warning in CPL_gdalvectortranslate(source, destination, options, oo, doo, :
-#> GDAL Message 1: A geometry of type MULTILINESTRING is inserted into layer lines
-#> of geometry type LINESTRING, which is not normally allowed by the GeoPackage
-#> specification, but the driver will however do it. To create a conformant
-#> GeoPackage, if using ogr2ogr, the -nlt option can be used to override the layer
-#> geometry type. This warning will no longer be emitted for this combination of
-#> layer and feature geometry type.
-#> Finished the vectortranslate operations on the input file!
 #> Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'
 #> Simple feature collection with 4163 features and 31 fields
 #> Geometry type: MULTILINESTRING
@@ -65,9 +39,6 @@ osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-#> Warning: st_point_on_surface assumes attributes are constant over geometries
-#> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
-#> give correct results for longitude/latitude data
 cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
 m = plot_osm_tmap(cycle_network_classified)
 m
@@ -75,58 +46,34 @@ m
 
 ![](man/figures/README-leeds-1.png)<!-- -->
 
-``` r
-tmap_save(m, "classify_cycle_infrastructure_leeds.html")
-browseURL("classify_cycle_infrastructure_leeds.html")
-```
-
 ## Edinburgh example
 
 ``` r
 edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_1km = edinburgh |>
+edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
-  filter(circle_id <= 1)
-osm = get_travel_network("Scotland")
-#> The input place was matched with: Scotland
-#> The chosen file was already detected in the download directory. Skip downloading.
-#> The corresponding gpkg file was already detected. Skip vectortranslate operations.
+  filter(circle_id <= 2) |>
+  sf::st_union()
+osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_scotland-latest.gpkg' using driver `GPKG'
-#> Simple feature collection with 1388227 features and 31 fields
-#> Geometry type: LINESTRING
+#> Simple feature collection with 44341 features and 31 fields
+#> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -20.62345 ymin: 52.69143 xmax: 9.975589 ymax: 65.36242
+#> Bounding box:  xmin: -3.236391 ymin: 55.9264 xmax: -3.140354 ymax: 55.98029
 #> Geodetic CRS:  WGS 84
 cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network(osm)
-edinburgh_cycle = cycle_network[edinburgh_1km, , op = sf::st_within]
-edinburgh_driving = driving_network[edinburgh_1km, , op = sf::st_within]
-edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
-#> Warning: st_point_on_surface assumes attributes are constant over geometries
-#> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
-#> give correct results for longitude/latitude data
-edinburgh_segregated = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
-table(edinburgh_segregated$cycle_segregation)
-#> 
-#>        offroad_track roadside_cycle_track        mixed_traffic 
-#>                    6                   87                  863
-m = plot_osm_tmap(edinburgh_segregated)
+driving_network = get_driving_network_major(osm)
+cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
+cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
+m = plot_osm_tmap(cycle_network_classified)
 m
 ```
 
 ![](man/figures/README-edinburgh-1.png)<!-- -->
 
-``` r
-# tmap_save(m, "classify_cycle_infrastructure_edinburgh.html")
-```
-
 Save an interactive version of the map to check the results as follows:
-
-``` r
-tmap_save(m, "classify_cycle_infrastructure_edinburgh.html")
-browseURL("classify_cycle_infrastructure_edinburgh.html")
-```
 
 ## Lisbon example
 
