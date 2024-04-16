@@ -224,6 +224,32 @@ classify_cycleways = function(cycleways, min_distance = 10) {
     ))
 }
 
+#' Create a tmap object for visualizing the classified cycle network
+#' 
+#' @param cycle_network_classified An sf object with the classified cycle network
+#' @param popup.vars A vector of variables to be displayed in the popup
+#' @param lwd The line width for the cycle network
+#' @param palette The palette to be used for the cycle segregation levels
+#' @return A tmap object for visualizing the classified cycle network
+#' @export
+plot_osm_tmap = function(
+    cycle_network_classified,
+    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"),
+    lwd = 4,
+    palette = "-PuBuGn"
+    ) {
+    cycle_network_classified |>
+        dplyr::arrange(desc(cycle_segregation)) |>
+        tmap::tm_shape() +
+        tmap::tm_lines(
+            col = "cycle_segregation",
+            lwd = lwd,
+            col.scale = tm_scale_categorical(values = palette),
+            popup.vars = popup.vars,
+            plot.order = tmap::tm_plot_order("DATA")
+            )
+}
+
 #' Remove columns rarely used in active travel analysis
 #' 
 #' @param osm An OSM network object

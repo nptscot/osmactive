@@ -73,9 +73,7 @@ cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 cycle_network_classified = classify_cycleways(cycle_network_with_distance)
-m = cycle_network_classified |>
-  arrange(desc(cycle_segregation)) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-PuBuGn", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"), plot.order = tm_plot_order("DATA"))
+m = plot_osm_tmap(cycle_network_classified)
 m
 ```
 
@@ -101,9 +99,7 @@ edinburgh_driving = driving_network[edinburgh_1km, , op = sf::st_within]
 edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
 edinburgh_segregated = classify_cycleways(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
-m = edinburgh_segregated |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+m = plot_osm_tmap(edinburgh_segregated)
 m
 # tmap_save(m, "classify_cycleways_edinburgh.html")
 ```
@@ -142,9 +138,7 @@ cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 lisbon_categorized = classify_cycleways(cycle_network_with_distance)
-m = lisbon_categorized |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+m = plot_osm_tmap(lisbon_categorized)
 m
 ```
 

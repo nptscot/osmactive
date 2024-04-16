@@ -16,3 +16,5 @@ Imports:
     sf,
     stringr
 URL: https://nptscot.github.io/osmactive/
+Suggests: 
+    tmap
