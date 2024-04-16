@@ -46,7 +46,8 @@ usethis::use_pkgdown_github_pages()
 # Add actions
 usethis::use_github_action("pkgdown")
 usethis::use_github_action("check-standard")
-
+# Add vignette with paper on cycle infrastructure classification
+usethis::use_vignette("classifying-cycle-infrastructure")
 # Add example datasets
 usethis::use_data_raw("osm_edinburgh")
 devtools::check()

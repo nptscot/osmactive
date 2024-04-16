@@ -1,0 +1,37 @@
+---
+title: "Typologies of cycle infrastructure"
+subtitle: "An international comparison"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Typologies of cycle infrastructure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(osmactive)
+```
+
+# Abstract
+
+Transport networks are diverse and complex. This applies to all modes of transport, but especially to the 'cycle network' which, uniquely, includes infrastructure for both motorised and non-motorised modes. In this paper we present a typology of cycle infrastructure classification systems, based on a review of official documents and academic literature. We find substantial differences in the way that cycle infrastructure is classified between countries. Countries with more established pro-cycling policies tend to have TBC classification systems, while countries with less established pro-cycling policies tend to have TBC classification systems. Recent efforts to provide international guidance on how to talk and classify cycling infrastructure has impacts on policies: measuring level of separation from motor traffic, for example, enables planners to focus on infrastructure that is safe for all. We conclude with tentative recommendations of classification systems for different use cases, with reference to open source implementations for reproducible cycle infrastructure classification. The `osmactive` package that accompanies this paper, which classifies cycle infrastructure based on OSM tags represents one such implementation. The work presented in this paper and our experience developing the package can provide a basis for open and community-driven classification systems that co-evolve with changing policy, community and data-availability landscapes.
+
+# Introduction
+
+# Academic literature review
+
+# Official classification systems
+
+# Results
+
+# Discussion

@@ -50,3 +50,4 @@ rsconnect/
 *.html
 docs
 *.gpkg
+inst/doc
