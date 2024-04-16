@@ -7,9 +7,11 @@ Authors@R: c(
     person("Joey", "Talbot", , "j.d.talbot@leeds.ac.uk", role = "aut",
            comment = c(ORCID = "0000-0002-6520-4560"))
   )
-Description: What the package does (one paragraph).
+Description: This package adds value to OpenStreetMap data by extracting active travel infrastructure such as cycleways and footways.
+  It builds on the 'osmextract' package and is designed to be extended to cover a wide range of classification systems for active travel infrastructure.
 License: MIT + file LICENSE
 URL: https://nptscot.github.io/osmactive/
+BugReports: https://github.com/nptscot/osmactive/issues
 Imports: 
     dplyr,
     geos,
