@@ -178,7 +178,7 @@ distance_to_road = function(rnet, roads) {
 #' @export
 #' @examples 
 #' library(tmap)
-#' tmap_mode("view")
+#' tmap_mode("plot")
 #' osm = osm_edinburgh
 #' cycle_network = get_cycling_network(osm)
 #' driving_network = get_driving_network(osm)
