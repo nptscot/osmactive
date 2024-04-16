@@ -2,11 +2,11 @@ Package: osmactive
 Title: Extract Active Travel Infrastructure from OpenStreetMap
 Version: 0.0.0.9000
 Authors@R: c(
-    person("Robin", "Lovelace", email = "rob00x@gmail.com",      role = c("aut","cre"),
-      comment = c(ORCID = "0000-0001-5679-6536")),
-    person("Joey", "Talbot", email = "j.d.talbot@leeds.ac.uk", role = c("aut"), 
-      comment = c(ORCID = "0000-0002-6520-4560"))
-    )
+    person("Robin", "Lovelace", , "rob00x@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5679-6536")),
+    person("Joey", "Talbot", , "j.d.talbot@leeds.ac.uk", role = "aut",
+           comment = c(ORCID = "0000-0002-6520-4560"))
+  )
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 URL: https://nptscot.github.io/osmactive/
