@@ -74,6 +74,14 @@ and then calculating the distance to the nearest road using the <code><a href="h
 <p>An sf object with the new column <code>distance_to_road</code> that contains the distance to the road.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="va">osm_edinburgh</span></span></span>
+<span class="r-in"><span><span class="va">cycle_network</span> <span class="op">=</span> <span class="fu"><a href="get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">driving_network</span> <span class="op">=</span> <span class="fu"><a href="get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">edinburgh_cycle_with_distance</span> <span class="op">=</span> <span class="fu">distance_to_road</span><span class="op">(</span><span class="va">cycle_network</span>, <span class="va">driving_network</span><span class="op">)</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside></div>
 
