@@ -68,7 +68,7 @@ cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 #> Warning: st_point_on_surface assumes attributes are constant over geometries
 #> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
 #> give correct results for longitude/latitude data
-cycle_network_classified = classify_cycleways(cycle_network_with_distance)
+cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
 m = plot_osm_tmap(cycle_network_classified)
 m
 ```
@@ -76,8 +76,8 @@ m
 ![](man/figures/README-leeds-1.png)<!-- -->
 
 ``` r
-tmap_save(m, "classify_cycleways_leeds.html")
-browseURL("classify_cycleways_leeds.html")
+tmap_save(m, "classify_cycle_infrastructure_leeds.html")
+browseURL("classify_cycle_infrastructure_leeds.html")
 ```
 
 ## Edinburgh example
@@ -106,7 +106,7 @@ edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driv
 #> Warning: st_point_on_surface assumes attributes are constant over geometries
 #> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
 #> give correct results for longitude/latitude data
-edinburgh_segregated = classify_cycleways(edinburgh_cycle_with_distance)
+edinburgh_segregated = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
 #> 
 #>        offroad_track roadside_cycle_track        mixed_traffic 
@@ -118,14 +118,14 @@ m
 ![](man/figures/README-edinburgh-1.png)<!-- -->
 
 ``` r
-# tmap_save(m, "classify_cycleways_edinburgh.html")
+# tmap_save(m, "classify_cycle_infrastructure_edinburgh.html")
 ```
 
 Save an interactive version of the map to check the results as follows:
 
 ``` r
-tmap_save(m, "classify_cycleways_edinburgh.html")
-browseURL("classify_cycleways_edinburgh.html")
+tmap_save(m, "classify_cycle_infrastructure_edinburgh.html")
+browseURL("classify_cycle_infrastructure_edinburgh.html")
 ```
 
 ## Lisbon example
@@ -152,12 +152,12 @@ list.files("~/data/osm", pattern = "portugal")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-lisbon_categorized = classify_cycleways(cycle_network_with_distance)
+lisbon_categorized = classify_cycle_infrastructure(cycle_network_with_distance)
 m = plot_osm_tmap(lisbon_categorized)
 m
 ```
 
 ``` r
-tmap_save(m, "classify_cycleways_lisbon.html")
-browseURL("classify_cycleways_lisbon.html")
+tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
+browseURL("classify_cycle_infrastructure_lisbon.html")
 ```

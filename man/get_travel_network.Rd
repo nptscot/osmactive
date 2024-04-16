@@ -4,12 +4,19 @@
 \alias{get_travel_network}
 \title{Get the OSM network functions}
 \usage{
-get_travel_network(place, extra_tags = et_active(), ...)
+get_travel_network(
+  place,
+  extra_tags = et_active(),
+  columns_to_remove = c("waterway", "aerialway", "barrier", "manmade"),
+  ...
+)
 }
 \arguments{
 \item{place}{A place name or a bounding box passed to \code{osmextract::oe_get()}}
 
 \item{extra_tags}{A vector of extra tags to be included in the OSM extract}
+
+\item{columns_to_remove}{A vector of columns to be removed from the OSM network}
 
 \item{...}{Additional arguments passed to \code{osmextract::oe_get()}}
 }

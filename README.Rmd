@@ -75,15 +75,15 @@ osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-cycle_network_classified = classify_cycleways(cycle_network_with_distance)
+cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
 m = plot_osm_tmap(cycle_network_classified)
 m
 ```
 
 ```{r}
 #| eval: false
-tmap_save(m, "classify_cycleways_leeds.html")
-browseURL("classify_cycleways_leeds.html")
+tmap_save(m, "classify_cycle_infrastructure_leeds.html")
+browseURL("classify_cycle_infrastructure_leeds.html")
 ```
 
 ## Edinburgh example
@@ -91,28 +91,29 @@ browseURL("classify_cycleways_leeds.html")
 
 ```{r edinburgh}
 edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_1km = edinburgh |>
+edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
-  filter(circle_id <= 1)
-osm = get_travel_network("Scotland")
+  filter(circle_id <= 2) |>
+  sf::st_union()
+osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
 cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network(osm)
-edinburgh_cycle = cycle_network[edinburgh_1km, , op = sf::st_within]
-edinburgh_driving = driving_network[edinburgh_1km, , op = sf::st_within]
-edinburgh_cycle_with_distance = distance_to_road(edinburgh_cycle, edinburgh_driving)
-edinburgh_segregated = classify_cycleways(edinburgh_cycle_with_distance)
-table(edinburgh_segregated$cycle_segregation)
-m = plot_osm_tmap(edinburgh_segregated)
+driving_network = get_driving_network_major(osm)
+cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
+cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
+m = plot_osm_tmap(cycle_network_classified)
 m
-# tmap_save(m, "classify_cycleways_edinburgh.html")
+
 ```
 
 Save an interactive version of the map to check the results as follows:
 
 ```{r}
 #| eval: false
-tmap_save(m, "classify_cycleways_edinburgh.html")
-browseURL("classify_cycleways_edinburgh.html")
+#| echo: false
+tmap_save(m, "cycle_network_classified_edinburgh.html")
+browseURL("cycle_network_classified_edinburgh.html")
+system("gh release create v0.1", intern = TRUE)
+system("gh release upload v0.1 cycle_network_classified_edinburgh.html", intern = TRUE)
 ```
 
 ## Lisbon example
@@ -140,13 +141,13 @@ list.files("~/data/osm", pattern = "portugal")
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-lisbon_categorized = classify_cycleways(cycle_network_with_distance)
+lisbon_categorized = classify_cycle_infrastructure(cycle_network_with_distance)
 m = plot_osm_tmap(lisbon_categorized)
 m
 ```
 
 ```{r}
 #| eval: false
-tmap_save(m, "classify_cycleways_lisbon.html")
-browseURL("classify_cycleways_lisbon.html")
+tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
+browseURL("classify_cycle_infrastructure_lisbon.html")
 ```
