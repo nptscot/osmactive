@@ -57,74 +57,36 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "osm_id"                "name"                  "highway"              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4] "waterway"              "aerialway"             "barrier"              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "man_made"              "maxspeed"              "oneway"               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10] "bicycle"               "cycleway"              "cycleway_left"        </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13] "cycleway_right"        "cycleway_both"         "lanes"                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16] "lanes_both_ways"       "lanes_forward"         "lanes_backward"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "lanes_bus"             "lanes_bus_conditional" "width"                </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [22] "segregated"            "sidewalk"              "footway"              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "service"               "surface"               "tracktype"            </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [28] "smoothness"            "access"                "z_order"              </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "other_tags"            "geometry"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "osm_id"     "name"       "highway"    "cycleway"   "bicycle"   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6] "lanes"      "sidewalk"   "other_tags" "geometry"  </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 31 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 8 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTILINESTRING</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -3.194737 ymin: 55.95514 xmax: -3.186586 ymax: 55.95921</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     osm_id                   name     highway waterway aerialway barrier</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 3992791             York Place    tertiary     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60 4049896           Leith Street     primary     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63 4071161       Broughton Street   secondary     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64 4071162          Dublin Street residential     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70 4084027 North St Andrew Street  pedestrian     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71 4084028   North St Andrew Lane     service     &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    man_made maxspeed oneway bicycle cycleway cycleway_left cycleway_right</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38     &lt;NA&gt;   20 mph    yes    &lt;NA&gt;     &lt;NA&gt;      separate             no</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60     &lt;NA&gt;   20 mph    yes    &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63     &lt;NA&gt;   20 mph   &lt;NA&gt;    &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64     &lt;NA&gt;   20 mph   &lt;NA&gt;    &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70     &lt;NA&gt;     &lt;NA&gt;   &lt;NA&gt;    &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71     &lt;NA&gt;     &lt;NA&gt;    yes    &lt;NA&gt;     &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    cycleway_both lanes lanes_both_ways lanes_forward lanes_backward lanes_bus</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38          &lt;NA&gt;     1            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60      separate     2            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63            no     2            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64          &lt;NA&gt;  &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70          &lt;NA&gt;  &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71          &lt;NA&gt;  &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;           &lt;NA&gt;      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    lanes_bus_conditional width segregated sidewalk footway service surface</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt; asphalt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt; asphalt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     both    &lt;NA&gt;    &lt;NA&gt; asphalt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     both    &lt;NA&gt;    &lt;NA&gt; asphalt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    sett</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71                  &lt;NA&gt;  &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt; asphalt</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    tracktype smoothness access z_order</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38      &lt;NA&gt;       &lt;NA&gt;   &lt;NA&gt;       4</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60      &lt;NA&gt;       &lt;NA&gt;   &lt;NA&gt;       7</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63      &lt;NA&gt;       good   &lt;NA&gt;       6</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64      &lt;NA&gt;       &lt;NA&gt;   &lt;NA&gt;       3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70      &lt;NA&gt;       &lt;NA&gt;   &lt;NA&gt;       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71      &lt;NA&gt;       &lt;NA&gt;   &lt;NA&gt;       0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                              other_tags</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 "embedded_rails"=&gt;"tram","sidewalk:left"=&gt;"separate","sidewalk:right"=&gt;"no","wikidata"=&gt;"Q102108491"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60                                               "lit"=&gt;"yes","ref"=&gt;"A900","sidewalk:both"=&gt;"separate"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63                  "incline"=&gt;"up","lit"=&gt;"yes","ref"=&gt;"B901","sidewalk:both:surface"=&gt;"paving_stones"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64                                                                         "incline"=&gt;"up","lit"=&gt;"yes"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70                                                                           "foot"=&gt;"yes","lit"=&gt;"yes"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71                                                                                                 &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                          geometry</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 38 MULTILINESTRING ((-3.187851...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 60 MULTILINESTRING ((-3.186586...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 63 MULTILINESTRING ((-3.190781...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 64 MULTILINESTRING ((-3.194218...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 70 MULTILINESTRING ((-3.192841...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71 MULTILINESTRING ((-3.194737...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      osm_id                   name     highway cycleway bicycle lanes sidewalk</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71  3992791             York Place    tertiary     &lt;NA&gt;    &lt;NA&gt;     1     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185 4049896           Leith Street     primary     &lt;NA&gt;    &lt;NA&gt;     2     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 197 4071161       Broughton Street   secondary     &lt;NA&gt;    &lt;NA&gt;     2     both</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 198 4071162          Dublin Street residential     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     both</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 241 4084027 North St Andrew Street  pedestrian     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 242 4084028   North St Andrew Lane     service     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                               other_tags</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71  "embedded_rails"=&gt;"tram","sidewalk:left"=&gt;"separate","sidewalk:right"=&gt;"no","wikidata"=&gt;"Q102108491"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185                                               "lit"=&gt;"yes","ref"=&gt;"A900","sidewalk:both"=&gt;"separate"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 197                  "incline"=&gt;"up","lit"=&gt;"yes","ref"=&gt;"B901","sidewalk:both:surface"=&gt;"paving_stones"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 198                                                                         "incline"=&gt;"up","lit"=&gt;"yes"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 241                                                                           "foot"=&gt;"yes","lit"=&gt;"yes"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 242                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                           geometry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71  MULTILINESTRING ((-3.187851...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185 MULTILINESTRING ((-3.186586...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 197 MULTILINESTRING ((-3.190781...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 198 MULTILINESTRING ((-3.194218...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 241 MULTILINESTRING ((-3.192841...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 242 MULTILINESTRING ((-3.194737...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>plotting the first 9 out of 31 attributes; use max.plot = 31 to plot all</span>
 <span class="r-plt img"><img src="osm_edinburgh-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
