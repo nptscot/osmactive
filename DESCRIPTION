@@ -18,3 +18,5 @@ Imports:
 URL: https://nptscot.github.io/osmactive/
 Suggests: 
     tmap
+Remotes: 
+    r-tmap/tmap
