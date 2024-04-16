@@ -66,10 +66,7 @@ cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 #> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
 #> give correct results for longitude/latitude data
 cycle_network_classified = classify_cycleways(cycle_network_with_distance)
-m = cycle_network_classified |>
-  arrange(desc(cycle_segregation)) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-PuBuGn", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"), plot.order = tm_plot_order("DATA"))
-#> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
+m = plot_osm_tmap(cycle_network_classified)
 m
 ```
 
@@ -111,10 +108,7 @@ table(edinburgh_segregated$cycle_segregation)
 #> 
 #>        offroad_track roadside_cycle_track        mixed_traffic 
 #>                    6                   87                  863
-m = edinburgh_segregated |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
-#> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
+m = plot_osm_tmap(edinburgh_segregated)
 m
 ```
 
@@ -156,9 +150,7 @@ cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 lisbon_categorized = classify_cycleways(cycle_network_with_distance)
-m = lisbon_categorized |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+m = plot_osm_tmap(lisbon_categorized)
 m
 ```
 
