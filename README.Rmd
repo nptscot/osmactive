@@ -44,6 +44,8 @@ usethis::use_pkgdown_github_pages()
 # Add actions
 usethis::use_github_action("pkgdown")
 
+# Add example datasets
+usethis::use_data_raw("osm_edinburgh")
 devtools::check()
 ```
 
@@ -72,8 +74,8 @@ driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 cycle_network_classified = classify_cycleways(cycle_network_with_distance)
 m = cycle_network_classified |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+  arrange(desc(cycle_segregation)) |>
+  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-PuBuGn", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"), plot.order = tm_plot_order("DATA"))
 m
 ```
 

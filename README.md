@@ -21,7 +21,20 @@ library(osmactive)
 
 ``` r
 library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 library(tmap)
+#> 
+#> Attaching package: 'tmap'
+#> The following object is masked from 'package:datasets':
+#> 
+#>     rivers
 leeds = zonebuilder::zb_zone("Leeds")
 leeds = leeds |>
   filter(circle_id == 1)
@@ -54,8 +67,8 @@ cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 #> give correct results for longitude/latitude data
 cycle_network_classified = classify_cycleways(cycle_network_with_distance)
 m = cycle_network_classified |>
-  arrange(cycle_segregation) |>
-  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
+  arrange(desc(cycle_segregation)) |>
+  tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-PuBuGn", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"), plot.order = tm_plot_order("DATA"))
 #> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
 m
 ```
