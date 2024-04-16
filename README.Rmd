@@ -68,8 +68,8 @@ devtools::load_all()
 ```{r leeds}
 library(dplyr)
 library(tmap)
-leeds = zonebuilder::zb_zone("Leeds")
-leeds = leeds |>
+leeds_zb = zonebuilder::zb_zone("Leeds")
+leeds = leeds_zb |>
   filter(circle_id == 1)
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 cycle_network = get_cycling_network(osm)
@@ -82,8 +82,20 @@ m
 
 ```{r}
 #| eval: false
+#| echo: false
+leeds_6km = leeds_zb |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
+cycle_network = get_cycling_network(osm)
+driving_network = get_driving_network_major(osm)
+cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
+cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
+m = plot_osm_tmap(cycle_network_classified)
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
+
+system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html")
 ```
 
 ## Edinburgh example
