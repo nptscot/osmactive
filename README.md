@@ -4,6 +4,9 @@
 # osmactive
 
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/nptscot/osmactive/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/nptscot/osmactive/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of osmactive is to provide functions, example datasets and

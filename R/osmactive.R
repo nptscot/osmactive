@@ -238,22 +238,40 @@ plot_osm_tmap = function(
     lwd = 4,
     palette = "-PuBuGn"
     ) {
+    # Stop if tmap is not installed or if the version is less than 3.99:
+    if (!requireNamespace("tmap", quietly = TRUE)) {
+        stop("tmap is not installed. Please install tmap to use this function.")
+    }
+    if (packageVersion("tmap") < "3.99") {
+        stop("Please update tmap to version 3.99 or higher.")
+    }
     cycle_network_classified |>
         dplyr::arrange(desc(cycle_segregation)) |>
         tmap::tm_shape() +
         tmap::tm_lines(
             col = "cycle_segregation",
             lwd = lwd,
-            col.scale = tm_scale_categorical(values = palette),
+            col.scale = tmap::tm_scale_categorical(values = palette),
             popup.vars = popup.vars,
             plot.order = tmap::tm_plot_order("DATA")
             )
 }
 
-#' Remove columns rarely used in active travel analysis
-#' 
-#' @param osm An OSM network object
-#' @param 
+#' Data from edinburgh's OSM network
+#'
+#'
+#' @docType data
+#' @keywords datasets
+#' @name osm_edinburgh
+#' @format An sf data frame
+#' @examples 
+#' library(sf)
+#' names(osm_edinburgh)
+#' head(osm_edinburgh)
+#' plot(osm_edinburgh)
+NULL
+
+
 
 # Ignore globals:
 utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving", "highway"))
