@@ -21,20 +21,7 @@ library(osmactive)
 
 ``` r
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(tmap)
-#> 
-#> Attaching package: 'tmap'
-#> The following object is masked from 'package:datasets':
-#> 
-#>     rivers
 leeds = zonebuilder::zb_zone("Leeds")
 leeds = leeds |>
   filter(circle_id == 1)
@@ -60,20 +47,20 @@ osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 #> Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639
 #> Geodetic CRS:  WGS 84
 cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network(osm)
+driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 #> Warning: st_point_on_surface assumes attributes are constant over geometries
 #> Warning in st_point_on_surface.sfc(st_geometry(x)): st_point_on_surface may not
 #> give correct results for longitude/latitude data
-leeds_categorized = classify_cycleways(cycle_network_with_distance)
-m = leeds_categorized |>
+cycle_network_classified = classify_cycleways(cycle_network_with_distance)
+m = cycle_network_classified |>
   arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
 #> tm_lines: Deprecated tmap v3 code detected. Code translated to v4
 m
 ```
 
-![](README_files/figure-gfm/leeds-1.png)<!-- -->
+![](man/figures/README-leeds-1.png)<!-- -->
 
 ``` r
 tmap_save(m, "classify_cycleways_leeds.html")
@@ -110,7 +97,7 @@ edinburgh_segregated = classify_cycleways(edinburgh_cycle_with_distance)
 table(edinburgh_segregated$cycle_segregation)
 #> 
 #>        offroad_track roadside_cycle_track        mixed_traffic 
-#>                    5                   63                  888
+#>                    6                   87                  863
 m = edinburgh_segregated |>
   arrange(cycle_segregation) |>
   tm_shape() + tm_lines("cycle_segregation", lwd = 4, palette = "-Blues", popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"))
@@ -118,7 +105,7 @@ m = edinburgh_segregated |>
 m
 ```
 
-![](README_files/figure-gfm/edinburgh-1.png)<!-- -->
+![](man/figures/README-edinburgh-1.png)<!-- -->
 
 ``` r
 # tmap_save(m, "classify_cycleways_edinburgh.html")

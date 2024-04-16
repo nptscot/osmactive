@@ -6,6 +6,7 @@ output: github_document
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
+  fig.path = "man/figures/README-",
   collapse = TRUE,
   comment = "#>"
 )
@@ -67,7 +68,7 @@ leeds = leeds |>
   filter(circle_id == 1)
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network(osm)
+driving_network = get_driving_network_major(osm)
 cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
 cycle_network_classified = classify_cycleways(cycle_network_with_distance)
 m = cycle_network_classified |>
