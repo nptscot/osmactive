@@ -209,8 +209,11 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "level_track",
-      highway == "pedestrian" ~ "stepped_or_footway",
-      highway == "path" ~ "stepped_or_footway",
+      highway == "pedestrian" & bicycle == "designated" ~ "stepped_or_footway",
+      highway == "path" & bicycle == "designated" ~ "stepped_or_footway",
+      # these by default are not shared with traffic:
+      segregated == "yes" ~ "stepped_or_footway",
+      segregated == "no" ~ "stepped_or_footway",
       TRUE ~ "mixed_traffic"
     )) |>
     # ...including by name
@@ -229,8 +232,6 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       stringr::str_detect(cycleway_chars, "lane") ~ "cycle_lane",
       stringr::str_detect(cycleway_chars, "track") ~ "light_segregation",
-      stringr::str_detect(segregated, "yes") ~ "stepped_or_footway",
-      stringr::str_detect(segregated, "no") ~ "stepped_or_footway",
       stringr::str_detect(cycleway_chars, "separate") ~ "stepped_or_footway",
       stringr::str_detect(cycleway_chars, "buffered_lane") ~ "cycle_lane",
       stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
