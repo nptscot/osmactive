@@ -166,7 +166,7 @@ distance_to_road = function(rnet, roads) {
   roads_geos = geos::as_geos_geometry(roads_union)
   points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
   points_distances = geos::geos_distance(points_geos, roads_geos)
-  rnet$distance_to_road = points_distances
+  rnet$distance_to_road = round(points_distances, 1)
   return(rnet)
 }
 
@@ -285,7 +285,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"),
+    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "other_tags"),
     lwd = 4,
     palette = "-PuBuGn"
     ) {
