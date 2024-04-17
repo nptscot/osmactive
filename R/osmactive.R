@@ -216,8 +216,8 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     # ...including by name
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath") & detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
-      # stringr::str_detect(name, "Track") ~ "level_track",
+      stringr::str_detect(name, "Path|Towpath|Railway|Trail") & 
+        detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
       TRUE ~ detailed_segregation
     )) |> 
     # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to cycle_track
@@ -236,38 +236,6 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
       TRUE ~ detailed_segregation
     )) |>
-    # TODO: remove this:
-    # dplyr::mutate(detailed_segregation = dplyr::case_when(
-    #   # Cycleways on road
-    #   cycleway == "lane" ~ "cycle_lane",
-    #   cycleway_right == "lane" ~ "cycle_lane",
-    #   cycleway_left == "lane" ~ "cycle_lane",
-    #   cycleway_both == "lane" ~ "cycle_lane",
-    #   cycleway == "track" ~ "light_segregation",
-    #   cycleway_left == "track" ~ "light_segregation",
-    #   cycleway_right == "track" ~ "light_segregation",
-    #   cycleway_both == "track" ~ "light_segregation",
-    #   # Shared with pedestrians (but not highway == cycleway)
-    #   TODO: why is this returning same value for yes and no?
-    #   Suggestion: separate function generating a new column called footway_segregation
-    #   segregated == "no" ~ "stepped_or_footway",
-    #   segregated == "yes" ~ "stepped_or_footway",
-    #   # Rare cases
-    #   cycleway == "separate" ~ "stepped_or_footway",
-    #   cycleway_left == "separate" ~ "stepped_or_footway",
-    #   cycleway_right == "separate" ~ "stepped_or_footway",
-    #   cycleway_both == "separate" ~ "stepped_or_footway",
-    #   cycleway == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_left == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_right == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_both == "buffered_lane" ~ "cycle_lane",
-    #   cycleway == "segregated" ~ "stepped_or_footway",
-    #   cycleway_left == "segregated" ~ "stepped_or_footway",
-    #   cycleway_right == "segregated" ~ "stepped_or_footway",
-    #   cycleway_both == "segregated" ~ "stepped_or_footway",
-    #   # Default mixed traffic
-    #   TRUE ~ detailed_segregation
-    # )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
       detailed_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
