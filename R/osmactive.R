@@ -216,14 +216,13 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     # ...including by name
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath") ~ "offroad_track",
+      stringr::str_detect(name, "Path|Towpath") & detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
       # stringr::str_detect(name, "Track") ~ "level_track",
       TRUE ~ detailed_segregation
     )) |> 
-    # When distance to road is more than min_distance m, change to offroad_track
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to cycle_track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation == "level_track" ~ "offroad_track",
-      distance_to_road > min_distance & detailed_segregation == "stepped_or_footway" ~ "offroad_track",
+      distance_to_road > min_distance & detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
@@ -276,7 +275,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("offroad_track", "roadside_cycle_track", "mixed_traffic"),
+      levels = c("cycle_track", "roadside_cycle_track", "mixed_traffic"),
       ordered = TRUE
     ))
 }
