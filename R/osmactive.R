@@ -298,9 +298,9 @@ plot_osm_tmap = function(
     }
     # Subset popup.vars to include only those that are present in the data:
     popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
-    cycle_network_classified |>
-        dplyr::arrange(desc(cycle_segregation)) |>
-        tmap::tm_shape() +
+    Infrastructure = cycle_network_classified |>
+        dplyr::arrange(desc(cycle_segregation))
+    tmap::tm_shape(Infrastructure) +
         tmap::tm_lines(
             col = "cycle_segregation",
             lwd = lwd,
