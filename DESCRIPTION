@@ -17,7 +17,8 @@ Imports:
     geos,
     osmextract,
     sf,
-    stringr
+    stringr,
+    tidyr
 Suggests: 
     tmap (>= 3.9)
 Remotes: 

@@ -212,15 +212,15 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       stringr::str_detect(name, "Track") ~ "level_track",
       TRUE ~ "mixed_traffic"
     )) |> 
-    dplyr::mutate(dplyr::across(dplyr::starts_with("cycleway"), ~dplyr::case_when(
-      .x == "lane" ~ "cycle_lane",
-      .x == "track" ~ "light_segregation",
-      # TODO: separate does not mean stepped_or_footway, right?
-      .x == "separate" ~ "stepped_or_footway",
-      .x == "buffered_lane" ~ "cycle_lane",
-      .x == "segregated" ~ "stepped_or_footway",
-      TRUE ~ "mixed_traffic"
-    ))) |>
+    tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      stringr::str_detect(cycleway_chars, "lane") ~ "cycle_lane",
+      stringr::str_detect(cycleway_chars, "track") ~ "light_segregation",
+      stringr::str_detect(cycleway_chars, "separate") ~ "stepped_or_footway",
+      stringr::str_detect(cycleway_chars, "buffered_lane") ~ "cycle_lane",
+      stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
+      TRUE ~ cycle_segregation
+    )) |>
     # TODO: remove this:
     # dplyr::mutate(cycle_segregation = dplyr::case_when(
     #   # Cycleways on road
