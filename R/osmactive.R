@@ -103,14 +103,17 @@ get_driving_network = function(
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
 #' @export
+#' @inheritParams get_driving_network
+#' @param pattern A character string of highway values to define major roads in the form `motorway|trunk|primary|secondary|tertiary`
 #' @rdname get_driving_network
 get_driving_network_major = function(
   osm,
-  ex_d = exclude_highway_driving()
+  ex_d = exclude_highway_driving(),
+  pattern = "motorway|trunk|primary|secondary|tertiary"
 ) {
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
-    dplyr::filter(stringr::str_detect(string = highway, pattern = "motorway|trunk|primary|secondary|tertiary"))
+    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
 }
 #' Get the OSM cycling network
 #' 
@@ -304,7 +307,9 @@ plot_osm_tmap = function(
             col.scale = tmap::tm_scale_categorical(values = palette),
             popup.vars = popup.vars,
             plot.order = tmap::tm_plot_order("DATA")
-            )
+            ) +
+        # Add scale bar
+        tmap::tm_scalebar() 
 }
 
 #' Data from edinburgh's OSM network
