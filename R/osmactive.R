@@ -230,11 +230,11 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "track") ~ "light_segregation",
-      stringr::str_detect(cycleway_chars, "separate") ~ "stepped_or_footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "mixed_traffic" ~ "cycle_lane",
+      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "mixed_traffic" ~ "light_segregation",
+      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "mixed_traffic" ~ "stepped_or_footway",
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "mixed_traffic" ~ "cycle_lane",
+      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "mixed_traffic" ~ "stepped_or_footway",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
