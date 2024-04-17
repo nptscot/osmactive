@@ -97,7 +97,7 @@ m = plot_osm_tmap(cycle_net)
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
 
-system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html")
+system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobber")
 ```
 
 ## Edinburgh example
@@ -119,15 +119,24 @@ m
 
 ```
 
-Save an interactive version of the map to check the results as follows:
+<!-- Save an interactive version of the map to check the results as follows: -->
 
 ```{r}
 #| eval: false
 #| echo: false
+edinburgh_6km = edinburgh |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Scotland", boundary = edinburgh_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 tmap_save(m, "cycle_net_edinburgh.html")
 browseURL("cycle_net_edinburgh.html")
 system("gh release create v0.1", intern = TRUE)
-system("gh release upload v0.1 cycle_net_edinburgh.html", intern = TRUE)
+system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
 ```
 
 ## Dublin example
