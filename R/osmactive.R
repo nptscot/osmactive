@@ -190,8 +190,9 @@ distance_to_road = function(rnet, roads) {
 #' cycle_network = get_cycling_network(osm)
 #' driving_network = get_driving_network(osm)
 #' netd = distance_to_road(cycle_network, driving_network)
-#' netc = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+#' netc = classify_cycle_infrastructure(netd)
 #' library(sf)
+#' plot(netc["cycle_segregation"])
 #' plot(netc["distance_to_road"])
 classify_cycle_infrastructure = function(osm, min_distance = 10, classification_type = "Scotland") {
   if (classification_type == "Scotland") {

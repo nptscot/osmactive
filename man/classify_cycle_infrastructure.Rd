@@ -38,7 +38,8 @@ osm = osm_edinburgh
 cycle_network = get_cycling_network(osm)
 driving_network = get_driving_network(osm)
 netd = distance_to_road(cycle_network, driving_network)
-netc = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+netc = classify_cycle_infrastructure(netd)
 library(sf)
+plot(netc["cycle_segregation"])
 plot(netc["distance_to_road"])
 }
