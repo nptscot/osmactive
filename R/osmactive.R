@@ -35,7 +35,7 @@ et_active = function() {
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
   to_exclude = paste0(
-    "motorway|bridleway|disused|emergency|escap",
+    "motorway|services|bridleway|disused|emergency|escap",
     "|far|foot|rest|road|track|steps"
   )
   return(to_exclude)
@@ -52,7 +52,7 @@ exclude_bicycle_cycling = function() {
 # Exclude highway values for driving
 exclude_highway_driving = function() {
   to_exclude = paste0(
-    "crossing|disused|emergency|escap|far|raceway|rest|track",
+    "crossing|services|disused|emergency|escap|far|raceway|rest|road|track",
     # Paths that cannot be driven on:
     "|bridleway|cycleway|footway|path|pedestrian|steps|track|proposed|construction"
   )
@@ -216,6 +216,8 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       stringr::str_detect(cycleway_chars, "lane") ~ "cycle_lane",
       stringr::str_detect(cycleway_chars, "track") ~ "light_segregation",
+      stringr::str_detect(segregated, "yes") ~ "stepped_or_footway",
+      stringr::str_detect(segregated, "no") ~ "stepped_or_footway",
       stringr::str_detect(cycleway_chars, "separate") ~ "stepped_or_footway",
       stringr::str_detect(cycleway_chars, "buffered_lane") ~ "cycle_lane",
       stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
@@ -253,19 +255,19 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     #   # Default mixed traffic
     #   TRUE ~ cycle_segregation
     # )) |>
-    dplyr::mutate(cycle_segregation = dplyr::case_when(
-      cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
-      cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
-      TRUE ~ cycle_segregation
-    )) |>
-    # If highway == cycleway, cycle_segregation is roadside_cycle_track in most cases
+    # If highway == cycleway|pedestrian|path, cycle_segregation is roadside_cycle_track in most cases
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       highway == "cycleway" ~ "roadside_cycle_track",
       TRUE ~ cycle_segregation
     )) |>
-    # When distance to road is more than min_distance m and cycleway type is stepped_or_footway, change to offroad_track
+    # When distance to road is more than min_distance m, change to offroad_track
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       distance_to_road > min_distance & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
+      TRUE ~ cycle_segregation
+    )) |>
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
+      cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
       TRUE ~ cycle_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
