@@ -28,7 +28,8 @@ et_active = function() {
     "tracktype",
     "surface",
     "smoothness",
-    "access"    
+    "access",
+    "route"
   )
 }
 
@@ -208,43 +209,43 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
   osm |> 
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      highway == "cycleway" ~ "level_track",
-      highway == "pedestrian" & bicycle == "designated" ~ "stepped_or_footway",
-      highway == "path" & bicycle == "designated" ~ "stepped_or_footway",
+      highway == "cycleway" ~ "Level track",
+      highway == "pedestrian" & bicycle == "designated" ~ "Stepped or footway",
+      highway == "path" & bicycle == "designated" ~ "Stepped or footway",
       # these by default are not shared with traffic:
-      segregated == "yes" ~ "stepped_or_footway",
-      segregated == "no" ~ "stepped_or_footway",
-      TRUE ~ "mixed_traffic"
+      segregated == "yes" ~ "Stepped or footway",
+      segregated == "no" ~ "Stepped or footway",
+      TRUE ~ "Mixed traffic"
     )) |>
     # ...including by name
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") & 
-        detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
       TRUE ~ detailed_segregation
     )) |> 
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to cycle_track
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Cycle track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("level_track", "stepped_or_footway") ~ "cycle_track",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "mixed_traffic" ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "mixed_traffic" ~ "light_segregation",
-      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "mixed_traffic" ~ "stepped_or_footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "mixed_traffic" ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "mixed_traffic" ~ "stepped_or_footway",
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed traffic" ~ "Light segregation",
+      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      detailed_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
-      detailed_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
+      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside cycle track",
+      detailed_segregation %in% c("Cycle lane", "Mixed traffic") ~ "Mixed traffic",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("cycle_track", "roadside_cycle_track", "mixed_traffic"),
+      levels = c("Cycle track", "Roadside cycle track", "Mixed traffic"),
       ordered = TRUE
     ))
 }
