@@ -282,7 +282,7 @@ plot_osm_tmap = function(
             plot.order = tmap::tm_plot_order("DATA")
             ) +
         # Add scale bar
-        tmap::tm_scalebar() 
+        tmap::tm_scalebar(position = c("left", "bottom"))
 }
 
 #' Data from edinburgh's OSM network
