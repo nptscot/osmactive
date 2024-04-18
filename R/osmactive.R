@@ -207,70 +207,72 @@ classify_cycle_infrastructure = function(osm, min_distance = 10, classification_
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
   osm |> 
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath") ~ "offroad_track",
-      stringr::str_detect(name, "Track") ~ "level_track",
-      TRUE ~ "mixed_traffic"
+      stringr::str_detect(name, "Path|Towpath") ~ "Offroad track",
+      stringr::str_detect(name, "Track") ~ "Level track",
+      TRUE ~ "Mixed traffic"
+      stringr::str_detect(name, "Path|Towpath") ~ "Offroad track",
+      stringr::str_detect(name, "Track") ~ "Level track",
+      TRUE ~ "Mixed traffic"
     )) |> 
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "track") ~ "light_segregation",
-      stringr::str_detect(cycleway_chars, "separate") ~ "stepped_or_footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") ~ "cycle_lane",
-      stringr::str_detect(cycleway_chars, "segregated") ~ "stepped_or_footway",
+      stringr::str_detect(cycleway_chars, "lane") ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "track") ~ "Light segregation",
+      stringr::str_detect(cycleway_chars, "separate") ~ "Stepped or footway",
+      stringr::str_detect(cycleway_chars, "buffered_lane") ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "segregated") ~ "Stepped or footway",
       TRUE ~ cycle_segregation
     )) |>
     # TODO: remove this:
     # dplyr::mutate(cycle_segregation = dplyr::case_when(
     #   # Cycleways on road
-    #   cycleway == "lane" ~ "cycle_lane",
-    #   cycleway_right == "lane" ~ "cycle_lane",
-    #   cycleway_left == "lane" ~ "cycle_lane",
-    #   cycleway_both == "lane" ~ "cycle_lane",
-    #   cycleway == "track" ~ "light_segregation",
-    #   cycleway_left == "track" ~ "light_segregation",
-    #   cycleway_right == "track" ~ "light_segregation",
-    #   cycleway_both == "track" ~ "light_segregation",
+    #   cycleway == "lane" ~ "Cycle lane",
+    #   cycleway_right == "lane" ~ "Cycle lane",
+    #   cycleway_left == "lane" ~ "Cycle lane",
+    #   cycleway_both == "lane" ~ "Cycle lane",
+    #   cycleway == "track" ~ "Light segregation",
+    #   cycleway_left == "track" ~ "Light segregation",
+    #   cycleway_right == "track" ~ "Light segregation",
+    #   cycleway_both == "track" ~ "Light segregation",
     #   # Shared with pedestrians (but not highway == cycleway)
     #   TODO: why is this returning same value for yes and no?
     #   Suggestion: separate function generating a new column called footway_segregation
-    #   segregated == "no" ~ "stepped_or_footway",
-    #   segregated == "yes" ~ "stepped_or_footway",
+    #   segregated == "no" ~ "Stepped or footway",
+    #   segregated == "yes" ~ "Stepped or footway",
     #   # Rare cases
-    #   cycleway == "separate" ~ "stepped_or_footway",
-    #   cycleway_left == "separate" ~ "stepped_or_footway",
-    #   cycleway_right == "separate" ~ "stepped_or_footway",
-    #   cycleway_both == "separate" ~ "stepped_or_footway",
-    #   cycleway == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_left == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_right == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_both == "buffered_lane" ~ "cycle_lane",
-    #   cycleway == "segregated" ~ "stepped_or_footway",
-    #   cycleway_left == "segregated" ~ "stepped_or_footway",
-    #   cycleway_right == "segregated" ~ "stepped_or_footway",
-    #   cycleway_both == "segregated" ~ "stepped_or_footway",
+    #   cycleway == "separate" ~ "Stepped or footway",
+    #   cycleway_left == "separate" ~ "Stepped or footway",
+    #   cycleway_right == "separate" ~ "Stepped or footway",
+    #   cycleway_both == "separate" ~ "Stepped or footway",
+    #   cycleway == "buffered_lane" ~ "Cycle lane",
+    #   cycleway_left == "buffered_lane" ~ "Cycle lane",
+    #   cycleway_right == "buffered_lane" ~ "Cycle lane",
+    #   cycleway_both == "buffered_lane" ~ "Cycle lane",
+    #   cycleway == "segregated" ~ "Stepped or footway",
+    #   cycleway_left == "segregated" ~ "Stepped or footway",
+    #   cycleway_right == "segregated" ~ "Stepped or footway",
+    #   cycleway_both == "segregated" ~ "Stepped or footway",
     #   # Default mixed traffic
     #   TRUE ~ cycle_segregation
     # )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
-      cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
+      cycle_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside track",
+      cycle_segregation %in% c("Cycle lane", "Mixed traffic") ~ "Mixed traffic",
       TRUE ~ cycle_segregation
     )) |>
-    # If highway == cycleway, cycle_segregation is roadside_cycle_track in most cases
+    # If highway == cycleway, cycle_segregation is Roadside track in most cases
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      highway == "cycleway" ~ "roadside_cycle_track",
+      highway == "cycleway" ~ "Roadside track",
       TRUE ~ cycle_segregation
     )) |>
-    # When distance to road is more than min_distance m and cycleway type is stepped_or_footway, change to offroad_track
+    # When distance to road is more than min_distance m and cycleway type is Stepped or footway, change to Offroad track
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      distance_to_road > min_distance & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
+      distance_to_road > min_distance & cycle_segregation == "Roadside track" ~ "Offroad track",
       TRUE ~ cycle_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("offroad_track", "roadside_cycle_track", "mixed_traffic"),
+      levels = c("Offroad track", "Roadside track", "Mixed traffic"),
       ordered = TRUE
     ))
 }
