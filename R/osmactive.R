@@ -279,10 +279,24 @@ plot_osm_tmap = function(
             lwd = lwd,
             col.scale = tmap::tm_scale_categorical(values = palette),
             popup.vars = popup.vars,
-            plot.order = tmap::tm_plot_order("DATA")
+            plot.order = tmap::tm_plot_order("DATA"),
+            # Change legend title:
+            col.legend = tmap::tm_legend(title = "Infrastructure type")
             ) +
         # Add scale bar
-        tmap::tm_scalebar(position = c("left", "bottom"))
+        tmap::tm_scalebar(position = c("left", "bottom")) +
+        tm_layout(basemap.server = basemaps())
+}
+
+basemaps = function() {
+  c(
+    # Grey background:
+    "Esri.WorldGrayCanvas",
+    # CyclOSM:
+    "CyclOSM",
+    # OpenStreetMap:
+    "OpenStreetMap"
+  )
 }
 
 #' Data from edinburgh's OSM network
