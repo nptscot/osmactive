@@ -73,7 +73,7 @@ m
 
 ![](man/figures/README-edinburgh-1.png)<!-- -->
 
-Save an interactive version of the map to check the results as follows:
+<!-- Save an interactive version of the map to check the results as follows: -->
 
 ## Dublin example
 
