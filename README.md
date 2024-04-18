@@ -31,7 +31,7 @@ leeds = leeds_zb |>
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
 #> Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'
-#> Simple feature collection with 4163 features and 31 fields
+#> Simple feature collection with 4163 features and 32 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639
@@ -58,7 +58,7 @@ osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_scotland-latest.gpkg' using driver `GPKG'
-#> Simple feature collection with 44341 features and 31 fields
+#> Simple feature collection with 44341 features and 32 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -3.236391 ymin: 55.9264 xmax: -3.140354 ymax: 55.98029
@@ -86,7 +86,7 @@ osm = get_travel_network("Republic of Ireland", boundary = dublin, boundary_type
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_ireland-and-northern-ireland-latest.gpkg' 
 #>   using driver `GPKG'
-#> Simple feature collection with 3723 features and 31 fields
+#> Simple feature collection with 3723 features and 32 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -6.275573 ymin: 53.3404 xmax: -6.245544 ymax: 53.35836

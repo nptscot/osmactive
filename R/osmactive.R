@@ -28,8 +28,7 @@ et_active = function() {
     "tracktype",
     "surface",
     "smoothness",
-    "access",
-    "route"
+    "access"
   )
 }
 
@@ -44,10 +43,9 @@ exclude_highway_cycling = function() {
 
 # Exclude bicycle values for utility cycling
 exclude_bicycle_cycling = function() {
-  to_exclude = paste0(
+  paste0(
     "mtb|discouraged|unknown"
   )
-  return(to_exclude)
 }
 
 # Exclude highway values for driving
