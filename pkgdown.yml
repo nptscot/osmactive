@@ -1,8 +1,9 @@
 pandoc: 3.1.11
 pkgdown: 2.0.9
 pkgdown_sha: ~
-articles: {}
-last_built: 2024-04-22T13:26Z
+articles:
+  classifying-cycle-infrastructure: classifying-cycle-infrastructure.html
+last_built: 2024-04-22T13:29Z
 urls:
   reference: https://nptscot.github.io/osmactive/reference
   article: https://nptscot.github.io/osmactive/articles
