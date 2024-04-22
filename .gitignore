@@ -51,4 +51,5 @@ rsconnect/
 *.html
 docs
 *.gpkg
+inst/doc
 *.geojson
