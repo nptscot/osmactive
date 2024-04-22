@@ -28,14 +28,14 @@ et_active = function() {
     "tracktype",
     "surface",
     "smoothness",
-    "access"    
+    "access"
   )
 }
 
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
   to_exclude = paste0(
-    "motorway|bridleway|disused|emergency|escap",
+    "motorway|services|bridleway|disused|emergency|escap",
     "|far|foot|rest|road|track|steps"
   )
   return(to_exclude)
@@ -43,16 +43,15 @@ exclude_highway_cycling = function() {
 
 # Exclude bicycle values for utility cycling
 exclude_bicycle_cycling = function() {
-  to_exclude = paste0(
+  paste0(
     "mtb|discouraged|unknown"
   )
-  return(to_exclude)
 }
 
 # Exclude highway values for driving
 exclude_highway_driving = function() {
   to_exclude = paste0(
-    "crossing|disused|emergency|escap|far|raceway|rest|track",
+    "crossing|services|disused|emergency|escap|far|raceway|rest|road|track",
     # Paths that cannot be driven on:
     "|bridleway|cycleway|footway|path|pedestrian|steps|track|proposed|construction"
   )
@@ -103,14 +102,17 @@ get_driving_network = function(
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
 #' @export
+#' @inheritParams get_driving_network
+#' @param pattern A character string of highway values to define major roads in the form `motorway|trunk|primary|secondary|tertiary`
 #' @rdname get_driving_network
 get_driving_network_major = function(
   osm,
-  ex_d = exclude_highway_driving()
+  ex_d = exclude_highway_driving(),
+  pattern = "motorway|trunk|primary|secondary|tertiary"
 ) {
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
-    dplyr::filter(stringr::str_detect(string = highway, pattern = "motorway|trunk|primary|secondary|tertiary"))
+    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
 }
 #' Get the OSM cycling network
 #' 
@@ -148,15 +150,22 @@ get_cycling_network = function(
 #' @param roads The road network to which the distance needs to be calculated.
 #' @return An sf object with the new column `distance_to_road` that contains the distance to the road.
 #' @export
+#' @examples
+#' osm = osm_edinburgh
+#' cycle_network = get_cycling_network(osm)
+#' driving_network = get_driving_network(osm)
+#' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
+  suppressWarnings({
   segregated_points = sf::st_point_on_surface(rnet)
+  })
   roads_union = roads |> 
     sf::st_union() |> 
     sf::st_transform(27700)
   roads_geos = geos::as_geos_geometry(roads_union)
   points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
   points_distances = geos::geos_distance(points_geos, roads_geos)
-  rnet$distance_to_road = points_distances
+  rnet$distance_to_road = round(points_distances, 1)
   return(rnet)
 }
 
@@ -182,9 +191,11 @@ distance_to_road = function(rnet, roads) {
 #' osm = osm_edinburgh
 #' cycle_network = get_cycling_network(osm)
 #' driving_network = get_driving_network(osm)
-#' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
-#' cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
-#' plot_osm_tmap(cycleways_classified)
+#' netd = distance_to_road(cycle_network, driving_network)
+#' netc = classify_cycle_infrastructure(netd)
+#' library(sf)
+#' plot(netc["cycle_segregation"])
+#' plot(netc["distance_to_road"])
 classify_cycle_infrastructure = function(osm, min_distance = 10, classification_type = "Scotland") {
   if (classification_type == "Scotland") {
     return(classify_cycle_infrastructure_scotland(osm, min_distance))
@@ -194,71 +205,45 @@ classify_cycle_infrastructure = function(osm, min_distance = 10, classification_
 }
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
   osm |> 
-    dplyr::mutate(cycle_segregation = dplyr::case_when(
+    # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
+    dplyr::mutate(detailed_segregation = dplyr::case_when(
+      highway == "cycleway" ~ "Level track",
+      highway == "pedestrian" & bicycle == "designated" ~ "Stepped or footway",
+      highway == "path" & bicycle == "designated" ~ "Stepped or footway",
+      # these by default are not shared with traffic:
+      segregated == "yes" ~ "Stepped or footway",
+      segregated == "no" ~ "Stepped or footway",
+      TRUE ~ "Mixed traffic"
+    )) |>
+    # ...including by name
+    dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath") ~ "offroad_track",
-      stringr::str_detect(name, "Track") ~ "level_track",
-      TRUE ~ "mixed_traffic"
+      stringr::str_detect(name, "Path|Towpath|Railway|Trail") & 
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
+      TRUE ~ detailed_segregation
     )) |> 
-    dplyr::mutate(dplyr::across(dplyr::starts_with("cycleway"), ~dplyr::case_when(
-      .x == "lane" ~ "cycle_lane",
-      .x == "track" ~ "light_segregation",
-      # TODO: separate does not mean stepped_or_footway, right?
-      .x == "separate" ~ "stepped_or_footway",
-      .x == "buffered_lane" ~ "cycle_lane",
-      .x == "segregated" ~ "stepped_or_footway",
-      TRUE ~ "mixed_traffic"
-    ))) |>
-    # TODO: remove this:
-    # dplyr::mutate(cycle_segregation = dplyr::case_when(
-    #   # Cycleways on road
-    #   cycleway == "lane" ~ "cycle_lane",
-    #   cycleway_right == "lane" ~ "cycle_lane",
-    #   cycleway_left == "lane" ~ "cycle_lane",
-    #   cycleway_both == "lane" ~ "cycle_lane",
-    #   cycleway == "track" ~ "light_segregation",
-    #   cycleway_left == "track" ~ "light_segregation",
-    #   cycleway_right == "track" ~ "light_segregation",
-    #   cycleway_both == "track" ~ "light_segregation",
-    #   # Shared with pedestrians (but not highway == cycleway)
-    #   TODO: why is this returning same value for yes and no?
-    #   Suggestion: separate function generating a new column called footway_segregation
-    #   segregated == "no" ~ "stepped_or_footway",
-    #   segregated == "yes" ~ "stepped_or_footway",
-    #   # Rare cases
-    #   cycleway == "separate" ~ "stepped_or_footway",
-    #   cycleway_left == "separate" ~ "stepped_or_footway",
-    #   cycleway_right == "separate" ~ "stepped_or_footway",
-    #   cycleway_both == "separate" ~ "stepped_or_footway",
-    #   cycleway == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_left == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_right == "buffered_lane" ~ "cycle_lane",
-    #   cycleway_both == "buffered_lane" ~ "cycle_lane",
-    #   cycleway == "segregated" ~ "stepped_or_footway",
-    #   cycleway_left == "segregated" ~ "stepped_or_footway",
-    #   cycleway_right == "segregated" ~ "stepped_or_footway",
-    #   cycleway_both == "segregated" ~ "stepped_or_footway",
-    #   # Default mixed traffic
-    #   TRUE ~ cycle_segregation
-    # )) |>
-    dplyr::mutate(cycle_segregation = dplyr::case_when(
-      cycle_segregation %in% c("level_track", "light_segregation", "stepped_or_footway") ~ "roadside_cycle_track",
-      cycle_segregation %in% c("cycle_lane", "mixed_traffic") ~ "mixed_traffic",
-      TRUE ~ cycle_segregation
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Cycle track
+    dplyr::mutate(detailed_segregation = dplyr::case_when(
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
+      TRUE ~ detailed_segregation
     )) |>
-    # If highway == cycleway, cycle_segregation is roadside_cycle_track in most cases
-    dplyr::mutate(cycle_segregation = dplyr::case_when(
-      highway == "cycleway" ~ "roadside_cycle_track",
-      TRUE ~ cycle_segregation
+    tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
+    dplyr::mutate(detailed_segregation = dplyr::case_when(
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed traffic" ~ "Light segregation",
+      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
+      TRUE ~ detailed_segregation
     )) |>
-    # When distance to road is more than min_distance m and cycleway type is stepped_or_footway, change to offroad_track
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      distance_to_road > min_distance & cycle_segregation == "roadside_cycle_track" ~ "offroad_track",
-      TRUE ~ cycle_segregation
+      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside cycle track",
+      detailed_segregation %in% c("Cycle lane", "Mixed traffic") ~ "Mixed traffic",
+      TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("offroad_track", "roadside_cycle_track", "mixed_traffic"),
+      levels = c("Cycle track", "Roadside cycle track", "Mixed traffic"),
       ordered = TRUE
     ))
 }
@@ -273,7 +258,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "other_tags"),
+    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "other_tags"),
     lwd = 4,
     palette = "-PuBuGn"
     ) {
@@ -286,16 +271,32 @@ plot_osm_tmap = function(
     }
     # Subset popup.vars to include only those that are present in the data:
     popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
-    cycle_network_classified |>
-        dplyr::arrange(desc(cycle_segregation)) |>
-        tmap::tm_shape() +
+    Infrastructure = cycle_network_classified |>
+        dplyr::arrange(desc(cycle_segregation))
+    tmap::tm_shape(Infrastructure) +
         tmap::tm_lines(
             col = "cycle_segregation",
             lwd = lwd,
             col.scale = tmap::tm_scale_categorical(values = palette),
             popup.vars = popup.vars,
-            plot.order = tmap::tm_plot_order("DATA")
-            )
+            plot.order = tmap::tm_plot_order("DATA"),
+            # Change legend title:
+            col.legend = tmap::tm_legend(title = "Infrastructure type")
+            ) +
+        # Add scale bar
+        tmap::tm_scalebar(position = c("left", "bottom")) +
+        tm_layout(basemap.server = basemaps())
+}
+
+basemaps = function() {
+  c(
+    # Grey background:
+    "Esri.WorldGrayCanvas",
+    # CyclOSM:
+    "CyclOSM",
+    # OpenStreetMap:
+    "OpenStreetMap"
+  )
 }
 
 #' Data from edinburgh's OSM network

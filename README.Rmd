@@ -8,7 +8,9 @@ output: github_document
 knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -69,22 +71,34 @@ devtools::load_all()
 ```{r leeds}
 library(dplyr)
 library(tmap)
-leeds = zonebuilder::zb_zone("Leeds")
-leeds = leeds |>
+leeds_zb = zonebuilder::zb_zone("Leeds")
+leeds = leeds_zb |>
   filter(circle_id == 1)
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
-cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network_major(osm)
-cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
-m = plot_osm_tmap(cycle_network_classified)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
 ```{r}
 #| eval: false
+#| echo: false
+leeds_6km = leeds_zb |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
+
+system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobber")
 ```
 
 ## Edinburgh example
@@ -97,58 +111,95 @@ edinburgh_3km = edinburgh |>
   filter(circle_id <= 2) |>
   sf::st_union()
 osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
-cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network_major(osm)
-cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-cycle_network_classified = classify_cycle_infrastructure(cycle_network_with_distance)
-m = plot_osm_tmap(cycle_network_classified)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 
 ```
 
-Save an interactive version of the map to check the results as follows:
+<!-- Save an interactive version of the map to check the results as follows: -->
 
 ```{r}
 #| eval: false
 #| echo: false
-tmap_save(m, "cycle_network_classified_edinburgh.html")
-browseURL("cycle_network_classified_edinburgh.html")
+edinburgh_6km = edinburgh |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Scotland", boundary = edinburgh_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+tmap_save(m, "cycle_net_edinburgh.html")
+browseURL("cycle_net_edinburgh.html")
 system("gh release create v0.1", intern = TRUE)
-system("gh release upload v0.1 cycle_network_classified_edinburgh.html", intern = TRUE)
+system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
+```
+
+## Dublin example
+
+```{r dublin}
+dublin_zones = zonebuilder::zb_zone("Dublin")
+dublin = dublin_zones |>
+  filter(circle_id == 1)
+osm = get_travel_network("Republic of Ireland", boundary = dublin, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+#| eval: false
+#| echo: false
+dublin_6km = dublin_zones |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+tmap_save(m, "classify_cycle_infrastructure_dublin.html")
+browseURL("classify_cycle_infrastructure_dublin.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobber")
 ```
 
 ## Lisbon example
 
 ```{r lisbon}
 #| eval: false
-lisbon = zonebuilder::zb_zone("Lisbon")
-lisbon = sf::st_sf(
-  lisbon |> sf::st_drop_geometry() |> select(-centroid),
-  geometry = sf::st_geometry(lisbon)
-)
-lisbon = lisbon |>
-  filter(circle_id == 1)
-u = "https://github.com/U-Shift/SiteSelection/releases/download/0.1/CAOP_municipios.gpkg"
-f = basename(f)
+u = "https://ushift.tecnico.ulisboa.pt/content/data/lisbon_limit.geojson"
+f = basename(u)
 if (!file.exists(f)) download.file(u, f)
-PTcities = sf::read_sf(f) # Portugal
-lisbon = PTcities |> filter(Concelho == "Lisboa")
+lisbon = sf::read_sf(f)
 lisbon = lisbon |>
-  sf::st_convex_hull()
-f = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
-osm = sf::read_sf(f, query = "select * from lines where highway is not null")
+  sf::st_cast("POLYGON")
 osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
-list.files("~/data/osm", pattern = "portugal")
-cycle_network = get_cycling_network(osm)
-driving_network = get_driving_network(osm)
-cycle_network_with_distance = distance_to_road(cycle_network, driving_network)
-lisbon_categorized = classify_cycle_infrastructure(cycle_network_with_distance)
-m = plot_osm_tmap(lisbon_categorized)
+# p = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
+# osm = sf::read_sf(p, query = "select * from lines where highway is not null")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
+
 ```
 
 ```{r}
 #| eval: false
+#| echo: false
 tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
 ```

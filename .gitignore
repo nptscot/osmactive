@@ -20,6 +20,7 @@
 
 # RStudio files
 .Rproj.user/
+*.Rproj
 
 # produced vignettes
 vignettes/*.html
@@ -51,3 +52,4 @@ rsconnect/
 docs
 *.gpkg
 inst/doc
+*.geojson

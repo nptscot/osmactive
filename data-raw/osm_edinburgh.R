@@ -39,21 +39,21 @@ plot(osm)
 
 # # Keep only most relevant columns
 osm = osm %>%
-  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, other_tags)
+  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, segregated, other_tags)
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
 driving_network = get_driving_network(osm)
 edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
-# cycleways_classified_old = cycleways_classified
-waldo::compare(cycleways_classified, cycleways_classified_old)
+# # cycleways_classified_old = cycleways_classified
+# waldo::compare(cycleways_classified, cycleways_classified_old)
 
-plot_osm_tmap(edinburgh_segregated)
+plot_osm_tmap(cycleways_classified)
 
 
-table(edinburgh_segregated$cycle_segregation)
-m = plot_osm_tmap(edinburgh_segregated)
+table(cycleways_classified$cycle_segregation)
+m = plot_osm_tmap(cycleways_classified)
 m
 
 # Save the data

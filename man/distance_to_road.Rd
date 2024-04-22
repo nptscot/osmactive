@@ -19,3 +19,9 @@ This function approximates the distance from the route network to the nearest ro
 It does this by first computing the \code{sf::st_point_on_surface} of the route network segments
 and then calculating the distance to the nearest road using the \code{geos::geos_distance} function.
 }
+\examples{
+osm = osm_edinburgh
+cycle_network = get_cycling_network(osm)
+driving_network = get_driving_network(osm)
+edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
+}
