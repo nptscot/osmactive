@@ -169,7 +169,7 @@ m = plot_osm_tmap(cycle_net)
 tmap_save(m, "classify_cycle_infrastructure_dublin.html")
 browseURL("classify_cycle_infrastructure_dublin.html")
 # upload:
-# system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobber")
+system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobber")
 ```
 
 ## Lisbon example
@@ -199,4 +199,6 @@ m
 #| echo: false
 tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
 ```
