@@ -176,34 +176,29 @@ system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobb
 
 ```{r lisbon}
 #| eval: false
-lisbon = zonebuilder::zb_zone("Lisbon")
-lisbon = sf::st_sf(
-  lisbon |> sf::st_drop_geometry() |> select(-centroid),
-  geometry = sf::st_geometry(lisbon)
-)
-lisbon = lisbon |>
-  filter(circle_id == 1)
-u = "https://github.com/U-Shift/SiteSelection/releases/download/0.1/CAOP_municipios.gpkg"
-f = basename(f)
+u = "https://ushift.tecnico.ulisboa.pt/content/data/lisbon_limit.geojson"
+f = basename(u)
 if (!file.exists(f)) download.file(u, f)
-PTcities = sf::read_sf(f) # Portugal
-lisbon = PTcities |> filter(Concelho == "Lisboa")
+lisbon = sf::read_sf(f)
 lisbon = lisbon |>
-  sf::st_convex_hull()
-f = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
-osm = sf::read_sf(f, query = "select * from lines where highway is not null")
+  sf::st_cast("POLYGON")
 osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
-list.files("~/data/osm", pattern = "portugal")
+# p = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
+# osm = sf::read_sf(p, query = "select * from lines where highway is not null")
 cycle_net = get_cycling_network(osm)
-drive_net = get_drive_net_major(osm)
+drive_net = get_driving_network_major(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
-lisbon_categorized = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(lisbon_categorized)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
+
 ```
 
 ```{r}
 #| eval: false
+#| echo: false
 tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
 ```
