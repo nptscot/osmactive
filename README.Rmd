@@ -10,7 +10,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   message = FALSE,
-  warning = FALSE
+  warning = FALSE,
+  cache = TRUE
 )
 ```
 
@@ -176,7 +177,6 @@ system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobb
 ## Lisbon example
 
 ```{r lisbon}
-#| eval: false
 u = "https://ushift.tecnico.ulisboa.pt/content/data/lisbon_limit.geojson"
 f = basename(u)
 if (!file.exists(f)) download.file(u, f)
@@ -184,15 +184,12 @@ lisbon = sf::read_sf(f)
 lisbon = lisbon |>
   sf::st_cast("POLYGON")
 osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
-# p = list.files("~/data/osm", pattern = "portugal*.+pbf", full.names = TRUE)
-# osm = sf::read_sf(p, query = "select * from lines where highway is not null")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
-
 ```
 
 ```{r}
