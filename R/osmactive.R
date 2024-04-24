@@ -313,7 +313,17 @@ basemaps = function() {
 #' plot(osm_edinburgh)
 NULL
 
-
+#' Data from edinburgh's OSM network with traffic volumes
+#'
+#' @docType data
+#' @keywords datasets
+#' @name traffic_volumes_edinburgh
+#' @aliases traffic_random_edinburgh
+#' @format A data frame
+#' @examples 
+#' head(traffic_volumes_edinburgh)
+#' head(traffic_random_edinburgh)
+NULL
 
 # Ignore globals:
 utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving", "highway"))
