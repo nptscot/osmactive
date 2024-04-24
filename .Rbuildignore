@@ -5,3 +5,5 @@
 ^pkgdown$
 ^\.github$
 ^data-raw$
+^.*\.Rproj$
+^\.Rproj\.user$

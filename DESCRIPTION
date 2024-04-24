@@ -20,6 +20,8 @@ Imports:
     stringr,
     tidyr
 Suggests: 
+    knitr,
+    rmarkdown,
     tmap (>= 3.9)
 Remotes: 
     r-tmap/tmap
@@ -29,3 +31,4 @@ RoxygenNote: 7.2.3
 Depends: 
     R (>= 2.10)
 LazyData: true
+VignetteBuilder: knitr
