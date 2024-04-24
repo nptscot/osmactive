@@ -85,6 +85,7 @@ cycle_net <- get_cycling_network(osm)
 drive_net <- get_driving_network(osm)
 drive_net_major <- get_driving_network_major(osm)
 cycle_net <- distance_to_road(cycle_net, drive_net)
+cycle_net <- classify_cycle_infrastructure(cycle_net)
 tm_shape(osm) +
   tm_lines(col = "grey") +
   tm_shape(cycle_net) +
@@ -93,6 +94,13 @@ tm_shape(osm) +
   tm_lines(col = "darkgrey") +
   tm_shape(drive_net_major) +
   tm_lines(col = "black")
+```
+
+You can also create plots with the packaged `plot_osm_tmap()` function:
+
+```{r}
+m = plot_osm_tmap(cycle_net)
+m
 ```
 
 ## Leeds example
