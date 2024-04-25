@@ -35,8 +35,8 @@ et_active = function() {
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
   to_exclude = paste0(
-    "motorway|services|bridleway|disused|emergency|escap",
-    "|far|foot|rest|road|track|steps"
+    "abandoned|bridleway|bus_guideway|byway|construction|corridor|disused|elevator|emergency|escalator|escap",
+    "|far|fixme|foot|gallop|historic|motorway|no|planned|platform|proposed|raceway|rest|road|services|steps|track"
   )
   return(to_exclude)
 }
@@ -51,9 +51,9 @@ exclude_bicycle_cycling = function() {
 # Exclude highway values for driving
 exclude_highway_driving = function() {
   to_exclude = paste0(
-    "crossing|services|disused|emergency|escap|far|raceway|rest|road|track",
-    # Paths that cannot be driven on:
-    "|bridleway|cycleway|footway|path|pedestrian|steps|track|proposed|construction"
+    "abandoned|bridleway|bus_guideway|byway|construction|corridor|crossing|cycleway|disused|elevator|emergency|
+    escalator|escap|far|fixme|footway|gallop|historic|no|path|pedestrian|planned|platform|proposed|
+    raceway|rest|road|services|steps|track"
   )
   return(to_exclude)
 }
