@@ -299,6 +299,21 @@ basemaps = function() {
   )
 }
 
+most_common_value = function(x) {
+  if (length(x) == 0) {
+    return(NA)
+  } else {
+    # Remove NA values if length X is greater than 1 and there are non NA values:
+    x = x[!is.na(x)]
+    res = names(sort(table(x), decreasing = TRUE)[1])
+    if (is.null(res)) {
+      return(NA)
+    } else {
+      return(res)
+    }
+  }
+}
+
 #' Data from edinburgh's OSM network
 #'
 #'
