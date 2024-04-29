@@ -1,10 +1,11 @@
+library(tidyverse)
 library(tmap)
 tmap_mode("view")
 
 edinburgh <- zonebuilder::zb_zone("Edinburgh")
 edinburgh_3km <- edinburgh |>
   # Change number in next line to change zone size:
-  filter(circle_id <= 2) |>
+  dplyr::filter(circle_id <= 2) |>
   sf::st_union()
 osm <- get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
 cycle_net <- get_cycling_network(osm)
@@ -115,8 +116,8 @@ cycle_net_joined = cycle_net_joined %>%
   ))
 
 # table(cycle_net_joined$final_speed, useNA = "always")
-# # 20 mph 30 mph 40 mph   <NA> 
-# #   1683    334     18   3847 
+# # 10 mph 20 mph 30 mph 40 mph  5 mph   <NA> 
+# # 71   5271    226     10     20    286 
 
 # roadside = cycle_net_joined %>% 
 #   filter(cycle_segregation == "Roadside cycle track")
@@ -129,6 +130,8 @@ cycle_net_joined = cycle_net_joined %>%
 # # cycleway         path   pedestrian      primary  residential    secondary     tertiary unclassified         <NA> 
 # #   98           14            6           94            7            8           23            7            0 
 
+saveRDS(cycle_net, "data/cycle-net.Rds")
+saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
 
 # Classify by final speed -------------------------------------------------
 
