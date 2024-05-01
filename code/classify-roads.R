@@ -44,6 +44,7 @@ table(nospeed$highway, useNA = "always")
 #   306            69            68            27          1775             2             6             0 
 
 # First add in assumed speed limits for highway categories that are missing them
+# Add in functions here from https://github.com/udsleeds/openinfra/blob/main/R/oi_clean_maxspeed_uk.R
 cycle_net = cycle_net %>% 
   mutate(assumed_speed = case_when(
     !is.na(maxspeed) ~ maxspeed,
@@ -82,7 +83,9 @@ cycle_net_joined_polygons = stplanr::rnet_join(
   rnet_x = cycle_net,
   rnet_y = drive_net %>% 
     transmute(
-      maxspeed_road = maxspeed) %>% 
+      maxspeed_road = maxspeed,
+      highway_join = highway
+      ) %>% 
     sf::st_cast(to = "LINESTRING"),
   dist = 20,
   segment_length = 10
@@ -98,7 +101,8 @@ cycleways_with_road_speeds_df = cycle_net_joined_polygons %>%
   st_drop_geometry() %>% 
   group_by(osm_id) %>% 
   summarise(
-    maxspeed_road = most_common_value(maxspeed_road)
+    maxspeed_road = most_common_value(maxspeed_road),
+    highway_join = most_common_value(highway_join)
   )
 
 # join back onto cycle_net
@@ -110,34 +114,76 @@ cycle_net_joined = left_join(cycle_net, cycleways_with_road_speeds_df)
 # #   1683    334     18   3847 
 
 cycle_net_joined = cycle_net_joined %>% 
-  mutate(final_speed = case_when(
-    !is.na(assumed_speed) ~ assumed_speed,
-    TRUE ~ maxspeed_road
+  mutate(join_volume = case_when(
+    highway_join == "primary" ~ 6000,
+    highway_join == "primary_link" ~ 6000,
+    highway_join == "secondary" ~ 5000,
+    highway_join == "secondary_link" ~ 5000,
+    highway_join == "tertiary" ~ 3000,
+    highway_join == "tertiary_link" ~ 3000,
+    highway_join == "residential" ~ 1000,
+    highway_join == "service" ~ 500,
+    highway_join == "unclassified" ~ 1000
   ))
 
-# table(cycle_net_joined$final_speed, useNA = "always")
-# # 10 mph 20 mph 30 mph 40 mph  5 mph   <NA> 
-# # 71   5271    226     10     20    286 
+cycle_net_joined = cycle_net_joined %>% 
+  mutate(
+    final_speed = case_when(
+      !is.na(assumed_speed) ~ assumed_speed,
+      TRUE ~ maxspeed_road),
+    final_volume = case_when(
+      !is.na(assumed_volume) ~ assumed_volume,
+      TRUE ~ join_volume)
+  )
 
-# roadside = cycle_net_joined %>% 
-#   filter(cycle_segregation == "Roadside cycle track")
-# 
-# # There are some roadside cycle tracks that aren't linked to roads
-# table(roadside$final_speed, useNA = "always")
-# # 20 mph 30 mph   <NA> 
-# #   200     38     19 
-# table(roadside$highway, useNA = "always")
-# # cycleway         path   pedestrian      primary  residential    secondary     tertiary unclassified         <NA> 
-# #   98           14            6           94            7            8           23            7            0 
+table(cycle_net_joined$final_speed, useNA = "always")
+# 10 mph 20 mph 30 mph 40 mph  5 mph   <NA>
+# 71   5271    226     10     20    286
+
+roadside = cycle_net_joined %>%
+  filter(cycle_segregation == "Roadside cycle track")
+
+# There are some roadside cycle tracks that aren't linked to roads
+table(roadside$final_speed, useNA = "always")
+# 20 mph 30 mph   <NA>
+#   200     38     19
+table(roadside$highway, useNA = "always")
+# cycleway         path   pedestrian      primary  residential    secondary     tertiary unclassified         <NA>
+#   98           14            6           94            7            8           23            7            0
+
+table(roadside$final_volume, useNA = "always")
+# 1000 3000 5000 6000 <NA> 
+#   14   60   18  145   20 
 
 saveRDS(cycle_net, "data/cycle-net.Rds")
 saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
+
+# Convert speeds to numeric
+cycle_net_joined$final_speed = gsub(" mph", "", cycle_net_joined$final_speed)
+cycle_net_joined$assumed_speed = gsub(" mph", "", cycle_net_joined$assumed_speed)
+cycle_net_joined$maxspeed = gsub(" mph", "", cycle_net_joined$maxspeed)
+cycle_net_joined$maxspeed_road = gsub(" mph", "", cycle_net_joined$maxspeed_road)
+
+cycle_net_joined$final_speed = as.numeric(cycle_net_joined$final_speed)
+cycle_net_joined$assumed_speed = as.numeric(cycle_net_joined$assumed_speed)
+cycle_net_joined$maxspeed = as.numeric(cycle_net_joined$maxspeed)
+cycle_net_joined$maxspeed_road = as.numeric(cycle_net_joined$maxspeed_road)
 
 # Classify by final speed -------------------------------------------------
 
 cycle_net_joined = cycle_net_joined %>% 
   mutate(level_of_service = case_when(
     detailed_segregation == "Cycle track" ~ "High",
-    detailed_segregation == "Level track" & final_speed >= 30 ~ "High",
-    ....
+    detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
+    detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
+    detailed_segregation == "Stepped or footway" & final_speed == 30 & final_volume < 4000 ~ "High",
+    detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
+    detailed_segregation == "Light segregation" & final_speed == 30 & final_volume < 4000 ~ "High",
+    detailed_segregation == "Cycle lane" & final_speed <= 20 & final_volume < 4000 ~ "High",
+    detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 1000 ~ "High",
+    detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 2000 ~ "High",
+    detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 1000 ~ "High",
+    TRUE ~ "Not High"
   ))
+
+tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
