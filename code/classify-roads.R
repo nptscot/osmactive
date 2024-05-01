@@ -46,17 +46,36 @@ table(nospeed$highway, useNA = "always")
 # First add in assumed speed limits for highway categories that are missing them
 # Add in functions here from https://github.com/udsleeds/openinfra/blob/main/R/oi_clean_maxspeed_uk.R
 cycle_net = cycle_net %>% 
-  mutate(assumed_speed = case_when(
-    !is.na(maxspeed) ~ maxspeed,
-    highway == "residential" ~ "20 mph",
-    highway == "service" ~ "20 mph",
-    highway == "unclassified" ~ "20 mph",
-    highway == "tertiary_link" ~ "30 mph"
+  mutate(
+    cleaned_speed = case_when(
+      maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
+      maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
+      TRUE ~ maxspeed
+    ))
+
+cycle_net$cleaned_speed = gsub(" mph", "", cycle_net$cleaned_speed)
+cycle_net$cleaned_speed = as.numeric(cycle_net$cleaned_speed)
+
+cycle_net = cycle_net %>% 
+  mutate(
+    cleaned_speed = case_when(
+    !is.na(cleaned_speed) ~ cleaned_speed,
+    highway == "residential" ~ 20,
+    highway == "service" ~ 20,
+    highway == "unclassified" ~ 20,
+    highway == "tertiary" ~ 30,
+    highway == "tertiary_link" ~ 30,
+    highway == "secondary" ~ 30,
+    highway == "secondary_link" ~ 30,
+    highway == "primary" ~ 40,
+    highway == "primary_link" ~ 40,
+    highway == "trunk" ~ 60,
+    highway == "trunk_link" ~ 60,
   ))
 
-table(cycle_net$assumed_speed, useNA = "always")
-# 10 mph 20 mph 30 mph 40 mph  5 mph   <NA> 
-#   71   5135    204      9     20    443 
+table(cycle_net$cleaned_speed, useNA = "always")
+# 5   10   20   30   40 <NA> 
+#   20   71 5137  205    9  443
 
 # Add assumed traffic volumes
 # Use Juan's estimates instead where possible
@@ -129,7 +148,7 @@ cycle_net_joined = cycle_net_joined %>%
 cycle_net_joined = cycle_net_joined %>% 
   mutate(
     final_speed = case_when(
-      !is.na(assumed_speed) ~ assumed_speed,
+      !is.na(cleaned_speed) ~ cleaned_speed,
       TRUE ~ maxspeed_road),
     final_volume = case_when(
       !is.na(assumed_volume) ~ assumed_volume,
@@ -160,12 +179,12 @@ saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
 
 # Convert speeds to numeric
 cycle_net_joined$final_speed = gsub(" mph", "", cycle_net_joined$final_speed)
-cycle_net_joined$assumed_speed = gsub(" mph", "", cycle_net_joined$assumed_speed)
+cycle_net_joined$cleaned_speed = gsub(" mph", "", cycle_net_joined$cleaned_speed)
 cycle_net_joined$maxspeed = gsub(" mph", "", cycle_net_joined$maxspeed)
 cycle_net_joined$maxspeed_road = gsub(" mph", "", cycle_net_joined$maxspeed_road)
 
 cycle_net_joined$final_speed = as.numeric(cycle_net_joined$final_speed)
-cycle_net_joined$assumed_speed = as.numeric(cycle_net_joined$assumed_speed)
+cycle_net_joined$cleaned_speed = as.numeric(cycle_net_joined$cleaned_speed)
 cycle_net_joined$maxspeed = as.numeric(cycle_net_joined$maxspeed)
 cycle_net_joined$maxspeed_road = as.numeric(cycle_net_joined$maxspeed_road)
 
