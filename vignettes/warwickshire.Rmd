@@ -1,0 +1,32 @@
+---
+title: "warwickshire"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{warwickshire}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(osmactive)
+```
+
+```{r}
+coventry_zb = zonebuilder::zb_zone("coventry")
+coventry = coventry_zb |>
+  filter(circle_id <= 3)
+osm = get_travel_network("Coventry", boundary = coventry, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+cycle_net |>
+  mapview::mapview(zcol = "cycle_segregation")
+```
