@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(osmactive)
+od = get_od_matrix("Coventry", cycle_net, drive_net
+library(tidyverse)
 ```
 
 ```{r}
@@ -29,4 +31,20 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 cycle_net |>
   mapview::mapview(zcol = "cycle_segregation")
+```
+
+
+Demo of getting `od`:
+
+```{r}
+od_warickshire = pct::get_pct_lines("warwickshire")
+names(od_warickshire)
+od_warickshire |>
+  mutate(walking = foot / all) |>
+  filter(all > 15) |>
+  arrange(walking) |>
+  ggplot() +
+  geom_sf(aes(color = walking), size = 0.5) +
+  scale_color_viridis_c() +
+  theme_minimal()
 ```
