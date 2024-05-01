@@ -17,6 +17,39 @@ m
 
 tm_shape(drive_net) + tm_lines("highway", lwd = 2)
 
+# Clean speeds in drive_net
+drive_net = drive_net %>% 
+  mutate(
+    cleaned_speed = case_when(
+      maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
+      maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
+      TRUE ~ maxspeed
+    ))
+
+drive_net$cleaned_speed = gsub(" mph", "", drive_net$cleaned_speed)
+drive_net$cleaned_speed = as.numeric(drive_net$cleaned_speed)
+
+drive_net = drive_net %>% 
+  mutate(
+    cleaned_speed = case_when(
+      !is.na(cleaned_speed) ~ cleaned_speed,
+      highway == "residential" ~ 20,
+      highway == "service" ~ 20,
+      highway == "unclassified" ~ 20,
+      highway == "tertiary" ~ 30,
+      highway == "tertiary_link" ~ 30,
+      highway == "secondary" ~ 30,
+      highway == "secondary_link" ~ 30,
+      highway == "primary" ~ 40,
+      highway == "primary_link" ~ 40,
+      highway == "trunk" ~ 60,
+      highway == "trunk_link" ~ 60,
+    ))
+
+table(drive_net$cleaned_speed, useNA = "always")
+# 20   30   40 <NA> 
+#   860  152    9    0 
+
 table(cycle_net$maxspeed, useNA = "always")
 # 10 mph 20 mph 30 mph 40 mph  5 mph   <NA> 
 #   71   3327    202      9     20   2253 
@@ -102,7 +135,7 @@ cycle_net_joined_polygons = stplanr::rnet_join(
   rnet_x = cycle_net,
   rnet_y = drive_net %>% 
     transmute(
-      maxspeed_road = maxspeed,
+      cleaned_speed_road = cleaned_speed,
       highway_join = highway
       ) %>% 
     sf::st_cast(to = "LINESTRING"),
@@ -112,7 +145,7 @@ cycle_net_joined_polygons = stplanr::rnet_join(
 
 # # Check results:
 # cycle_net_joined_polygons %>% 
-#   select(maxspeed_road) %>% 
+#   select(cleaned_speed_road) %>% 
 #   plot()
 
 # group by + summarise stage
@@ -120,15 +153,16 @@ cycleways_with_road_speeds_df = cycle_net_joined_polygons %>%
   st_drop_geometry() %>% 
   group_by(osm_id) %>% 
   summarise(
-    maxspeed_road = most_common_value(maxspeed_road),
+    cleaned_speed_road = most_common_value(cleaned_speed_road),
     highway_join = most_common_value(highway_join)
-  )
+  ) %>% 
+  mutate(cleaned_speed_road = as.numeric(cleaned_speed_road))
 
 # join back onto cycle_net
 
 cycle_net_joined = left_join(cycle_net, cycleways_with_road_speeds_df)
 
-# table(cycle_net_joined$maxspeed_road, useNA = "always")
+# table(cycle_net_joined$cleaned_speed_road, useNA = "always")
 # # 20 mph 30 mph 40 mph   <NA> 
 # #   1683    334     18   3847 
 
@@ -149,15 +183,15 @@ cycle_net_joined = cycle_net_joined %>%
   mutate(
     final_speed = case_when(
       !is.na(cleaned_speed) ~ cleaned_speed,
-      TRUE ~ maxspeed_road),
+      TRUE ~ cleaned_speed_road),
     final_volume = case_when(
       !is.na(assumed_volume) ~ assumed_volume,
       TRUE ~ join_volume)
   )
 
 table(cycle_net_joined$final_speed, useNA = "always")
-# 10 mph 20 mph 30 mph 40 mph  5 mph   <NA>
-# 71   5271    226     10     20    286
+# 5   10   20   30   40 <NA> 
+#   20   71 5271  227   10  286
 
 roadside = cycle_net_joined %>%
   filter(cycle_segregation == "Roadside cycle track")
@@ -173,20 +207,6 @@ table(roadside$highway, useNA = "always")
 table(roadside$final_volume, useNA = "always")
 # 1000 3000 5000 6000 <NA> 
 #   14   60   18  145   20 
-
-saveRDS(cycle_net, "data/cycle-net.Rds")
-saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
-
-# Convert speeds to numeric
-cycle_net_joined$final_speed = gsub(" mph", "", cycle_net_joined$final_speed)
-cycle_net_joined$cleaned_speed = gsub(" mph", "", cycle_net_joined$cleaned_speed)
-cycle_net_joined$maxspeed = gsub(" mph", "", cycle_net_joined$maxspeed)
-cycle_net_joined$maxspeed_road = gsub(" mph", "", cycle_net_joined$maxspeed_road)
-
-cycle_net_joined$final_speed = as.numeric(cycle_net_joined$final_speed)
-cycle_net_joined$cleaned_speed = as.numeric(cycle_net_joined$cleaned_speed)
-cycle_net_joined$maxspeed = as.numeric(cycle_net_joined$maxspeed)
-cycle_net_joined$maxspeed_road = as.numeric(cycle_net_joined$maxspeed_road)
 
 # Classify by final speed -------------------------------------------------
 
@@ -206,3 +226,6 @@ cycle_net_joined = cycle_net_joined %>%
   ))
 
 tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
+
+saveRDS(cycle_net, "data/cycle-net.Rds")
+saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
