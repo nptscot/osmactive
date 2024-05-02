@@ -130,11 +130,11 @@ get_cycling_network = function(
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b)) |>
-    # Remove highway=path without bicycle values of yes, designated, or permissive:
+    # Remove highway=path without bicycle value of designated:
     dplyr::filter(
       !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     ) |>
-    # Remove highway=pedestrian without bicycle values of yes, designated, or permissive:
+    # Remove highway=pedestrian without bicycle value of designated:
     dplyr::filter(
       !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     )
