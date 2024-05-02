@@ -314,6 +314,38 @@ most_common_value = function(x) {
   }
 }
 
+clean_speeds = function(road_network) {
+  road_network = road_network |>
+    dpyr::mutate(
+      cleaned_speed = dplyr::case_when(
+        maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
+        maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
+        TRUE ~ maxspeed
+      ))
+  
+  road_network$cleaned_speed = gsub(" mph", "", road_network$cleaned_speed)
+  road_network$cleaned_speed = as.numeric(road_network$cleaned_speed)
+  
+  road_network = road_network |>
+    dplyr::mutate(
+      cleaned_speed = dplyr::case_when(
+        !is.na(cleaned_speed) ~ cleaned_speed,
+        highway == "residential" ~ 20,
+        highway == "service" ~ 20,
+        highway == "unclassified" ~ 20,
+        highway == "tertiary" ~ 30,
+        highway == "tertiary_link" ~ 30,
+        highway == "secondary" ~ 30,
+        highway == "secondary_link" ~ 30,
+        highway == "primary" ~ 40,
+        highway == "primary_link" ~ 40,
+        highway == "trunk" ~ 60,
+        highway == "trunk_link" ~ 60,
+      )
+    )
+}
+
+
 #' Data from edinburgh's OSM network
 #'
 #'
