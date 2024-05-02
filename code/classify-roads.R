@@ -216,10 +216,10 @@ cycle_net_joined = cycle_net_joined %>%
     detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
     detailed_segregation == "Light segregation" & final_speed == 40 & final_volume < 2000 ~ "Medium",
     detailed_segregation == "Light segregation" & final_speed == 50 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Cycle lane" & final_speed == 20 ~ "Medium",
+    detailed_segregation == "Cycle lane" & final_speed <= 20 ~ "Medium",
     detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 4000 ~ "Medium",
     detailed_segregation == "Cycle lane" & final_speed == 40 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Mixed traffic" & final_speed == 20 & final_volume < 4000 ~ "Medium",
+    detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 4000 ~ "Medium",
     detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 2000 ~ "Medium",
     detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 1000 ~ "Medium",
     
