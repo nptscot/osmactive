@@ -23,8 +23,8 @@ et_active = function() {
     "footway",
     # "highway", # included by default
     # "name", # included by default
-    "service", 
-    "surface", 
+    "service",
+    "surface",
     "tracktype",
     "surface",
     "smoothness",
@@ -35,8 +35,8 @@ et_active = function() {
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
   to_exclude = paste0(
-    "motorway|services|bridleway|disused|emergency|escap",
-    "|far|foot|rest|road|track|steps"
+    "abandoned|bridleway|bus_guideway|byway|construction|corridor|disused|elevator|emergency|escalator|escap",
+    "|far|fixme|foot|gallop|historic|motorway|no|planned|platform|proposed|raceway|rest|road|services|steps|track"
   )
   return(to_exclude)
 }
@@ -44,22 +44,22 @@ exclude_highway_cycling = function() {
 # Exclude bicycle values for utility cycling
 exclude_bicycle_cycling = function() {
   paste0(
-    "mtb|discouraged|unknown"
+    "mtb|discouraged|unknown|no"
   )
 }
 
 # Exclude highway values for driving
 exclude_highway_driving = function() {
   to_exclude = paste0(
-    "crossing|services|disused|emergency|escap|far|raceway|rest|road|track",
-    # Paths that cannot be driven on:
-    "|bridleway|cycleway|footway|path|pedestrian|steps|track|proposed|construction"
+    "abandoned|bridleway|bus_guideway|byway|construction|corridor|crossing|cycleway|disused|elevator|emergency|
+    escalator|escap|far|fixme|footway|gallop|historic|no|path|pedestrian|planned|platform|proposed|
+    raceway|rest|road|services|steps|track"
   )
   return(to_exclude)
 }
 
 #' Get the OSM network functions
-#' 
+#'
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
 #' @param extra_tags A vector of extra tags to be included in the OSM extract
 #' @param columns_to_remove A vector of columns to be removed from the OSM network
@@ -85,11 +85,11 @@ get_travel_network = function(
 }
 
 #' Get the OSM driving network
-#' 
+#'
 #' This function returns the OSM driving network by excluding certain highway values.
-#' 
+#'
 #' `get_driving_network_major` returns only the major roads.
-#' 
+#'
 #' @inheritParams get_cycling_network
 #' @param ex_d A character string of highway values to exclude in the form `value1|value2` etc
 #' @return A sf object with the OSM driving network
@@ -98,7 +98,7 @@ get_driving_network = function(
   osm,
   ex_d = exclude_highway_driving()
 ) {
-  osm |> 
+  osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
 #' @export
@@ -110,12 +110,12 @@ get_driving_network_major = function(
   ex_d = exclude_highway_driving(),
   pattern = "motorway|trunk|primary|secondary|tertiary"
 ) {
-  osm |> 
+  osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
     dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
 }
 #' Get the OSM cycling network
-#' 
+#'
 #' @param osm An OSM network object
 #' @param ex_c A vector of highway values to exclude
 #' @param ex_b A vector of bicycle values to exclude
@@ -126,26 +126,26 @@ get_cycling_network = function(
   ex_c = exclude_highway_cycling(),
   ex_b = exclude_bicycle_cycling()
 ) {
-  osm |> 
+  osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
-    # Exclude mtb paths and related tags
+    # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b)) |>
-    # Remove highway=path without bicycle values of yes, designated, or permissive:
+    # Remove highway=path without bicycle value of designated:
     dplyr::filter(
-      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     ) |>
-    # Remove links with highway == "pedestrian" and no bicycle == "yes" etc
+    # Remove highway=pedestrian without bicycle value of designated:
     dplyr::filter(
-      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     )
 }
 
 #' Calculate distance from route network segments to roads
-#' 
+#'
 #' This function approximates the distance from the route network to the nearest road.
 #' It does this by first computing the `sf::st_point_on_surface` of the route network segments
 #' and then calculating the distance to the nearest road using the `geos::geos_distance` function.
-#' 
+#'
 #' @param rnet The route network for which the distance to the road needs to be calculated.
 #' @param roads The road network to which the distance needs to be calculated.
 #' @return An sf object with the new column `distance_to_road` that contains the distance to the road.
@@ -159,8 +159,8 @@ distance_to_road = function(rnet, roads) {
   suppressWarnings({
   segregated_points = sf::st_point_on_surface(rnet)
   })
-  roads_union = roads |> 
-    sf::st_union() |> 
+  roads_union = roads |>
+    sf::st_union() |>
     sf::st_transform(27700)
   roads_geos = geos::as_geos_geometry(roads_union)
   points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
@@ -172,20 +172,20 @@ distance_to_road = function(rnet, roads) {
 #' Segregation levels
 #'
 #' This function classifies OSM ways in by cycle infrastructure type levels for a given dataset.
-#' 
+#'
 #' See [wiki.openstreetmap.org/wiki/Key:cycleway](https://wiki.openstreetmap.org/wiki/Key:cycleway)
 #' and [taginfo.openstreetmap.org/keys/cycleway#values](https://taginfo.openstreetmap.org/keys/cycleway#values)
 #' for more information on cycleway values used to classify cycle infrastructure.
-#' 
+#'
 #' Currently, only the "Scotland" classification type is supported.
 #' See the Scottish Government's [Cycling by Design](https://www.transport.gov.scot/publication/cycling-by-design/) for more information.
-#' 
+#'
 #' @param osm The input dataset for which segregation levels need to be calculated.
 #' @param min_distance The minimum distance to the road for a cycleway to be considered off-road.
 #' @param classification_type The classification type to be used. Currently only "Scotland" is supported.
 #' @return A an sf object with the new column `cycle_segregation` that contains the segregation levels.
 #' @export
-#' @examples 
+#' @examples
 #' library(tmap)
 #' tmap_mode("plot")
 #' osm = osm_edinburgh
@@ -204,12 +204,12 @@ classify_cycle_infrastructure = function(osm, min_distance = 10, classification_
   }
 }
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
-  osm |> 
+  osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
-      highway == "pedestrian" & bicycle == "designated" ~ "Stepped or footway",
-      highway == "path" & bicycle == "designated" ~ "Stepped or footway",
+      highway == "pedestrian" ~ "Stepped or footway",
+      highway == "path" ~ "Stepped or footway",
       # these by default are not shared with traffic:
       segregated == "yes" ~ "Stepped or footway",
       segregated == "no" ~ "Stepped or footway",
@@ -218,10 +218,10 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     # ...including by name
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath|Railway|Trail") & 
+      stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
         detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
       TRUE ~ detailed_segregation
-    )) |> 
+    )) |>
     # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Cycle track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
@@ -249,7 +249,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
 }
 
 #' Create a tmap object for visualizing the classified cycle network
-#' 
+#'
 #' @param cycle_network_classified An sf object with the classified cycle network
 #' @param popup.vars A vector of variables to be displayed in the popup
 #' @param lwd The line width for the cycle network
@@ -299,6 +299,73 @@ basemaps = function() {
   )
 }
 
+most_common_value = function(x) {
+  if (length(x) == 0) {
+    return(NA)
+  } else {
+    # Remove NA values if length X is greater than 1 and there are non NA values:
+    x = x[!is.na(x)]
+    res = names(sort(table(x), decreasing = TRUE)[1])
+    if (is.null(res)) {
+      return(NA)
+    } else {
+      return(res)
+    }
+  }
+}
+
+#' Clean speeds
+#'
+#' @param osm An sf object with the road network
+#' @return An sf object with the cleaned speed values in the column `maxspeed_clean`
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' osm_cleaned = clean_speeds(osm)
+#' # check NAs:
+#' sel_nas = is.na(osm_cleaned$maxspeed_clean)
+#' osm_no_maxspeed = osm_cleaned[sel_nas, c("highway")]
+#' table(osm_no_maxspeed$highway) # Active travel infrastructure has no maxspeed
+#' table(osm_cleaned$maxspeed)
+#' table(osm_cleaned$maxspeed_clean)
+#' plot(osm_cleaned[c("maxspeed", "maxspeed_clean")])
+clean_speeds = function(osm) {
+  osm = osm |>
+    dplyr::mutate(
+      maxspeed_clean = dplyr::case_when(
+        maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
+        maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
+        TRUE ~ maxspeed
+      ))
+
+  osm$maxspeed_clean = gsub(" mph", "", osm$maxspeed_clean)
+  osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
+
+  osm = osm |>
+    dplyr::mutate(
+      maxspeed_clean = dplyr::case_when(
+        !is.na(maxspeed_clean) ~ maxspeed_clean,
+        highway == "residential" ~ 20,
+        highway == "service" ~ 20,
+        highway == "unclassified" ~ 20,
+        highway == "tertiary" ~ 30,
+        highway == "tertiary_link" ~ 30,
+        highway == "secondary" ~ 30,
+        highway == "secondary_link" ~ 30,
+        highway == "primary" ~ 40,
+        highway == "primary_link" ~ 40,
+        highway == "trunk" ~ 60,
+        highway == "trunk_link" ~ 60,
+      )
+    )
+  osm = sf::st_sf(
+    osm |> sf::st_drop_geometry(),
+    geometry = sf::st_geometry(osm)
+  )
+  osm
+}
+
+
 #' Data from edinburgh's OSM network
 #'
 #'
@@ -306,7 +373,7 @@ basemaps = function() {
 #' @keywords datasets
 #' @name osm_edinburgh
 #' @format An sf data frame
-#' @examples 
+#' @examples
 #' library(sf)
 #' names(osm_edinburgh)
 #' head(osm_edinburgh)
@@ -320,7 +387,7 @@ NULL
 #' @name traffic_volumes_edinburgh
 #' @aliases traffic_random_edinburgh
 #' @format A data frame
-#' @examples 
+#' @examples
 #' head(traffic_volumes_edinburgh)
 #' head(traffic_random_edinburgh)
 NULL
