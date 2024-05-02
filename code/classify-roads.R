@@ -208,7 +208,36 @@ cycle_net_joined = cycle_net_joined %>%
     detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 1000 ~ "High",
     detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 2000 ~ "High",
     detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 1000 ~ "High",
-    TRUE ~ "Not High"
+    
+    detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
+    detailed_segregation == "Level track" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+    detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
+    detailed_segregation == "Stepped or footway" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+    detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
+    detailed_segregation == "Light segregation" & final_speed == 40 & final_volume < 2000 ~ "Medium",
+    detailed_segregation == "Light segregation" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+    detailed_segregation == "Cycle lane" & final_speed == 20 ~ "Medium",
+    detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 4000 ~ "Medium",
+    detailed_segregation == "Cycle lane" & final_speed == 40 & final_volume < 1000 ~ "Medium",
+    detailed_segregation == "Mixed traffic" & final_speed == 20 & final_volume < 4000 ~ "Medium",
+    detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 2000 ~ "Medium",
+    detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 1000 ~ "Medium",
+    
+    
+    detailed_segregation == "Level track" ~ "Low",
+    detailed_segregation == "Stepped or footway" ~ "Low",
+    detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
+    detailed_segregation == "Light segregation" & final_speed == 60 & final_volume < 1000 ~ "Low",
+    detailed_segregation == "Cycle lane" & final_speed <= 50 ~ "Low",
+    detailed_segregation == "Cycle lane" & final_speed == 60 & final_volume < 1000 ~ "Low",
+    detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
+    detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 2000 ~ "Low",
+    detailed_segregation == "Mixed traffic" & final_speed == 60 & final_volume < 1000 ~ "Low",
+    
+    detailed_segregation == "Light segregation" ~ "Should not be used",
+    detailed_segregation == "Cycle lane" ~ "Should not be used",
+    detailed_segregation == "Mixed traffic" ~ "Should not be used",
+    TRUE ~ "Unknown"
   ))
 
 tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
