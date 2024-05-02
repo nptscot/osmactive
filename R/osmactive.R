@@ -365,6 +365,10 @@ clean_speeds = function(osm) {
   osm
 }
 
+level_of_service = function(osm) {
+  
+}
+
 
 #' Data from edinburgh's OSM network
 #'
