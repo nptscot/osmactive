@@ -316,8 +316,8 @@ most_common_value = function(x) {
 
 clean_speeds = function(road_network) {
   road_network = road_network %>% 
-    mutate(
-      cleaned_speed = case_when(
+    dpyr::mutate(
+      cleaned_speed = dplyr::case_when(
         maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
         maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
         TRUE ~ maxspeed
@@ -327,8 +327,8 @@ clean_speeds = function(road_network) {
   road_network$cleaned_speed = as.numeric(road_network$cleaned_speed)
   
   road_network = road_network %>% 
-    mutate(
-      cleaned_speed = case_when(
+    dplyr::mutate(
+      cleaned_speed = dplyr::case_when(
         !is.na(cleaned_speed) ~ cleaned_speed,
         highway == "residential" ~ 20,
         highway == "service" ~ 20,
