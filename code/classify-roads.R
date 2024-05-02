@@ -242,5 +242,16 @@ cycle_net_joined = cycle_net_joined %>%
 
 tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
 
+# Checks
+snbu = cycle_net_joined %>% filter(level_of_service == "Should not be used")
+View(snbu)
+tm_shape(snbu) + tm_lines("highway", lwd = 2)
+
+paths = cycle_net_joined %>% filter(
+  highway == "path" | highway == "pedestrian",
+  bicycle == "permissive" | bicycle == "yes"
+)
+tm_shape(paths) + tm_lines("highway")
+
 saveRDS(cycle_net, "data/cycle-net.Rds")
 saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")

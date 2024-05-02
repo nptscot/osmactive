@@ -128,15 +128,15 @@ get_cycling_network = function(
 ) {
   osm |> 
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
-    # Exclude mtb paths and related tags
+    # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b)) |>
     # Remove highway=path without bicycle values of yes, designated, or permissive:
     dplyr::filter(
-      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     ) |>
-    # Remove links with highway == "pedestrian" and no bicycle == "yes" etc
+    # Remove highway=pedestrian without bicycle values of yes, designated, or permissive:
     dplyr::filter(
-      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "yes|designated|permissive"))
+      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "designated"))
     )
 }
 
@@ -208,8 +208,8 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
-      highway == "pedestrian" & bicycle == "designated" ~ "Stepped or footway",
-      highway == "path" & bicycle == "designated" ~ "Stepped or footway",
+      highway == "pedestrian" ~ "Stepped or footway",
+      highway == "path" ~ "Stepped or footway",
       # these by default are not shared with traffic:
       segregated == "yes" ~ "Stepped or footway",
       segregated == "no" ~ "Stepped or footway",
