@@ -46,38 +46,24 @@ drive_net = drive_net %>%
       highway == "trunk_link" ~ 60,
     ))
 
-table(drive_net$cleaned_speed, useNA = "always")
-# 20   30   40 <NA> 
-#   860  152    9    0 
+# table(drive_net$cleaned_speed, useNA = "always")
+# # 20   30   40 <NA> 
+# #   860  152    9    0 
 
-table(cycle_net$maxspeed, useNA = "always")
-# 10 mph 20 mph 30 mph 40 mph  5 mph   <NA> 
-#   71   3327    202      9     20   2253 
+# Check and clean cycle_net
+# table(cycle_net$cycle_segregation, useNA = "always")
+# # Cycle track Roadside cycle track        Mixed traffic 
+# # 267                  257                 5394
+# 
+# # Check with roads are missing speed limits
+# nospeed = cycle_net %>% 
+#   filter(is.na(maxspeed))
+# table(nospeed$highway, useNA = "always")
+# # cycleway          path    pedestrian   residential       service tertiary_link  unclassified          <NA> 
+# #   306            69            68            27          1775             2             6             0 
 
-table(cycle_net$cycle_segregation, useNA = "always")
-# Cycle track Roadside cycle track        Mixed traffic 
-# 267                  257                 5394
-
-roadside = cycle_net %>% 
-  filter(cycle_segregation == "Roadside cycle track")
-
-# There are some roadside cycle tracks that aren't linked to roads
-table(roadside$maxspeed, useNA = "always")
-# 20 mph 30 mph   <NA> 
-#   114     27    116 
-table(roadside$highway, useNA = "always")
-# cycleway         path   pedestrian      primary  residential    secondary     tertiary unclassified         <NA> 
-#   98           14            6           94            7            8           23            7            0 
-
-# Check with roads are missing speed limits
-nospeed = cycle_net %>% 
-  filter(is.na(maxspeed))
-table(nospeed$highway, useNA = "always")
-# cycleway          path    pedestrian   residential       service tertiary_link  unclassified          <NA> 
-#   306            69            68            27          1775             2             6             0 
-
-# First add in assumed speed limits for highway categories that are missing them
-# Add in functions here from https://github.com/udsleeds/openinfra/blob/main/R/oi_clean_maxspeed_uk.R
+# First clean cycle_net speed limits
+# Functions here derived from https://github.com/udsleeds/openinfra/blob/main/R/oi_clean_maxspeed_uk.R
 cycle_net = cycle_net %>% 
   mutate(
     cleaned_speed = case_when(
@@ -106,9 +92,9 @@ cycle_net = cycle_net %>%
     highway == "trunk_link" ~ 60,
   ))
 
-table(cycle_net$cleaned_speed, useNA = "always")
-# 5   10   20   30   40 <NA> 
-#   20   71 5137  205    9  443
+# table(cycle_net$cleaned_speed, useNA = "always")
+# # 5   10   20   30   40 <NA> 
+# #   20   71 5137  205    9  443
 
 # Add assumed traffic volumes
 # Use Juan's estimates instead where possible
@@ -125,9 +111,9 @@ cycle_net = cycle_net %>%
     highway == "unclassified" ~ 1000
   ))
 
-table(cycle_net$assumed_volume, useNA = "always")
-# 500 1000 3000 5000 6000 <NA> 
-#   2085 2311  576   79  365  466
+# table(cycle_net$assumed_volume, useNA = "always")
+# # 500 1000 3000 5000 6000 <NA> 
+# #   2085 2311  576   79  365  466
 
 # Join cycle_net and drive_net
 # See tutorial: https://github.com/acteng/network-join-demos
@@ -196,7 +182,7 @@ table(cycle_net_joined$final_speed, useNA = "always")
 roadside = cycle_net_joined %>%
   filter(cycle_segregation == "Roadside cycle track")
 
-# There are some roadside cycle tracks that aren't linked to roads
+# There are some roadside cycle tracks that still aren't linked to roads
 table(roadside$final_speed, useNA = "always")
 # 20 mph 30 mph   <NA>
 #   200     38     19
