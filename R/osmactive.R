@@ -44,7 +44,7 @@ exclude_highway_cycling = function() {
 # Exclude bicycle values for utility cycling
 exclude_bicycle_cycling = function() {
   paste0(
-    "mtb|discouraged|unknown"
+    "mtb|discouraged|unknown|no"
   )
 }
 
