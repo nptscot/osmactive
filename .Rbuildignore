@@ -7,3 +7,4 @@
 ^data-raw$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+cache
