@@ -24,6 +24,7 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/classify-volumes.html">Classify Cycle by Design road volumes</a>
     <a class="dropdown-item" href="../articles/classifying-cycle-infrastructure.html">Typologies of cycle infrastructure</a>
   </div>
 </li>
@@ -63,9 +64,10 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "osm_id"     "name"       "highway"    "cycleway"   "bicycle"   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "lanes"      "sidewalk"   "segregated" "other_tags" "geometry"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6] "lanes"      "sidewalk"   "segregated" "maxspeed"   "other_tags"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] "geometry"  </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 9 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 10 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTILINESTRING</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -3.194737 ymin: 55.95514 xmax: -3.186586 ymax: 55.95921</span>
@@ -77,13 +79,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 198 4071162          Dublin Street residential     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     both</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 241 4084027 North St Andrew Street  pedestrian     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 242 4084028   North St Andrew Lane     service     &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     segregated</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71        &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     segregated maxspeed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71        &lt;NA&gt;   20 mph</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185       &lt;NA&gt;   20 mph</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 197       &lt;NA&gt;   20 mph</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 198       &lt;NA&gt;   20 mph</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 241       &lt;NA&gt;     &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 242       &lt;NA&gt;     &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                               other_tags</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 71  "embedded_rails"=&gt;"tram","sidewalk:left"=&gt;"separate","sidewalk:right"=&gt;"no","wikidata"=&gt;"Q102108491"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 185                                               "lit"=&gt;"yes","ref"=&gt;"A900","sidewalk:both"=&gt;"separate"</span>
@@ -99,6 +101,7 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> 241 MULTILINESTRING ((-3.192841...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 242 MULTILINESTRING ((-3.194737...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>plotting the first 9 out of 10 attributes; use max.plot = 10 to plot all</span>
 <span class="r-plt img"><img src="osm_edinburgh-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
