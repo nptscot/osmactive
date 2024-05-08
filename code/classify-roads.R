@@ -18,35 +18,9 @@ m
 tm_shape(drive_net) + tm_lines("highway", lwd = 2)
 
 # Clean speeds in drive_net
-drive_net = drive_net %>% 
-  mutate(
-    cleaned_speed = case_when(
-      maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
-      maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
-      TRUE ~ maxspeed
-    ))
+drive_net = clean_speeds(drive_net)
 
-drive_net$cleaned_speed = gsub(" mph", "", drive_net$cleaned_speed)
-drive_net$cleaned_speed = as.numeric(drive_net$cleaned_speed)
-
-drive_net = drive_net %>% 
-  mutate(
-    cleaned_speed = case_when(
-      !is.na(cleaned_speed) ~ cleaned_speed,
-      highway == "residential" ~ 20,
-      highway == "service" ~ 20,
-      highway == "unclassified" ~ 20,
-      highway == "tertiary" ~ 30,
-      highway == "tertiary_link" ~ 30,
-      highway == "secondary" ~ 30,
-      highway == "secondary_link" ~ 30,
-      highway == "primary" ~ 40,
-      highway == "primary_link" ~ 40,
-      highway == "trunk" ~ 60,
-      highway == "trunk_link" ~ 60,
-    ))
-
-# table(drive_net$cleaned_speed, useNA = "always")
+# table(drive_net$maxspeed_clean, useNA = "always")
 # # 20   30   40 <NA> 
 # #   860  152    9    0 
 
@@ -64,35 +38,9 @@ drive_net = drive_net %>%
 
 # First clean cycle_net speed limits
 # Functions here derived from https://github.com/udsleeds/openinfra/blob/main/R/oi_clean_maxspeed_uk.R
-cycle_net = cycle_net %>% 
-  mutate(
-    cleaned_speed = case_when(
-      maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
-      maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
-      TRUE ~ maxspeed
-    ))
+cycle_net = clean_speeds(cycle_net)
 
-cycle_net$cleaned_speed = gsub(" mph", "", cycle_net$cleaned_speed)
-cycle_net$cleaned_speed = as.numeric(cycle_net$cleaned_speed)
-
-cycle_net = cycle_net %>% 
-  mutate(
-    cleaned_speed = case_when(
-    !is.na(cleaned_speed) ~ cleaned_speed,
-    highway == "residential" ~ 20,
-    highway == "service" ~ 20,
-    highway == "unclassified" ~ 20,
-    highway == "tertiary" ~ 30,
-    highway == "tertiary_link" ~ 30,
-    highway == "secondary" ~ 30,
-    highway == "secondary_link" ~ 30,
-    highway == "primary" ~ 40,
-    highway == "primary_link" ~ 40,
-    highway == "trunk" ~ 60,
-    highway == "trunk_link" ~ 60,
-  ))
-
-# table(cycle_net$cleaned_speed, useNA = "always")
+# table(cycle_net$maxspeed_clean, useNA = "always")
 # # 5   10   20   30   40 <NA> 
 # #   20   71 5137  205    9  443
 
@@ -121,7 +69,7 @@ cycle_net_joined_polygons = stplanr::rnet_join(
   rnet_x = cycle_net,
   rnet_y = drive_net %>% 
     transmute(
-      cleaned_speed_road = cleaned_speed,
+      maxspeed_road = maxspeed_clean,
       highway_join = highway
       ) %>% 
     sf::st_cast(to = "LINESTRING"),
@@ -131,7 +79,7 @@ cycle_net_joined_polygons = stplanr::rnet_join(
 
 # # Check results:
 # cycle_net_joined_polygons %>% 
-#   select(cleaned_speed_road) %>% 
+#   select(maxspeed_road) %>% 
 #   plot()
 
 # group by + summarise stage
@@ -139,16 +87,16 @@ cycleways_with_road_speeds_df = cycle_net_joined_polygons %>%
   st_drop_geometry() %>% 
   group_by(osm_id) %>% 
   summarise(
-    cleaned_speed_road = most_common_value(cleaned_speed_road),
+    maxspeed_road = most_common_value(maxspeed_road),
     highway_join = most_common_value(highway_join)
   ) %>% 
-  mutate(cleaned_speed_road = as.numeric(cleaned_speed_road))
+  mutate(maxspeed_road = as.numeric(maxspeed_road))
 
 # join back onto cycle_net
 
 cycle_net_joined = left_join(cycle_net, cycleways_with_road_speeds_df)
 
-# table(cycle_net_joined$cleaned_speed_road, useNA = "always")
+# table(cycle_net_joined$maxspeed_road, useNA = "always")
 # # 20 mph 30 mph 40 mph   <NA> 
 # #   1683    334     18   3847 
 
@@ -168,8 +116,8 @@ cycle_net_joined = cycle_net_joined %>%
 cycle_net_joined = cycle_net_joined %>% 
   mutate(
     final_speed = case_when(
-      !is.na(cleaned_speed) ~ cleaned_speed,
-      TRUE ~ cleaned_speed_road),
+      !is.na(maxspeed_clean) ~ maxspeed_clean,
+      TRUE ~ maxspeed_road),
     final_volume = case_when(
       !is.na(assumed_volume) ~ assumed_volume,
       TRUE ~ join_volume)
