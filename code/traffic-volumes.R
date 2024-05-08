@@ -127,4 +127,4 @@ cycle_net_traffic = cycle_net_traffic %>%
   ))
 
 
-tm_shape(cycle_net_traffic) + tm_lines("Level of Service", lwd = 2, palette = "-PuBu")
+tm_shape(cycle_net_traffic) + tm_lines("Level of Service", lwd = 2, palette = "viridis")
