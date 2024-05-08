@@ -17,9 +17,9 @@ et_active = function() {
     "lanes:bus",
     "lanes:bus:conditional",
     "oneway",
-    "width",      # useful to ensure width of cycleways is at least 1.5m
-    "segregated",  # classifies whether cycles and pedestrians are segregated on shared paths
-    "sidewalk",    # useful to ensure width of cycleways is at least 1.5m
+    "width", # useful to ensure width of cycleways is at least 1.5m
+    "segregated", # classifies whether cycles and pedestrians are segregated on shared paths
+    "sidewalk", # useful to ensure width of cycleways is at least 1.5m
     "footway",
     # "highway", # included by default
     # "name", # included by default
@@ -70,18 +70,17 @@ get_travel_network = function(
     place,
     extra_tags = et_active(),
     columns_to_remove = c("waterway", "aerialway", "barrier", "manmade"),
+    ...) {
+  osm_highways = osmextract::oe_get(
+    place = place,
+    extra_tags = extra_tags,
     ...
-) {
-    osm_highways = osmextract::oe_get(
-        place = place,
-        extra_tags = extra_tags,
-        ...
-    )
-    osm_highways |>
-        dplyr::filter(!is.na(highway)) |>
-        # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
-        dplyr::filter(is.na(service)) |>
-        dplyr::select(-dplyr::matches(columns_to_remove))
+  )
+  osm_highways |>
+    dplyr::filter(!is.na(highway)) |>
+    # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
+    dplyr::filter(is.na(service)) |>
+    dplyr::select(-dplyr::matches(columns_to_remove))
 }
 
 #' Get the OSM driving network
@@ -95,9 +94,8 @@ get_travel_network = function(
 #' @return A sf object with the OSM driving network
 #' @export
 get_driving_network = function(
-  osm,
-  ex_d = exclude_highway_driving()
-) {
+    osm,
+    ex_d = exclude_highway_driving()) {
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d))
 }
@@ -106,10 +104,9 @@ get_driving_network = function(
 #' @param pattern A character string of highway values to define major roads in the form `motorway|trunk|primary|secondary|tertiary`
 #' @rdname get_driving_network
 get_driving_network_major = function(
-  osm,
-  ex_d = exclude_highway_driving(),
-  pattern = "motorway|trunk|primary|secondary|tertiary"
-) {
+    osm,
+    ex_d = exclude_highway_driving(),
+    pattern = "motorway|trunk|primary|secondary|tertiary") {
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
     dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
@@ -122,14 +119,13 @@ get_driving_network_major = function(
 #' @return A sf object with the OSM cycling network
 #' @export
 get_cycling_network = function(
-  osm,
-  ex_c = exclude_highway_cycling(),
-  ex_b = exclude_bicycle_cycling()
-) {
+    osm,
+    ex_c = exclude_highway_cycling(),
+    ex_b = exclude_bicycle_cycling()) {
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
-    dplyr::filter(is.na(bicycle)|!stringr::str_detect(string = bicycle, pattern = ex_b)) |>
+    dplyr::filter(is.na(bicycle) | !stringr::str_detect(string = bicycle, pattern = ex_b)) |>
     # Remove highway=path without bicycle value of designated:
     dplyr::filter(
       !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
@@ -157,13 +153,13 @@ get_cycling_network = function(
 #' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
   suppressWarnings({
-  segregated_points = sf::st_point_on_surface(rnet)
+    segregated_points = sf::st_point_on_surface(rnet)
   })
   roads_union = roads |>
     sf::st_union() |>
     sf::st_transform(27700)
   roads_geos = geos::as_geos_geometry(roads_union)
-  points_geos = geos::as_geos_geometry(segregated_points |>  sf::st_transform(27700))
+  points_geos = geos::as_geos_geometry(segregated_points |> sf::st_transform(27700))
   points_distances = geos::geos_distance(points_geos, roads_geos)
   rnet$distance_to_road = round(points_distances, 1)
   return(rnet)
@@ -260,32 +256,31 @@ plot_osm_tmap = function(
     cycle_network_classified,
     popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "other_tags"),
     lwd = 4,
-    palette = "-PuBuGn"
-    ) {
-    # Stop if tmap is not installed or if the version is less than 3.99:
-    if (!requireNamespace("tmap", quietly = TRUE)) {
-        stop("tmap is not installed. Please install tmap to use this function.")
-    }
-    if (packageVersion("tmap") < "3.99") {
-        stop("Please update tmap to version 3.99 or higher.")
-    }
-    # Subset popup.vars to include only those that are present in the data:
-    popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
-    Infrastructure = cycle_network_classified |>
-        dplyr::arrange(desc(cycle_segregation))
-    tmap::tm_shape(Infrastructure) +
-        tmap::tm_lines(
-            col = "cycle_segregation",
-            lwd = lwd,
-            col.scale = tmap::tm_scale_categorical(values = palette),
-            popup.vars = popup.vars,
-            plot.order = tmap::tm_plot_order("DATA"),
-            # Change legend title:
-            col.legend = tmap::tm_legend(title = "Infrastructure type")
-            ) +
-        # Add scale bar
-        tmap::tm_scalebar(position = c("left", "bottom")) +
-        tm_layout(basemap.server = basemaps())
+    palette = "-PuBuGn") {
+  # Stop if tmap is not installed or if the version is less than 3.99:
+  if (!requireNamespace("tmap", quietly = TRUE)) {
+    stop("tmap is not installed. Please install tmap to use this function.")
+  }
+  if (packageVersion("tmap") < "3.99") {
+    stop("Please update tmap to version 3.99 or higher.")
+  }
+  # Subset popup.vars to include only those that are present in the data:
+  popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
+  Infrastructure = cycle_network_classified |>
+    dplyr::arrange(desc(cycle_segregation))
+  tmap::tm_shape(Infrastructure) +
+    tmap::tm_lines(
+      col = "cycle_segregation",
+      lwd = lwd,
+      col.scale = tmap::tm_scale_categorical(values = palette),
+      popup.vars = popup.vars,
+      plot.order = tmap::tm_plot_order("DATA"),
+      # Change legend title:
+      col.legend = tmap::tm_legend(title = "Infrastructure type")
+    ) +
+    # Add scale bar
+    tmap::tm_scalebar(position = c("left", "bottom")) +
+    tm_layout(basemap.server = basemaps())
 }
 
 basemaps = function() {
@@ -336,7 +331,8 @@ clean_speeds = function(osm) {
         maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~ "70 mph",
         maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~ "60 mph",
         TRUE ~ maxspeed
-      ))
+      )
+    )
 
   osm$maxspeed_clean = gsub(" mph", "", osm$maxspeed_clean)
   osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
@@ -366,7 +362,7 @@ clean_speeds = function(osm) {
 }
 
 level_of_service = function(osm) {
-  
+
 }
 
 
