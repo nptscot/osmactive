@@ -78,7 +78,7 @@ tm_shape(cycle_net_traffic) + tm_lines("final_traffic", lwd = 2, breaks = c(0, 1
 # tm_shape(cycle_net_traffic) + tm_lines("detailed_segregation")
 
 cycle_net_traffic = cycle_net_traffic %>% 
-  mutate(level_of_service = case_when(
+  mutate(`Level of Service` = case_when(
     detailed_segregation == "Cycle track" ~ "High",
     detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
     detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
@@ -119,6 +119,12 @@ cycle_net_traffic = cycle_net_traffic %>%
     detailed_segregation == "Cycle lane" ~ "Should not be used",
     detailed_segregation == "Mixed traffic" ~ "Should not be used",
     TRUE ~ "Unknown"
+  )) %>% 
+  dplyr::mutate(`Level of Service` = factor(
+    `Level of Service`,
+    levels = c("High", "Medium", "Low", "Should not be used"),
+    ordered = TRUE
   ))
 
-tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
+
+tm_shape(cycle_net_traffic) + tm_lines("Level of Service", lwd = 2)
