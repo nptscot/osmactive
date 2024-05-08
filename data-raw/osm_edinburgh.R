@@ -16,7 +16,7 @@ edinburgh_sf = sf::st_sf(
   crs = 4326
 )
 edinburgh_3km = edinburgh_sf |>
-  sf::st_buffer(3000) 
+  sf::st_buffer(3000)
 
 osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
 names(osm)
