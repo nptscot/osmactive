@@ -1,5 +1,6 @@
 library(tidyverse)
 library(tmap)
+library(sf)
 tmap_mode("view")
 
 edinburgh <- zonebuilder::zb_zone("Edinburgh")
