@@ -13,7 +13,7 @@ edinburgh_3km <- edinburgh |>
   sf::st_union()
 traffic_volumes_edinburgh = traffic_volumes_scotland[edinburgh_3km, ]
 
-tm_shape(traffic_volumes_edinburgh) + tm_lines("pred_flows")
+# tm_shape(traffic_volumes_edinburgh) + tm_lines("pred_flows")
 
 # Join traffic volumes with cycle_net
 # See tutorial: https://github.com/acteng/network-join-demos
@@ -60,15 +60,16 @@ tm_shape(cycle_net_traffic) + tm_lines("highway", lwd = 2)
 
 # To investigate potential mapping errors (check to make sure this doesn't include genuine ratruns)
 high_flow = cycle_net_traffic %>% 
-  filter(highway %in% c("residential", "service") & pred_flows >= 4000)
+  filter(highway %in% c("residential", "service") & road_classification %in% c("A Road", "B Road", "Classified Unnumbered") & pred_flows >= 4000)
 tm_shape(high_flow) + tm_lines("pred_flows", lwd = 2)
 
-# Use original traffic estimates in some cases
+# Use original traffic estimates in some cases 
+# e.g. where residential/service roads have been misclassified as A/B/C roads
 cycle_net_traffic = cycle_net_traffic %>% 
   mutate(
     final_traffic = case_when(
       detailed_segregation == "Cycle track" ~ 0,
-      # highway %in% c("residential", "service") & pred_flows >= 4000 ~ final_volume,
+      highway %in% c("residential", "service") & road_classification %in% c("A Road", "B Road", "Classified Unnumbered") & pred_flows >= 4000 ~ final_volume,
       !is.na(pred_flows) ~ pred_flows,
       TRUE ~ final_volume)
     )
