@@ -2,7 +2,7 @@ library(tidyverse)
 library(sf)
 library(rsgeo)
 
-cycle_net_joined = readRDS("data/cycle-net-joined.Rds")
+cycle_net_joined = readRDS("data-raw/cycle-net-joined.Rds")
 traffic_volumes_scotland = read_sf("data-raw/final_estimates_Scotland.gpkg")
 
 # Edinburgh traffic volumes

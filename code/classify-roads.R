@@ -211,5 +211,5 @@ paths = cycle_net_joined %>% filter(
 )
 tm_shape(paths) + tm_lines("highway")
 
-saveRDS(cycle_net, "data/cycle-net.Rds")
-saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
+saveRDS(cycle_net, "data-raw/cycle-net.Rds")
+saveRDS(cycle_net_joined, "data-raw/cycle-net-joined.Rds")

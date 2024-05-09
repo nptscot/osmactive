@@ -361,6 +361,11 @@ clean_speeds = function(osm) {
   osm
 }
 
+#' Generate Cycle by Design Level of Service
+#'
+#' @param osm An sf object with the road network including speed limits and traffic volumes
+#' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
+#' @export
 level_of_service = function(osm) {
   osm = osm |>
     dplyr::mutate(`Level of Service` = dplyr::case_when(
