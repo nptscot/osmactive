@@ -10,7 +10,7 @@ estimate_traffic(osm)
 \item{osm}{An sf object with the road network}
 }
 \value{
-An sf object with the estimated traffic volumes in the column \code{assumed_volume}
+An sf object with the estimated road traffic volumes in the column \code{assumed_volume}
 }
 \description{
 Estimate traffic
@@ -21,6 +21,6 @@ osm_traffic = estimate_traffic(osm)
 # check NAs:
 sel_nas = is.na(osm_traffic$assumed_volume)
 osm_no_traffic = osm_traffic[sel_nas, c("highway")]
-table(osm_no_traffic$highway) # Active travel infrastructure has no maxspeed
+table(osm_no_traffic$highway) # Active travel infrastructure has no road traffic
 table(osm_traffic$assumed_volume, useNA = "always")
 }

@@ -47,20 +47,7 @@ cycle_net = clean_speeds(cycle_net)
 
 # Add assumed traffic volumes
 # Use Juan's estimates instead where possible
-cycle_net = cycle_net %>% 
-  mutate(assumed_volume = case_when(
-    highway == "trunk" ~ 8000,
-    highway == "trunk_link" ~ 8000,
-    highway == "primary" ~ 6000,
-    highway == "primary_link" ~ 6000,
-    highway == "secondary" ~ 5000,
-    highway == "secondary_link" ~ 5000,
-    highway == "tertiary" ~ 3000,
-    highway == "tertiary_link" ~ 3000,
-    highway == "residential" ~ 1000,
-    highway == "service" ~ 500,
-    highway == "unclassified" ~ 1000
-  ))
+cycle_net = estimate_traffic(cycle_net)
 
 # table(cycle_net$assumed_volume, useNA = "always")
 # # 500 1000 3000 5000 6000 <NA> 

@@ -376,21 +376,28 @@ clean_speeds = function(osm) {
 #' table(osm_traffic$assumed_volume, useNA = "always")
 estimate_traffic = function(osm) {
   osm = osm|>
-    dplyr::mutate(assumed_volume = dplyr::case_when(
-      highway == "motorway" ~ 20000,
-      highway == "motorway_link" ~ 20000,
-      highway == "trunk" ~ 8000,
-      highway == "trunk_link" ~ 8000,
-      highway == "primary" ~ 6000,
-      highway == "primary_link" ~ 6000,
-      highway == "secondary" ~ 5000,
-      highway == "secondary_link" ~ 5000,
-      highway == "tertiary" ~ 3000,
-      highway == "tertiary_link" ~ 3000,
-      highway == "residential" ~ 1000,
-      highway == "service" ~ 500,
-      highway == "unclassified" ~ 1000
-    ))
+    dplyr::mutate(
+      assumed_volume = dplyr::case_when(
+        highway == "motorway" ~ 20000,
+        highway == "motorway_link" ~ 20000,
+        highway == "trunk" ~ 8000,
+        highway == "trunk_link" ~ 8000,
+        highway == "primary" ~ 6000,
+        highway == "primary_link" ~ 6000,
+        highway == "secondary" ~ 5000,
+        highway == "secondary_link" ~ 5000,
+        highway == "tertiary" ~ 3000,
+        highway == "tertiary_link" ~ 3000,
+        highway == "residential" ~ 1000,
+        highway == "service" ~ 500,
+        highway == "unclassified" ~ 1000
+      )
+    )
+  osm = sf::st_sf(
+    osm |> sf::st_drop_geometry(),
+    geometry = sf::st_geometry(osm)
+  )
+  osm
 }
   
 
