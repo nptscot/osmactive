@@ -361,6 +361,39 @@ clean_speeds = function(osm) {
   osm
 }
 
+#' Estimate traffic
+#'
+#' @param osm An sf object with the road network
+#' @return An sf object with the estimated road traffic volumes in the column `assumed_volume`
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' osm_traffic = estimate_traffic(osm)
+#' # check NAs:
+#' sel_nas = is.na(osm_traffic$assumed_volume)
+#' osm_no_traffic = osm_traffic[sel_nas, c("highway")]
+#' table(osm_no_traffic$highway) # Active travel infrastructure has no road traffic
+#' table(osm_traffic$assumed_volume, useNA = "always")
+estimate_traffic = function(osm) {
+  osm = osm|>
+    dplyr::mutate(assumed_volume = dplyr::case_when(
+      highway == "motorway" ~ 20000,
+      highway == "motorway_link" ~ 20000,
+      highway == "trunk" ~ 8000,
+      highway == "trunk_link" ~ 8000,
+      highway == "primary" ~ 6000,
+      highway == "primary_link" ~ 6000,
+      highway == "secondary" ~ 5000,
+      highway == "secondary_link" ~ 5000,
+      highway == "tertiary" ~ 3000,
+      highway == "tertiary_link" ~ 3000,
+      highway == "residential" ~ 1000,
+      highway == "service" ~ 500,
+      highway == "unclassified" ~ 1000
+    ))
+}
+  
+
 #' Generate Cycle by Design Level of Service
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
