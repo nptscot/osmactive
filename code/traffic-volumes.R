@@ -58,7 +58,7 @@ tm_shape(cycle_net_traffic) + tm_lines("highway", lwd = 2)
 # cycle_net_traffic$road_classification = gsub("B Road", "secondary", cycle_net_traffic$road_classification)
 # cycle_net_traffic$road_classification = gsub("Classified Unnumbered", "tertiary", cycle_net_traffic$road_classification)
 
-# To correct mapping errors (check to make sure this doesn't include genuine ratruns)
+# To investigate potential mapping errors (check to make sure this doesn't include genuine ratruns)
 high_flow = cycle_net_traffic %>% 
   filter(highway %in% c("residential", "service") & pred_flows >= 4000)
 tm_shape(high_flow) + tm_lines("pred_flows", lwd = 2)
@@ -68,7 +68,7 @@ cycle_net_traffic = cycle_net_traffic %>%
   mutate(
     final_traffic = case_when(
       detailed_segregation == "Cycle track" ~ 0,
-      highway %in% c("residential", "service") & pred_flows >= 4000 ~ final_volume,
+      # highway %in% c("residential", "service") & pred_flows >= 4000 ~ final_volume,
       !is.na(pred_flows) ~ pred_flows,
       TRUE ~ final_volume)
     )
