@@ -361,49 +361,99 @@ clean_speeds = function(osm) {
   osm
 }
 
+#' Estimate traffic
+#'
+#' @param osm An sf object with the road network
+#' @return An sf object with the estimated road traffic volumes in the column `assumed_volume`
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' osm_traffic = estimate_traffic(osm)
+#' # check NAs:
+#' sel_nas = is.na(osm_traffic$assumed_volume)
+#' osm_no_traffic = osm_traffic[sel_nas, c("highway")]
+#' table(osm_no_traffic$highway) # Active travel infrastructure has no road traffic
+#' table(osm_traffic$assumed_volume, useNA = "always")
+estimate_traffic = function(osm) {
+  osm = osm|>
+    dplyr::mutate(
+      assumed_volume = dplyr::case_when(
+        highway == "motorway" ~ 20000,
+        highway == "motorway_link" ~ 20000,
+        highway == "trunk" ~ 8000,
+        highway == "trunk_link" ~ 8000,
+        highway == "primary" ~ 6000,
+        highway == "primary_link" ~ 6000,
+        highway == "secondary" ~ 5000,
+        highway == "secondary_link" ~ 5000,
+        highway == "tertiary" ~ 3000,
+        highway == "tertiary_link" ~ 3000,
+        highway == "residential" ~ 1000,
+        highway == "service" ~ 500,
+        highway == "unclassified" ~ 1000
+      )
+    )
+  osm = sf::st_sf(
+    osm |> sf::st_drop_geometry(),
+    geometry = sf::st_geometry(osm)
+  )
+  osm
+}
+  
+
+#' Generate Cycle by Design Level of Service
+#'
+#' @param osm An sf object with the road network including speed limits and traffic volumes
+#' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
+#' @export
 level_of_service = function(osm) {
   osm = osm |>
-    dplyr::mutate(level_of_service = dplyr::case_when(
+    dplyr::mutate(`Level of Service` = dplyr::case_when(
       detailed_segregation == "Cycle track" ~ "High",
       detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
       detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
-      detailed_segregation == "Stepped or footway" & final_speed == 30 & final_volume < 4000 ~ "High",
+      detailed_segregation == "Stepped or footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
       detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
-      detailed_segregation == "Light segregation" & final_speed == 30 & final_volume < 4000 ~ "High",
-      detailed_segregation == "Cycle lane" & final_speed <= 20 & final_volume < 4000 ~ "High",
-      detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 1000 ~ "High",
-      detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 2000 ~ "High",
-      detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 1000 ~ "High",
+      detailed_segregation == "Light segregation" & final_speed == 30 & final_traffic < 4000 ~ "High",
+      detailed_segregation == "Cycle lane" & final_speed <= 20 & final_traffic < 4000 ~ "High",
+      detailed_segregation == "Cycle lane" & final_speed == 30 & final_traffic < 1000 ~ "High",
+      detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 2000 ~ "High",
+      detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
       
       detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
-      detailed_segregation == "Level track" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+      detailed_segregation == "Level track" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
-      detailed_segregation == "Stepped or footway" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+      detailed_segregation == "Stepped or footway" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
-      detailed_segregation == "Light segregation" & final_speed == 40 & final_volume < 2000 ~ "Medium",
-      detailed_segregation == "Light segregation" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+      detailed_segregation == "Light segregation" & final_speed == 40 & final_traffic < 2000 ~ "Medium",
+      detailed_segregation == "Light segregation" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Cycle lane" & final_speed <= 20 ~ "Medium",
-      detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 4000 ~ "Medium",
-      detailed_segregation == "Cycle lane" & final_speed == 40 & final_volume < 1000 ~ "Medium",
-      detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 4000 ~ "Medium",
-      detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 2000 ~ "Medium",
-      detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 1000 ~ "Medium",
+      detailed_segregation == "Cycle lane" & final_speed == 30 & final_traffic < 4000 ~ "Medium",
+      detailed_segregation == "Cycle lane" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
+      detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 4000 ~ "Medium",
+      detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
+      detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
       
       
       detailed_segregation == "Level track" ~ "Low",
       detailed_segregation == "Stepped or footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
-      detailed_segregation == "Light segregation" & final_speed == 60 & final_volume < 1000 ~ "Low",
+      detailed_segregation == "Light segregation" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       detailed_segregation == "Cycle lane" & final_speed <= 50 ~ "Low",
-      detailed_segregation == "Cycle lane" & final_speed == 60 & final_volume < 1000 ~ "Low",
+      detailed_segregation == "Cycle lane" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
-      detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 2000 ~ "Low",
-      detailed_segregation == "Mixed traffic" & final_speed == 60 & final_volume < 1000 ~ "Low",
+      detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 2000 ~ "Low",
+      detailed_segregation == "Mixed traffic" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       
       detailed_segregation == "Light segregation" ~ "Should not be used",
       detailed_segregation == "Cycle lane" ~ "Should not be used",
       detailed_segregation == "Mixed traffic" ~ "Should not be used",
       TRUE ~ "Unknown"
+    )) |>
+    dplyr::mutate(`Level of Service` = factor(
+      `Level of Service`,
+      levels = c("High", "Medium", "Low", "Should not be used"),
+      ordered = TRUE
     ))
   osm = sf::st_sf(
     osm |> sf::st_drop_geometry(),

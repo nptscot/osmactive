@@ -47,18 +47,7 @@ cycle_net = clean_speeds(cycle_net)
 
 # Add assumed traffic volumes
 # Use Juan's estimates instead where possible
-cycle_net = cycle_net %>% 
-  mutate(assumed_volume = case_when(
-    highway == "primary" ~ 6000,
-    highway == "primary_link" ~ 6000,
-    highway == "secondary" ~ 5000,
-    highway == "secondary_link" ~ 5000,
-    highway == "tertiary" ~ 3000,
-    highway == "tertiary_link" ~ 3000,
-    highway == "residential" ~ 1000,
-    highway == "service" ~ 500,
-    highway == "unclassified" ~ 1000
-  ))
+cycle_net = estimate_traffic(cycle_net)
 
 # table(cycle_net$assumed_volume, useNA = "always")
 # # 500 1000 3000 5000 6000 <NA> 
@@ -103,6 +92,8 @@ cycle_net_joined = left_join(cycle_net, cycleways_with_road_speeds_df)
 
 cycle_net_joined = cycle_net_joined %>% 
   mutate(join_volume = case_when(
+    highway_join == "trunk" ~ 8000,
+    highway_join == "trunk_link" ~ 8000,
     highway_join == "primary" ~ 6000,
     highway_join == "primary_link" ~ 6000,
     highway_join == "secondary" ~ 5000,
@@ -146,7 +137,7 @@ table(roadside$final_volume, useNA = "always")
 # Classify by final speed -------------------------------------------------
 
 cycle_net_joined = cycle_net_joined %>% 
-  mutate(level_of_service = case_when(
+  mutate(`Level of Service` = case_when(
     detailed_segregation == "Cycle track" ~ "High",
     detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
     detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
@@ -187,9 +178,14 @@ cycle_net_joined = cycle_net_joined %>%
     detailed_segregation == "Cycle lane" ~ "Should not be used",
     detailed_segregation == "Mixed traffic" ~ "Should not be used",
     TRUE ~ "Unknown"
+  )) %>% 
+  dplyr::mutate(`Level of Service` = factor(
+    `Level of Service`,
+    levels = c("High", "Medium", "Low", "Should not be used"),
+    ordered = TRUE
   ))
 
-tm_shape(cycle_net_joined) + tm_lines("level_of_service", lwd = 2)
+tm_shape(cycle_net_joined) + tm_lines("Level of Service", lwd = 2, palette = "viridis")
 
 # Checks
 snbu = cycle_net_joined %>% filter(level_of_service == "Should not be used")
@@ -202,5 +198,5 @@ paths = cycle_net_joined %>% filter(
 )
 tm_shape(paths) + tm_lines("highway")
 
-saveRDS(cycle_net, "data/cycle-net.Rds")
-saveRDS(cycle_net_joined, "data/cycle-net-joined.Rds")
+saveRDS(cycle_net, "data-raw/cycle-net.Rds")
+saveRDS(cycle_net_joined, "data-raw/cycle-net-joined.Rds")
