@@ -21,6 +21,8 @@ tm_shape(drive_net) + tm_lines("highway", lwd = 2)
 # Clean speeds in drive_net
 drive_net = clean_speeds(drive_net)
 
+drive_net = estimate_traffic(drive_net)
+
 # table(drive_net$maxspeed_clean, useNA = "always")
 # # 20   30   40 <NA> 
 # #   860  152    9    0 
@@ -60,7 +62,8 @@ cycle_net_joined_polygons = stplanr::rnet_join(
   rnet_y = drive_net %>% 
     transmute(
       maxspeed_road = maxspeed_clean,
-      highway_join = highway
+      highway_join = highway,
+      volume_join = assumed_volume
       ) %>% 
     sf::st_cast(to = "LINESTRING"),
   dist = 20,
@@ -78,9 +81,13 @@ cycleways_with_road_speeds_df = cycle_net_joined_polygons %>%
   group_by(osm_id) %>% 
   summarise(
     maxspeed_road = most_common_value(maxspeed_road),
-    highway_join = most_common_value(highway_join)
+    highway_join = most_common_value(highway_join),
+    volume_join = most_common_value(volume_join)
   ) %>% 
-  mutate(maxspeed_road = as.numeric(maxspeed_road))
+  mutate(
+    maxspeed_road = as.numeric(maxspeed_road),
+    volume_join = as.numeric(volume_join)
+    )
 
 # join back onto cycle_net
 
@@ -91,28 +98,13 @@ cycle_net_joined = left_join(cycle_net, cycleways_with_road_speeds_df)
 # #   1683    334     18   3847 
 
 cycle_net_joined = cycle_net_joined %>% 
-  mutate(join_volume = case_when(
-    highway_join == "trunk" ~ 8000,
-    highway_join == "trunk_link" ~ 8000,
-    highway_join == "primary" ~ 6000,
-    highway_join == "primary_link" ~ 6000,
-    highway_join == "secondary" ~ 5000,
-    highway_join == "secondary_link" ~ 5000,
-    highway_join == "tertiary" ~ 3000,
-    highway_join == "tertiary_link" ~ 3000,
-    highway_join == "residential" ~ 1000,
-    highway_join == "service" ~ 500,
-    highway_join == "unclassified" ~ 1000
-  ))
-
-cycle_net_joined = cycle_net_joined %>% 
   mutate(
     final_speed = case_when(
       !is.na(maxspeed_clean) ~ maxspeed_clean,
       TRUE ~ maxspeed_road),
     final_volume = case_when(
       !is.na(assumed_volume) ~ assumed_volume,
-      TRUE ~ join_volume)
+      TRUE ~ volume_join)
   )
 
 table(cycle_net_joined$final_speed, useNA = "always")
@@ -134,69 +126,71 @@ table(roadside$final_volume, useNA = "always")
 # 1000 3000 5000 6000 <NA> 
 #   14   60   18  145   20 
 
-# Classify by final speed -------------------------------------------------
+# Now go to script traffic-volumes.R
 
-cycle_net_joined = cycle_net_joined %>% 
-  mutate(`Level of Service` = case_when(
-    detailed_segregation == "Cycle track" ~ "High",
-    detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
-    detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
-    detailed_segregation == "Stepped or footway" & final_speed == 30 & final_volume < 4000 ~ "High",
-    detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
-    detailed_segregation == "Light segregation" & final_speed == 30 & final_volume < 4000 ~ "High",
-    detailed_segregation == "Cycle lane" & final_speed <= 20 & final_volume < 4000 ~ "High",
-    detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 1000 ~ "High",
-    detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 2000 ~ "High",
-    detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 1000 ~ "High",
-    
-    detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
-    detailed_segregation == "Level track" & final_speed == 50 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
-    detailed_segregation == "Stepped or footway" & final_speed == 50 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
-    detailed_segregation == "Light segregation" & final_speed == 40 & final_volume < 2000 ~ "Medium",
-    detailed_segregation == "Light segregation" & final_speed == 50 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Cycle lane" & final_speed <= 20 ~ "Medium",
-    detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 4000 ~ "Medium",
-    detailed_segregation == "Cycle lane" & final_speed == 40 & final_volume < 1000 ~ "Medium",
-    detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 4000 ~ "Medium",
-    detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 2000 ~ "Medium",
-    detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 1000 ~ "Medium",
-    
-    
-    detailed_segregation == "Level track" ~ "Low",
-    detailed_segregation == "Stepped or footway" ~ "Low",
-    detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
-    detailed_segregation == "Light segregation" & final_speed == 60 & final_volume < 1000 ~ "Low",
-    detailed_segregation == "Cycle lane" & final_speed <= 50 ~ "Low",
-    detailed_segregation == "Cycle lane" & final_speed == 60 & final_volume < 1000 ~ "Low",
-    detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
-    detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 2000 ~ "Low",
-    detailed_segregation == "Mixed traffic" & final_speed == 60 & final_volume < 1000 ~ "Low",
-    
-    detailed_segregation == "Light segregation" ~ "Should not be used",
-    detailed_segregation == "Cycle lane" ~ "Should not be used",
-    detailed_segregation == "Mixed traffic" ~ "Should not be used",
-    TRUE ~ "Unknown"
-  )) %>% 
-  dplyr::mutate(`Level of Service` = factor(
-    `Level of Service`,
-    levels = c("High", "Medium", "Low", "Should not be used"),
-    ordered = TRUE
-  ))
-
-tm_shape(cycle_net_joined) + tm_lines("Level of Service", lwd = 2, palette = "viridis")
-
-# Checks
-snbu = cycle_net_joined %>% filter(level_of_service == "Should not be used")
-View(snbu)
-tm_shape(snbu) + tm_lines("highway", lwd = 2)
-
-paths = cycle_net_joined %>% filter(
-  highway == "path" | highway == "pedestrian",
-  bicycle == "permissive" | bicycle == "yes"
-)
-tm_shape(paths) + tm_lines("highway")
+# # Classify by final speed -------------------------------------------------
+# 
+# cycle_net_joined = cycle_net_joined %>% 
+#   mutate(`Level of Service` = case_when(
+#     detailed_segregation == "Cycle track" ~ "High",
+#     detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
+#     detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
+#     detailed_segregation == "Stepped or footway" & final_speed == 30 & final_volume < 4000 ~ "High",
+#     detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
+#     detailed_segregation == "Light segregation" & final_speed == 30 & final_volume < 4000 ~ "High",
+#     detailed_segregation == "Cycle lane" & final_speed <= 20 & final_volume < 4000 ~ "High",
+#     detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 1000 ~ "High",
+#     detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 2000 ~ "High",
+#     detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 1000 ~ "High",
+#     
+#     detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
+#     detailed_segregation == "Level track" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+#     detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
+#     detailed_segregation == "Stepped or footway" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+#     detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
+#     detailed_segregation == "Light segregation" & final_speed == 40 & final_volume < 2000 ~ "Medium",
+#     detailed_segregation == "Light segregation" & final_speed == 50 & final_volume < 1000 ~ "Medium",
+#     detailed_segregation == "Cycle lane" & final_speed <= 20 ~ "Medium",
+#     detailed_segregation == "Cycle lane" & final_speed == 30 & final_volume < 4000 ~ "Medium",
+#     detailed_segregation == "Cycle lane" & final_speed == 40 & final_volume < 1000 ~ "Medium",
+#     detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_volume < 4000 ~ "Medium",
+#     detailed_segregation == "Mixed traffic" & final_speed == 30 & final_volume < 2000 ~ "Medium",
+#     detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 1000 ~ "Medium",
+#     
+#     
+#     detailed_segregation == "Level track" ~ "Low",
+#     detailed_segregation == "Stepped or footway" ~ "Low",
+#     detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
+#     detailed_segregation == "Light segregation" & final_speed == 60 & final_volume < 1000 ~ "Low",
+#     detailed_segregation == "Cycle lane" & final_speed <= 50 ~ "Low",
+#     detailed_segregation == "Cycle lane" & final_speed == 60 & final_volume < 1000 ~ "Low",
+#     detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
+#     detailed_segregation == "Mixed traffic" & final_speed == 40 & final_volume < 2000 ~ "Low",
+#     detailed_segregation == "Mixed traffic" & final_speed == 60 & final_volume < 1000 ~ "Low",
+#     
+#     detailed_segregation == "Light segregation" ~ "Should not be used",
+#     detailed_segregation == "Cycle lane" ~ "Should not be used",
+#     detailed_segregation == "Mixed traffic" ~ "Should not be used",
+#     TRUE ~ "Unknown"
+#   )) %>% 
+#   dplyr::mutate(`Level of Service` = factor(
+#     `Level of Service`,
+#     levels = c("High", "Medium", "Low", "Should not be used"),
+#     ordered = TRUE
+#   ))
+# 
+# tm_shape(cycle_net_joined) + tm_lines("Level of Service", lwd = 2, palette = "viridis")
+# 
+# # Checks
+# snbu = cycle_net_joined %>% filter(level_of_service == "Should not be used")
+# View(snbu)
+# tm_shape(snbu) + tm_lines("highway", lwd = 2)
+# 
+# paths = cycle_net_joined %>% filter(
+#   highway == "path" | highway == "pedestrian",
+#   bicycle == "permissive" | bicycle == "yes"
+# )
+# tm_shape(paths) + tm_lines("highway")
 
 saveRDS(cycle_net, "data-raw/cycle-net.Rds")
 saveRDS(cycle_net_joined, "data-raw/cycle-net-joined.Rds")
