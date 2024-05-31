@@ -62,7 +62,7 @@ tm_shape(osm) +
   tm_lines(col = "black")
 ```
 
-![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
+![](man/figures/README-minimal-1.png)<!-- -->
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
 
@@ -71,7 +71,7 @@ m = plot_osm_tmap(cycle_net)
 m
 ```
 
-![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
+![](man/figures/README-minimal_plot_osm_tmap-1.png)<!-- -->
 
 ## Leeds example
 

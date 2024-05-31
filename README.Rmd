@@ -89,7 +89,7 @@ devtools::load_all()
 The package comes with example data for testing functions.
 You can test the functions as follows:
 
-```{r}
+```{r minimal}
 osm = osm_edinburgh
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
@@ -110,7 +110,7 @@ tm_shape(osm) +
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
 
-```{r}
+```{r minimal_plot_osm_tmap}
 m = plot_osm_tmap(cycle_net)
 m
 ```
