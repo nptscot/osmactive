@@ -215,31 +215,31 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Separated cycle track",
       TRUE ~ detailed_segregation
     )) |>
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Cycle track
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Separated cycle track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Cycle track",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Separated cycle track",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane on carriageway",
       stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed traffic" ~ "Light segregation",
       stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane on carriageway",
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside cycle track",
-      detailed_segregation %in% c("Cycle lane", "Mixed traffic") ~ "Mixed traffic",
+      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside infrastructure",
+      detailed_segregation %in% c("Cycle lane on carriageway", "Mixed traffic") ~ "Mixed traffic",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Cycle track", "Roadside cycle track", "Mixed traffic"),
+      levels = c("Separated cycle track", "Roadside infrastructure", "Mixed traffic"),
       ordered = TRUE
     ))
 }
@@ -294,6 +294,12 @@ basemaps = function() {
   )
 }
 
+# Function: most_common_value
+# Description: This function takes a vector as input and returns the most common value in the vector.
+# Parameters:
+#   - x: A vector of values
+# Returns:
+#   - The most common value in the vector, or NA if the vector is empty or contains only NA values.
 most_common_value = function(x) {
   if (length(x) == 0) {
     return(NA)
@@ -409,14 +415,14 @@ estimate_traffic = function(osm) {
 level_of_service = function(osm) {
   osm = osm |>
     dplyr::mutate(`Level of Service` = dplyr::case_when(
-      detailed_segregation == "Cycle track" ~ "High",
+      detailed_segregation == "Separated cycle track" ~ "High",
       detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
       detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
       detailed_segregation == "Stepped or footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
       detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
       detailed_segregation == "Light segregation" & final_speed == 30 & final_traffic < 4000 ~ "High",
-      detailed_segregation == "Cycle lane" & final_speed <= 20 & final_traffic < 4000 ~ "High",
-      detailed_segregation == "Cycle lane" & final_speed == 30 & final_traffic < 1000 ~ "High",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed <= 20 & final_traffic < 4000 ~ "High",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed == 30 & final_traffic < 1000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 2000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
       
@@ -427,9 +433,9 @@ level_of_service = function(osm) {
       detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 40 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
-      detailed_segregation == "Cycle lane" & final_speed <= 20 ~ "Medium",
-      detailed_segregation == "Cycle lane" & final_speed == 30 & final_traffic < 4000 ~ "Medium",
-      detailed_segregation == "Cycle lane" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed <= 20 ~ "Medium",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed == 30 & final_traffic < 4000 ~ "Medium",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 4000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
@@ -439,14 +445,14 @@ level_of_service = function(osm) {
       detailed_segregation == "Stepped or footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
       detailed_segregation == "Light segregation" & final_speed == 60 & final_traffic < 1000 ~ "Low",
-      detailed_segregation == "Cycle lane" & final_speed <= 50 ~ "Low",
-      detailed_segregation == "Cycle lane" & final_speed == 60 & final_traffic < 1000 ~ "Low",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed <= 50 ~ "Low",
+      detailed_segregation == "Cycle lane on carriageway" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 2000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       
       detailed_segregation == "Light segregation" ~ "Should not be used",
-      detailed_segregation == "Cycle lane" ~ "Should not be used",
+      detailed_segregation == "Cycle lane on carriageway" ~ "Should not be used",
       detailed_segregation == "Mixed traffic" ~ "Should not be used",
       TRUE ~ "Unknown"
     )) |>
