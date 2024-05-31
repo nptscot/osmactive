@@ -53,13 +53,17 @@ usethis::use_github_action("check-standard")
 usethis::use_vignette("classifying-cycle-infrastructure")
 # Add example datasets
 usethis::use_data_raw("osm_edinburgh")
-devtools::check()
 usethis::use_vignette("classify-volumes", "Classify Cycle by Design road volumes")
 # Style the package
 remotes::install_github("Robinlovelace/styler.equals")
 styler.equals::style_pkg()
 # And the README:
 styler.equals::style_file("README.Rmd")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+# For testing:
+devtools::check()
 ```
 
 Install the package with:
@@ -92,6 +96,8 @@ drive_net = get_driving_network(osm)
 drive_net_major = get_driving_network_major(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
+table(cycle_net$detailed_segregation)
+table(cycle_net$cycle_segregation)
 tm_shape(osm) +
   tm_lines(col = "grey") +
   tm_shape(cycle_net) +
