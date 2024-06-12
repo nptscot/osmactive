@@ -131,7 +131,7 @@ m
 ```
 
 ```{r}
-#| eval: false
+#| eval: true
 #| echo: false
 leeds_6km = leeds_zb |>
   filter(circle_id <= 3) |>
