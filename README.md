@@ -23,6 +23,8 @@ remotes::install_github("nptscot/osmactive")
 library(osmactive)
 library(tmap) # for mapping
 library(dplyr) # for data manipulation
+library(sf) # for spatial data
+sf::sf_use_s2(FALSE)
 ```
 
 Alternatively, you can load the package with the following for local
@@ -179,3 +181,27 @@ m
 ```
 
 ![](man/figures/README-lisbon-1.png)<!-- -->
+
+## London
+
+``` r
+london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Reading layer `lines' from data source 
+#>   `/home/robin/data/osm/geofabrik_greater-london-latest.gpkg' 
+#>   using driver `GPKG'
+#> Simple feature collection with 5856 features and 31 fields
+#> Geometry type: MULTILINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009279 ymax: 51.51222
+#> Geodetic CRS:  WGS 84
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+![](man/figures/README-london-1.png)<!-- -->
