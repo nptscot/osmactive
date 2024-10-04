@@ -102,14 +102,18 @@ get_driving_network = function(
 #' @export
 #' @inheritParams get_driving_network
 #' @param pattern A character string of highway values to define major roads in the form `motorway|trunk|primary|secondary|tertiary`
+#' @param min_maxspeed The minimum maxspeed value for a road to be considered a major road
 #' @rdname get_driving_network
 get_driving_network_major = function(
     osm,
     ex_d = exclude_highway_driving(),
-    pattern = "motorway|trunk|primary|secondary|tertiary") {
+    pattern = "motorway|trunk|primary|secondary|tertiary",
+    min_maxspeed = 40
+    ) {
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
-    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
+    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern)) |>
+    dplyr::filter(maxspeed >= min_maxspeed)
 }
 #' Get the OSM cycling network
 #'
@@ -152,6 +156,10 @@ get_cycling_network = function(
 #' driving_network = get_driving_network(osm)
 #' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
+  if (nrow(roads) == 0) {
+    rnet$distance_to_road = Inf
+    return(rnet)
+  }
   suppressWarnings({
     segregated_points = sf::st_point_on_surface(rnet)
   })
@@ -278,8 +286,10 @@ plot_osm_tmap = function(
       col.legend = tmap::tm_legend(title = "Infrastructure type")
     ) +
     # Add scale bar
-    tmap::tm_scalebar(position = c("left", "bottom")) +
-    tm_layout(basemap.server = basemaps())
+    tmap::tm_scalebar(position = c("left", "bottom"))
+    # TODO: replace with tmap v4 alternative:
+    # +
+    # tm_layout(basemap.server = basemaps())
 }
 
 basemaps = function() {

@@ -76,6 +76,8 @@ remotes::install_github("nptscot/osmactive")
 library(osmactive)
 library(tmap) # for mapping
 library(dplyr) # for data manipulation
+library(sf) # for spatial data
+sf::sf_use_s2(FALSE)
 ```
 
 Alternatively, you can load the package with the following for local development:
@@ -248,4 +250,17 @@ tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
 # upload:
 system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
+```
+
+## London
+
+```{r london}
+london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
 ```
