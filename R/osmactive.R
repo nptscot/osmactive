@@ -102,18 +102,14 @@ get_driving_network = function(
 #' @export
 #' @inheritParams get_driving_network
 #' @param pattern A character string of highway values to define major roads in the form `motorway|trunk|primary|secondary|tertiary`
-#' @param min_maxspeed The minimum maxspeed value for a road to be considered a major road
 #' @rdname get_driving_network
 get_driving_network_major = function(
     osm,
     ex_d = exclude_highway_driving(),
-    pattern = "motorway|trunk|primary|secondary|tertiary",
-    min_maxspeed = 40
-    ) {
+    pattern = "motorway|trunk|primary|secondary|tertiary") {
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_d)) |>
-    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern)) |>
-    dplyr::filter(maxspeed >= min_maxspeed)
+    dplyr::filter(stringr::str_detect(string = highway, pattern = pattern))
 }
 #' Get the OSM cycling network
 #'
@@ -156,10 +152,6 @@ get_cycling_network = function(
 #' driving_network = get_driving_network(osm)
 #' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
-  if (nrow(roads) == 0) {
-    rnet$distance_to_road = Inf
-    return(rnet)
-  }
   suppressWarnings({
     segregated_points = sf::st_point_on_surface(rnet)
   })
@@ -286,10 +278,8 @@ plot_osm_tmap = function(
       col.legend = tmap::tm_legend(title = "Infrastructure type")
     ) +
     # Add scale bar
-    tmap::tm_scalebar(position = c("left", "bottom"))
-    # TODO: replace with tmap v4 alternative:
-    # +
-    # tm_layout(basemap.server = basemaps())
+    tmap::tm_scalebar(position = c("left", "bottom")) +
+    tm_layout(basemap.server = basemaps())
 }
 
 basemaps = function() {
@@ -390,7 +380,7 @@ clean_speeds = function(osm) {
 #' table(osm_no_traffic$highway) # Active travel infrastructure has no road traffic
 #' table(osm_traffic$assumed_volume, useNA = "always")
 estimate_traffic = function(osm) {
-  osm = osm |>
+  osm = osm|>
     dplyr::mutate(
       assumed_volume = dplyr::case_when(
         highway == "motorway" ~ 20000,
@@ -414,7 +404,7 @@ estimate_traffic = function(osm) {
   )
   osm
 }
-
+  
 
 #' Generate Cycle by Design Level of Service
 #'
@@ -434,6 +424,7 @@ level_of_service = function(osm) {
       detailed_segregation == "Cycle lane on carriageway" & final_speed == 30 & final_traffic < 1000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 2000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
+      
       detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
       detailed_segregation == "Level track" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
@@ -447,6 +438,8 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 4000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
+      
+      
       detailed_segregation == "Level track" ~ "Low",
       detailed_segregation == "Stepped or footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
@@ -456,6 +449,7 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 2000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 60 & final_traffic < 1000 ~ "Low",
+      
       detailed_segregation == "Light segregation" ~ "Should not be used",
       detailed_segregation == "Cycle lane on carriageway" ~ "Should not be used",
       detailed_segregation == "Mixed traffic" ~ "Should not be used",
