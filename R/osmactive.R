@@ -233,12 +233,12 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Roadside infrastructure",
+      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Separated cycle track",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Remote cycle track", "Roadside infrastructure", "Cycle lane on carriageway", "Mixed traffic"),
+      levels = c("Remote cycle track", "Separated cycle track", "Cycle lane on carriageway", "Mixed traffic"),
       ordered = TRUE
     ))
 }

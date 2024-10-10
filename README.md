@@ -50,7 +50,7 @@ table(cycle_net$detailed_segregation)
 #>                         4
 table(cycle_net$cycle_segregation)
 #> 
-#>     Separated cycle track   Roadside infrastructure Cycle lane on carriageway 
+#>     Separated cycle track   Separated cycle track Cycle lane on carriageway 
 #>                         4                        14                         1 
 #>             Mixed traffic 
 #>                        52
