@@ -1,66 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://nptscot.github.io/osmactive/404.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/articles/classify-volumes.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/articles/classifying-cycle-infrastructure.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/classify_cycle_infrastructure.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/clean_speeds.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/distance_to_road.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/estimate_traffic.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/et_active.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/get_cycling_network.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/get_driving_network.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/get_travel_network.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/level_of_service.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/osm_edinburgh.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/plot_osm_tmap.html</loc>
-  </url>
-  <url>
-    <loc>https://nptscot.github.io/osmactive/reference/traffic_volumes_edinburgh.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://nptscot.github.io/osmactive/404.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/LICENSE-text.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/LICENSE.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/articles/classify-volumes.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/articles/classifying-cycle-infrastructure.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/articles/index.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/authors.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/index.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/classify_cycle_infrastructure.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/clean_speeds.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/distance_to_road.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/estimate_traffic.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/et_active.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/get_cycling_network.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/get_driving_network.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/get_travel_network.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/index.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/level_of_service.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/osm_edinburgh.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/plot_osm_tmap.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/traffic_volumes_edinburgh.html</loc></url>
 </urlset>
+
