@@ -215,12 +215,12 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Separated cycle track",
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Remote cycle track",
       TRUE ~ detailed_segregation
     )) |>
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Separated cycle track
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Remote cycle track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Separated cycle track",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Remote cycle track",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
@@ -238,7 +238,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Separated cycle track", "Roadside infrastructure", "Cycle lane on carriageway", "Mixed traffic"),
+      levels = c("Remote cycle track", "Roadside infrastructure", "Cycle lane on carriageway", "Mixed traffic"),
       ordered = TRUE
     ))
 }
@@ -404,7 +404,7 @@ estimate_traffic = function(osm) {
   )
   osm
 }
-  
+
 
 #' Generate Cycle by Design Level of Service
 #'
@@ -414,7 +414,7 @@ estimate_traffic = function(osm) {
 level_of_service = function(osm) {
   osm = osm |>
     dplyr::mutate(`Level of Service` = dplyr::case_when(
-      detailed_segregation == "Separated cycle track" ~ "High",
+      detailed_segregation == "Remote cycle track" ~ "High",
       detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
       detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
       detailed_segregation == "Stepped or footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
@@ -424,7 +424,7 @@ level_of_service = function(osm) {
       detailed_segregation == "Cycle lane on carriageway" & final_speed == 30 & final_traffic < 1000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 2000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
-      
+
       detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
       detailed_segregation == "Level track" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
@@ -438,8 +438,8 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 4000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
-      
-      
+
+
       detailed_segregation == "Level track" ~ "Low",
       detailed_segregation == "Stepped or footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
@@ -449,7 +449,7 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 2000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 60 & final_traffic < 1000 ~ "Low",
-      
+
       detailed_segregation == "Light segregation" ~ "Should not be used",
       detailed_segregation == "Cycle lane on carriageway" ~ "Should not be used",
       detailed_segregation == "Mixed traffic" ~ "Should not be used",
