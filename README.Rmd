@@ -260,11 +260,19 @@ system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobb
 ## London
 
 ```{r london}
-london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+devtools::load_all()
+library(tidyverse)
+london = zonebuilder::zb_zone("Southwark Station", n_circles = 5)
+london = sf::st_union(london) |>
+  sf::st_make_valid()
 osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
+system.time({
+  cycle_net = distance_to_road(cycle_net, drive_net)
+})
+head(cycle_net$distance_to_road)
+mean(cycle_net$distance_to_road)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
