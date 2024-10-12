@@ -153,13 +153,17 @@ get_cycling_network = function(
 #' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
   suppressWarnings({
-    segregated_points = sf::st_point_on_surface(rnet)
+    rnet_points = rnet |> 
+      sf::st_transform(27700) |>
+      sf::st_point_on_surface()        
   })
-  roads_union = roads |>
+  roads_transformed = roads |>
     sf::st_transform(27700)
-  roads_geos = geos::as_geos_geometry(roads_union)
-  points_geos = geos::as_geos_geometry(segregated_points |> sf::st_transform(27700))
-  points_distances = geos::geos_distance(points_geos, roads_geos)
+  roads_geos = geos::as_geos_geometry(roads_transformed)
+  points_geos = geos::as_geos_geometry(rnet_points)
+  roads_nearest_i = geos::geos_nearest(points_geos, roads_geos)
+  roads_nearest = roads_geos[roads_nearest_i]
+  points_distances = geos::geos_distance(points_geos, roads_nearest)
   rnet$distance_to_road = round(points_distances, 1)
   return(rnet)
 }
