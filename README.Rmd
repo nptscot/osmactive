@@ -157,6 +157,8 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 
 
 ```{r edinburgh}
+devtools::load_all()
+library(tidyverse)
 edinburgh = zonebuilder::zb_zone("Edinburgh")
 edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
@@ -165,7 +167,10 @@ edinburgh_3km = edinburgh |>
 osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
+system.time({
+  cycle_net = distance_to_road(cycle_net, drive_net)
+})
+# 0.269s with union, 0.071s without
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
