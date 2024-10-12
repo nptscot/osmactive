@@ -156,7 +156,6 @@ distance_to_road = function(rnet, roads) {
     segregated_points = sf::st_point_on_surface(rnet)
   })
   roads_union = roads |>
-    sf::st_union() |>
     sf::st_transform(27700)
   roads_geos = geos::as_geos_geometry(roads_union)
   points_geos = geos::as_geos_geometry(segregated_points |> sf::st_transform(27700))
