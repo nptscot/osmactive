@@ -4,7 +4,7 @@ pkgdown_sha: ~
 articles:
   classify-volumes: classify-volumes.html
   classifying-cycle-infrastructure: classifying-cycle-infrastructure.html
-last_built: 2024-10-13T16:04Z
+last_built: 2024-10-13T16:07Z
 urls:
   reference: https://nptscot.github.io/osmactive/reference
   article: https://nptscot.github.io/osmactive/articles
