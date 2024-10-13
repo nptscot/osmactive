@@ -282,7 +282,7 @@ plot_osm_tmap = function(
     ) +
     # Add scale bar
     tmap::tm_scalebar(position = c("left", "bottom")) +
-    tm_layout(basemap.server = basemaps())
+    tmap::tm_layout(basemap.server = basemaps())
 }
 
 basemaps = function() {
