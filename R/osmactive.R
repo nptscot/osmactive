@@ -274,8 +274,8 @@ classify_cycle_infrastructure_scotland = function(
   osm_classified = osm_classified |>
     clean_widths() |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      detailed_segregation %in% segtypes & is_wide(width) ~ "Segregated Track (wide)",
-      detailed_segregation %in% segtypes & !is_wide(width) ~ "Segregated Track (narrow)",
+      detailed_segregation %in% segtypes & is_wide(width_clean) ~ "Segregated Track (wide)",
+      detailed_segregation %in% segtypes & !is_wide(width_clean) ~ "Segregated Track (narrow)",
       # Shared use:
       (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") |
         (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track") ~ "Shared use",
@@ -354,6 +354,7 @@ classify_shared_use = function(osm) {
 #' @export
 #' @examples
 #' osm = osm_edinburgh
+#' osm$width
 #' osm$est_width = NA
 #' osm$est_width[1:3] = 2
 #' osm_cleaned = clean_widths(osm)
@@ -362,17 +363,20 @@ classify_shared_use = function(osm) {
 clean_widths = function(osm) {
   # Check if the est_width column is present and skip if not:
   if (!"est_width" %in% names(osm)) {
+    suppressWarnings({
+      osm$width_clean = as.numeric(osm$width)
+    })
     return(osm)
   }
   suppressWarnings({
-    osm$width = as.numeric(osm$width)
-    osm$est_width = as.numeric(osm$est_width)
+    width = as.numeric(osm$width)
+    est_width = as.numeric(osm$est_width)
   })
-  osm$width[is.na(osm$width)] = 0
-  osm$est_width[is.na(osm$est_width)] = 0
-  osm$width = dplyr::case_when(
-    osm$width == 0 ~ osm$est_width,
-    TRUE ~ osm$width
+  width[is.na(width)] = 0
+  est_width[is.na(est_width)] = 0
+  osm$width_clean = dplyr::case_when(
+    est_width > 0 & width == 0 ~ est_width,
+    TRUE ~ width
   )
   osm
 }
@@ -391,7 +395,7 @@ clean_widths = function(osm) {
 #' x = osm_edinburgh$width
 #' x
 #' is_wide(x)
-is_wide = function(x, min_width = 1.5) {
+is_wide = function(x, min_width = 2) {
   suppressWarnings({
     x = as.numeric(x)
   })

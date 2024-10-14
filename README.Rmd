@@ -144,6 +144,7 @@ leeds_6km = leeds_zb |>
   sf::st_union()
 osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
+names(cycle_net)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
