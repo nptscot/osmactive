@@ -283,7 +283,7 @@ is_wide = function(x, min_width = 1.5) {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "other_tags"),
+    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "width", "other_tags"),
     lwd = 4,
     palette = "-PuBuGn") {
   # Stop if tmap is not installed or if the version is less than 3.99:
