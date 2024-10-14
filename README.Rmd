@@ -99,6 +99,9 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 table(cycle_net$cycle_segregation)
+```
+
+```{r minimal_plot_osm_tmap, eval=FALSE, echo=FALSE}
 tm_shape(osm) +
   tm_lines(col = "grey") +
   tm_shape(cycle_net) +
@@ -111,7 +114,7 @@ tm_shape(osm) +
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
 
-```{r minimal_plot_osm_tmap}
+```{r minimal_plot_osm}
 m = plot_osm_tmap(cycle_net)
 m
 ```
