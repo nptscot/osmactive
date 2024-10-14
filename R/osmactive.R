@@ -254,6 +254,46 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     ))
 }
 
+#' Classify ways by level of pedestrian/cyclist sharing
+#' 
+#' Ways on which bicycles and pedestrians share space are classified as "Shared use".
+#' According to 
+#' 
+#' tagging includes:
+#' 
+#' - highway=path (signposted foot and bicycle path, no dividing line)
+#'   + foot=designated
+#'   + bicycle=designated
+#'   + segregated=no
+#'
+#' - highway=path (Signposted foot and bicycle path with dividing line.)
+#'   + segregated=yes
+#' 
+#' - highway=pedestrian (A way intended for pedestrians)
+#' @param osm An sf object with the road network
+#' @return An sf object with the classified cycle network
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' cycle_network = get_cycling_network(osm)
+#' cycle_network_shared = classify_shared_use(cycle_network)
+#' table(cycle_network_shared$cycle_segregation)
+#' plot(cycle_network_shared["cycle_segregation"])
+classify_shared_use = function(osm) {
+  osm |>
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      highway == "path" & bicycle == "designated" & foot == "designated" & segregated == "no" ~ "Shared use",
+      highway == "path" & bicycle == "designated" & foot == "designated" & segregated == "yes" ~ "Shared use",
+      highway == "pedestrian" ~ "Shared use",
+      TRUE ~ "Unknown"
+    )) |>
+    dplyr::mutate(cycle_segregation = factor(
+      cycle_segregation,
+      levels = c("Shared use", "Unknown"),
+      ordered = TRUE
+    ))
+}
+
 #' Clean cycleway widths (use est_widths when available and width otherwise)
 #' 
 #' @param osm An sf object with the road network
