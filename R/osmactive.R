@@ -22,6 +22,8 @@ et_active = function() {
     "width", # To check if width is compliant with guidance
     "est_width", # in some cases present but width is missing
     "segregated",
+    "foot",
+    "path",
     "sidewalk",
     "footway",
     "service",
