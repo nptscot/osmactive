@@ -208,7 +208,6 @@ classify_cycle_infrastructure = function(
 }
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
   segtypes = c("Level track", "Light segregation", "Stepped or footway")
-  browser()
   osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
