@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   message = FALSE,
   warning = FALSE
-  , cache = TRUE
+  , cache = FALSE
 )
 ```
 
@@ -161,8 +161,6 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 
 
 ```{r edinburgh}
-devtools::load_all()
-library(tidyverse)
 edinburgh = zonebuilder::zb_zone("Edinburgh")
 edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
@@ -171,10 +169,7 @@ edinburgh_3km = edinburgh |>
 osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
-system.time({
-  cycle_net = distance_to_road(cycle_net, drive_net)
-})
-# 0.269s with union, 0.071s without
+cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
@@ -183,17 +178,7 @@ m
 <!-- Save an interactive version of the map to check the results as follows: -->
 
 ```{r}
-#| eval: false
-#| echo: false
-edinburgh_6km = edinburgh |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Scotland", boundary = edinburgh_6km, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+#| include: false
 tmap_save(m, "cycle_net_edinburgh.html")
 browseURL("cycle_net_edinburgh.html")
 system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
@@ -264,7 +249,6 @@ system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobb
 ## London
 
 ```{r london}
-devtools::load_all()
 london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
 london = sf::st_union(london) |>
   sf::st_make_valid()
