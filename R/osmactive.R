@@ -208,7 +208,8 @@ classify_cycle_infrastructure = function(
 }
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
   segtypes = c("Level track", "Light segregation", "Stepped or footway")
-  osm |>
+  browser()
+  osm_to_check = osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
@@ -250,6 +251,10 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       levels = c("Remote cycle track", "Separated cycle track (wide)", "Separated cycle track (narrow/unknown)", "Cycle lane on carriageway", "Mixed traffic"),
       ordered = TRUE
     ))
+  osm_to_check_na = osm_to_check |>
+    dplyr::filter(is.na(cycle_segregation)) |>
+    sf::st_drop_geometry() |>
+    dplyr::select(highway, cycleway, detailed_segregation, cycle_segregation)
 }
 
 #' Classify Separated cycle track by width
