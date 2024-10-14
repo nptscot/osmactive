@@ -318,7 +318,14 @@ plot_osm_tmap = function(
   # Subset popup.vars to include only those that are present in the data:
   popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
   Infrastructure = cycle_network_classified |>
-    dplyr::arrange(desc(cycle_segregation))
+    dplyr::arrange(desc(cycle_segregation)) |>
+    # Truncate the other_tags column to everything before the 5th comma:
+    dplyr::mutate(other_tags = stringr::str_extract(other_tags, "([^,]*,){0,4}[^,]*") ) |>
+    # # Replace "," with line breaks (TODO: fix this):
+    # dplyr::mutate(
+    #   other_tags = stringr::str_replace_all(other_tags, ",", "\\\\n")
+    # ) |>
+    dplyr::select(all_of(popup.vars), cycle_segregation) 
   tmap::tm_shape(Infrastructure) +
     tmap::tm_lines(
       col = "cycle_segregation",
