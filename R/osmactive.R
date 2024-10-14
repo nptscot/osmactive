@@ -300,8 +300,8 @@ plot_osm_tmap = function(
 #  'Mixed traffic': '~EFD1C5', // Almond
   palette_npt = c(
     "Remote cycle track" = "#008000",
-    "Separated cycle track (wide)" = "#7BCCB5",
-    "Separated cycle track (narrow/unknown)" = "#8B4513",
+    "Separated cycle track (wide)" = "#54bb90",
+    "Separated cycle track (narrow/unknown)" = "#ff8e0d",
     "Cycle lane on carriageway" = "#FF0000",
     "Mixed traffic" = "#EFD1C5"
   )
