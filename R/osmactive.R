@@ -278,14 +278,36 @@ is_wide = function(x, min_width = 1.5) {
 #' @param cycle_network_classified An sf object with the classified cycle network
 #' @param popup.vars A vector of variables to be displayed in the popup
 #' @param lwd The line width for the cycle network
-#' @param palette The palette to be used for the cycle segregation levels
+#' @param palette The palette to be used for the cycle segregation levels, 
+#'   such as "-PuBuGn" or "npt" (default)
 #' @return A tmap object for visualizing the classified cycle network
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
     popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "width", "other_tags"),
     lwd = 4,
-    palette = "-PuBuGn") {
+    palette = "npt") {
+# Previously:
+#  'Separated cycle track': '#008000', // Green 
+#  'Roadside infrastructure': '#FFBF00', // Amber 
+#  'Cycle lane on carriageway': '#FF0000', // Red 
+#  'Mixed traffic': '#EFD1C5', // Almond 
+  # JS code:
+#  'Remote cycle track': '#008000', // Green
+#  'Separated cycle track (wide)': '#7BCCB5', // Green
+#  'Separated cycle track (narrow/unknown)': '#8B4513', // Browny red
+#  'Cycle lane on carriageway': '#FF0000', // Red
+#  'Mixed traffic': '~EFD1C5', // Almond
+  palette_npt = c(
+    "Remote cycle track" = "#008000",
+    "Separated cycle track (wide)" = "#7BCCB5",
+    "Separated cycle track (narrow/unknown)" = "#8B4513",
+    "Cycle lane on carriageway" = "#FF0000",
+    "Mixed traffic" = "#EFD1C5"
+  )
+  if (palette == "npt") {
+    palette = palette_npt
+  }
   # Stop if tmap is not installed or if the version is less than 3.99:
   if (!requireNamespace("tmap", quietly = TRUE)) {
     stop("tmap is not installed. Please install tmap to use this function.")
