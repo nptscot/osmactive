@@ -162,9 +162,9 @@ get_cycling_network = function(
 #' edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
 distance_to_road = function(rnet, roads) {
   suppressWarnings({
-    rnet_points = rnet |> 
+    rnet_points = rnet |>
       sf::st_transform(27700) |>
-      sf::st_point_on_surface()        
+      sf::st_point_on_surface()
   })
   roads_transformed = roads |>
     sf::st_transform(27700)
@@ -206,11 +206,10 @@ distance_to_road = function(rnet, roads) {
 #' plot(netc["cycle_segregation"])
 #' plot(netc["distance_to_road"])
 classify_cycle_infrastructure = function(
-  osm,
-  min_distance = 10,
-  classification_type = "Scotland",
-  include_mixed_traffic = FALSE
-  ) {
+    osm,
+    min_distance = 10,
+    classification_type = "Scotland",
+    include_mixed_traffic = FALSE) {
   if (classification_type == "Scotland") {
     infra = classify_cycle_infrastructure_scotland(
       osm,
@@ -224,10 +223,9 @@ classify_cycle_infrastructure = function(
 }
 
 classify_cycle_infrastructure_scotland = function(
-  osm,
-  min_distance = 10,
-  include_mixed_traffic = FALSE
-  ) {
+    osm,
+    min_distance = 10,
+    include_mixed_traffic = FALSE) {
   segtypes = c("Level track", "Light segregation", "Stepped or footway")
   osm_classified = osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
@@ -263,29 +261,29 @@ classify_cycle_infrastructure_scotland = function(
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     ))
-      # For cycleway:left:segregated" and "cycleway:right:segregated"
-  if("cycleway_left_segregated" %in% names(osm_classified) & "cycleway_right_segregated" %in% names(osm_classified)) {
-      osm_classified = osm_classified |>
-  mutate(
-    detailed_segregation = dplyr::case_when(
-      cycleway_left_segregated == "yes" | cycleway_right_segregated == "yes" ~ "Light segregation",
-      TRUE ~ detailed_segregation
-    )
-  )
+  # For cycleway:left:segregated" and "cycleway:right:segregated"
+  if ("cycleway_left_segregated" %in% names(osm_classified) & "cycleway_right_segregated" %in% names(osm_classified)) {
+    osm_classified = osm_classified |>
+      mutate(
+        detailed_segregation = dplyr::case_when(
+          cycleway_left_segregated == "yes" | cycleway_right_segregated == "yes" ~ "Light segregation",
+          TRUE ~ detailed_segregation
+        )
+      )
   }
-     osm_classified = osm_classified |>
+  osm_classified = osm_classified |>
     clean_widths() |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% segtypes & is_wide(width) ~ "Segregated Track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width) ~ "Segregated Track (narrow)",
       # Shared use:
-      (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") | 
+      (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") |
         (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track") ~ "Shared use",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane", "Mixed Traffic Street"), 
+      levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane", "Mixed Traffic Street"),
       ordered = TRUE
     ))
   # Remove mixed traffic if not required:
@@ -294,7 +292,7 @@ classify_cycle_infrastructure_scotland = function(
       dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>
       dplyr::mutate(cycle_segregation = factor(
         cycle_segregation,
-        levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane"), 
+        levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane"),
         ordered = TRUE
       ))
   }
@@ -302,12 +300,12 @@ classify_cycle_infrastructure_scotland = function(
 }
 
 #' Classify ways by level of pedestrian/cyclist sharing
-#' 
+#'
 #' Ways on which bicycles and pedestrians share space are classified as "Shared use".
-#' According to 
-#' 
+#' According to
+#'
 #' tagging includes:
-#' 
+#'
 #' - highway=path (signposted foot and bicycle path, no dividing line)
 #'   + foot=designated
 #'   + bicycle=designated
@@ -315,7 +313,7 @@ classify_cycle_infrastructure_scotland = function(
 #'
 #' - highway=path (Signposted foot and bicycle path with dividing line.)
 #'   + segregated=yes
-#' 
+#'
 #' - highway=pedestrian (A way intended for pedestrians)
 #' @param osm An sf object with the road network
 #' @return An sf object with the classified cycle network
@@ -334,7 +332,7 @@ classify_shared_use = function(osm) {
       # Walking is permitted:
       (highway == "footway" | highway == "path" | highway == "pedestrian" | foot == "designated") &
         # Bicycle also permitted:
-        (bicycle == "designated" | highway == "path" ) ~ "Shared use (not segregated)",
+        (bicycle == "designated" | highway == "path") ~ "Shared use (not segregated)",
       TRUE ~ "Unknown"
     )) |>
     dplyr::mutate(cycle_pedestrian_separation = dplyr::case_when(
@@ -350,7 +348,7 @@ classify_shared_use = function(osm) {
 }
 
 #' Clean cycleway widths (use est_widths when available and width otherwise)
-#' 
+#'
 #' @param osm An sf object with the road network
 #' @return An sf object with the cleaned cycleway widths in the column `width`
 #' @export
@@ -381,15 +379,15 @@ clean_widths = function(osm) {
 
 
 #' Classify Separated cycle track by width
-#' 
+#'
 #' This function classifies cycleways as wide if the width is greater than or equal to `min_width`.
 #' NA values are replaced with 0, meaning that ways with no measurement are considered narrow.
-#' 
+#'
 #' @param x A numeric vector with the width of the cycleway (m)
 #' @param min_width The minimum width for a cycleway to be considered wide (m)
 #' @return A logical vector indicating whether the cycleway is wide
 #' @export
-#' @examples 
+#' @examples
 #' x = osm_edinburgh$width
 #' x
 #' is_wide(x)
@@ -406,7 +404,7 @@ is_wide = function(x, min_width = 1.5) {
 #' @param cycle_network_classified An sf object with the classified cycle network
 #' @param popup.vars A vector of variables to be displayed in the popup
 #' @param lwd The line width for the cycle network
-#' @param palette The palette to be used for the cycle segregation levels, 
+#' @param palette The palette to be used for the cycle segregation levels,
 #'   such as "-PuBuGn" or "npt" (default)
 #' @return A tmap object for visualizing the classified cycle network
 #' @export
@@ -415,23 +413,23 @@ plot_osm_tmap = function(
     popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
     lwd = 4,
     palette = "npt") {
-# Previously:
-#  'Separated cycle track': '#008000', // Green 
-#  'Roadside infrastructure': '#FFBF00', // Amber 
-#  'Cycle lane on carriageway': '#FF0000', // Red 
-#  'Mixed traffic': '#EFD1C5', // Almond 
+  # Previously:
+  #  'Separated cycle track': '#008000', // Green
+  #  'Roadside infrastructure': '#FFBF00', // Amber
+  #  'Cycle lane on carriageway': '#FF0000', // Red
+  #  'Mixed traffic': '#EFD1C5', // Almond
   # JS code:
-#  'Remote cycle track': '#008000', // Green
-#  'Separated cycle track (wide)': '#7BCCB5', // Green
-#  'Separated cycle track (narrow/unknown)': '#8B4513', // Browny red
-#  'Cycle lane on carriageway': '#FF0000', // Red
-#  'Mixed traffic': '~EFD1C5', // Almond
+  #  'Remote cycle track': '#008000', // Green
+  #  'Separated cycle track (wide)': '#7BCCB5', // Green
+  #  'Separated cycle track (narrow/unknown)': '#8B4513', // Browny red
+  #  'Cycle lane on carriageway': '#FF0000', // Red
+  #  'Mixed traffic': '~EFD1C5', // Almond
   palette_npt = c(
-      "Off-road Track" = "#4db92c",  # Mid/Light Green
-      "Segregated Track (wide)" = "#054d05",  # Dark Green
-      "Segregated Track (narrow)" = "#87d66883",  # Orange
-      "Painted Lane" = "#FF0000",  # Red
-      "Shared use" = "#f0b97b"  # Grey/Neutral
+    "Off-road Track" = "#4db92c", # Mid/Light Green
+    "Segregated Track (wide)" = "#054d05", # Dark Green
+    "Segregated Track (narrow)" = "#87d66883", # Orange
+    "Painted Lane" = "#FF0000", # Red
+    "Shared use" = "#f0b97b" # Grey/Neutral
   )
   if (palette == "npt") {
     palette = palette_npt
@@ -448,12 +446,12 @@ plot_osm_tmap = function(
   Infrastructure = cycle_network_classified |>
     dplyr::arrange(desc(cycle_segregation)) |>
     # Truncate the other_tags column to everything before the 5th comma:
-    dplyr::mutate(other_tags = stringr::str_extract(other_tags, "([^,]*,){0,4}[^,]*") ) |>
+    dplyr::mutate(other_tags = stringr::str_extract(other_tags, "([^,]*,){0,4}[^,]*")) |>
     # # Replace "," with line breaks (TODO: fix this):
     # dplyr::mutate(
     #   other_tags = stringr::str_replace_all(other_tags, ",", "\\\\n")
     # ) |>
-    dplyr::select(all_of(popup.vars), cycle_segregation) 
+    dplyr::select(all_of(popup.vars), cycle_segregation)
   tmap::tm_shape(Infrastructure) +
     tmap::tm_lines(
       col = "cycle_segregation",
@@ -567,7 +565,7 @@ clean_speeds = function(osm) {
 #' table(osm_no_traffic$highway) # Active travel infrastructure has no road traffic
 #' table(osm_traffic$assumed_volume, useNA = "always")
 estimate_traffic = function(osm) {
-  osm = osm|>
+  osm = osm |>
     dplyr::mutate(
       assumed_volume = dplyr::case_when(
         highway == "motorway" ~ 20000,
@@ -611,7 +609,6 @@ level_of_service = function(osm) {
       detailed_segregation == "Cycle lane on carriageway" & final_speed == 30 & final_traffic < 1000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 2000 ~ "High",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
-
       detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
       detailed_segregation == "Level track" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
@@ -625,8 +622,6 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 20 & final_traffic < 4000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
-
-
       detailed_segregation == "Level track" ~ "Low",
       detailed_segregation == "Stepped or footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
@@ -636,7 +631,6 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed <= 30 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 2000 ~ "Low",
       detailed_segregation == "Mixed traffic" & final_speed == 60 & final_traffic < 1000 ~ "Low",
-
       detailed_segregation == "Light segregation" ~ "Should not be used",
       detailed_segregation == "Cycle lane on carriageway" ~ "Should not be used",
       detailed_segregation == "Mixed traffic" ~ "Should not be used",
