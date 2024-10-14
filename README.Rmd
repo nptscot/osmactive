@@ -10,8 +10,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   message = FALSE,
-  warning = FALSE,
-  cache = TRUE
+  warning = FALSE
+  , cache = FALSE
 )
 ```
 
@@ -77,7 +77,6 @@ library(osmactive)
 library(tmap) # for mapping
 library(dplyr) # for data manipulation
 library(sf) # for spatial data
-sf::sf_use_s2(FALSE)
 ```
 
 Alternatively, you can load the package with the following for local development:
@@ -122,7 +121,9 @@ m
 ```{r leeds}
 leeds_zb = zonebuilder::zb_zone("Leeds")
 leeds = leeds_zb |>
-  filter(circle_id == 1)
+  filter(circle_id == 1) |>
+  sf::st_union() |>
+  sf::st_make_valid()
 osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
@@ -260,6 +261,7 @@ system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobb
 ## London
 
 ```{r london}
+devtools::load_all()
 london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
 london = sf::st_union(london) |>
   sf::st_make_valid()
