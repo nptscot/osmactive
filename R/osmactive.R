@@ -195,7 +195,11 @@ distance_to_road = function(rnet, roads) {
 #' library(sf)
 #' plot(netc["cycle_segregation"])
 #' plot(netc["distance_to_road"])
-classify_cycle_infrastructure = function(osm, min_distance = 10, classification_type = "Scotland") {
+classify_cycle_infrastructure = function(
+  osm,
+  min_distance = 10,
+  classification_type = "Scotland"
+  ) {
   if (classification_type == "Scotland") {
     return(classify_cycle_infrastructure_scotland(osm, min_distance))
   } else {
@@ -203,6 +207,7 @@ classify_cycle_infrastructure = function(osm, min_distance = 10, classification_
   }
 }
 classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
+  segtypes = c("Level track", "Light segregation", "Stepped or footway")
   osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
@@ -236,14 +241,13 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      segtypes = c("Level track", "Light segregation", "Stepped or footway"),
-      detailed_segregation %in% segtypes & 
-       ~ "Separated cycle track",
+      detailed_segregation %in% segtypes & is_wide(width) ~ "Separated cycle track (wide)",
+      detailed_segregation %in% segtypes & !is_wide(width) ~ "Separated cycle track (narrow)",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Remote cycle track", "Separated cycle track", "Cycle lane on carriageway", "Mixed traffic"),
+      levels = c("Remote cycle track", "Separated cycle track (wide)", "Separated cycle track (narrow/unknown)", "Cycle lane on carriageway", "Mixed traffic"),
       ordered = TRUE
     ))
 }
