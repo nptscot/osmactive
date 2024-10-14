@@ -236,7 +236,9 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
-      detailed_segregation %in% c("Level track", "Light segregation", "Stepped or footway") ~ "Separated cycle track",
+      segtypes = c("Level track", "Light segregation", "Stepped or footway"),
+      detailed_segregation %in% segtypes & 
+       ~ "Separated cycle track",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
@@ -246,7 +248,26 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     ))
 }
 
-# Classify Separated cycle track by width and 
+#' Classify Separated cycle track by width
+#' 
+#' This function classifies cycleways as wide if the width is greater than or equal to `min_width`.
+#' NA values are replaced with 0, meaning that ways with no measurement are considered narrow.
+#' 
+#' @param x A numeric vector with the width of the cycleway (m)
+#' @param min_width The minimum width for a cycleway to be considered wide (m)
+#' @return A logical vector indicating whether the cycleway is wide
+#' @export
+#' @examples 
+#' x = osm_edinburgh$width
+#' x
+#' is_wide(x)
+is_wide = function(x, min_width = 1.5) {
+  suppressWarnings({
+    x = as.numeric(x)
+  })
+  x[is.na(x)] = 0
+  x >= min_width
+}
 
 #' Create a tmap object for visualizing the classified cycle network
 #'
