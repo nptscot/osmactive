@@ -3,7 +3,7 @@
 remotes::install_github("nptscot/osmactive")
 library(osmactive)
 # Or
-devtools::load_all()
+# devtools::load_all()
 library(dplyr)
 library(tmap)
 library(sf)
@@ -39,7 +39,7 @@ plot(osm)
 
 # # Keep only most relevant columns
 osm = osm %>%
-  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, segregated, maxspeed, other_tags)
+  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, other_tags)
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network

@@ -54,3 +54,4 @@ docs
 inst/doc
 *.geojson
 *.Rds
+*.pdf
