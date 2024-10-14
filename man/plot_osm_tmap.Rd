@@ -7,9 +7,9 @@
 plot_osm_tmap(
   cycle_network_classified,
   popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway",
-    "cycleway", "width", "other_tags"),
+    "cycleway", "lanes", "width", "other_tags"),
   lwd = 4,
-  palette = "-PuBuGn"
+  palette = "npt"
 )
 }
 \arguments{
@@ -19,7 +19,8 @@ plot_osm_tmap(
 
 \item{lwd}{The line width for the cycle network}
 
-\item{palette}{The palette to be used for the cycle segregation levels}
+\item{palette}{The palette to be used for the cycle segregation levels,
+such as "-PuBuGn" or "npt" (default)}
 }
 \value{
 A tmap object for visualizing the classified cycle network

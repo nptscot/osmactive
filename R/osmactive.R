@@ -19,9 +19,10 @@ et_active = function() {
     "lanes:bus:conditional",
     "lit", # useful to check if cycleways are lit
     "oneway",
-    "width", # useful to ensure width of cycleways is at least 1.5m
+    "width", # To check if width is compliant with guidance
+    "est_width", # in some cases present but width is missing
     "segregated",
-    "sidewalk", # useful to ensure width of cycleways is at least 1.5m
+    "sidewalk",
     "footway",
     "service",
     "surface",
@@ -240,6 +241,7 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     )) |>
+    clean_widths() |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% segtypes & is_wide(width) ~ "Separated cycle track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width) ~ "Separated cycle track (narrow/unknown)",
@@ -251,6 +253,37 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       ordered = TRUE
     ))
 }
+
+#' Clean cycleway widths (use est_widths when available and width otherwise)
+#' 
+#' @param osm An sf object with the road network
+#' @return An sf object with the cleaned cycleway widths in the column `width`
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' osm$est_width = NA
+#' osm$est_width[1:3] = 2
+#' osm_cleaned = clean_widths(osm)
+#' osm$width
+#' osm_cleaned$width
+clean_widths = function(osm) {
+  # Check if the est_width column is present and skip if not:
+  if (!"est_width" %in% names(osm)) {
+    return(osm)
+  }
+  suppressWarnings({
+    osm$width = as.numeric(osm$width)
+    osm$est_width = as.numeric(osm$est_width)
+  })
+  osm$width[is.na(osm$width)] = 0
+  osm$est_width[is.na(osm$est_width)] = 0
+  osm$width = dplyr::case_when(
+    osm$width == 0 ~ osm$est_width,
+    TRUE ~ osm$width
+  )
+  osm
+}
+
 
 #' Classify Separated cycle track by width
 #' 
