@@ -251,7 +251,10 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
       cycle_segregation,
       levels = c("Remote cycle track", "Separated cycle track (wide)", "Separated cycle track (narrow/unknown)", "Cycle lane on carriageway", "Mixed traffic"),
       ordered = TRUE
-    ))
+    )) |>
+    dplyr::mutate(
+      color = palette_npt[as.character(cycle_segregation)]
+    )    
 }
 
 #' Clean cycleway widths (use est_widths when available and width otherwise)
