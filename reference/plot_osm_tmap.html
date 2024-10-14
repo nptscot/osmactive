@@ -46,9 +46,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_osm_tmap</span><span class="op">(</span></span>
 <span>  <span class="va">cycle_network_classified</span>,</span>
 <span>  popup.vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"name"</span>, <span class="st">"cycle_segregation"</span>, <span class="st">"distance_to_road"</span>, <span class="st">"maxspeed"</span>, <span class="st">"highway"</span>,</span>
-<span>    <span class="st">"cycleway"</span>, <span class="st">"other_tags"</span><span class="op">)</span>,</span>
+<span>    <span class="st">"cycleway"</span>, <span class="st">"lanes"</span>, <span class="st">"width"</span>, <span class="st">"other_tags"</span><span class="op">)</span>,</span>
 <span>  lwd <span class="op">=</span> <span class="fl">4</span>,</span>
-<span>  palette <span class="op">=</span> <span class="st">"-PuBuGn"</span></span>
+<span>  palette <span class="op">=</span> <span class="st">"npt"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -69,7 +69,8 @@
 
 
 <dt id="arg-palette">palette<a class="anchor" aria-label="anchor" href="#arg-palette"></a></dt>
-<dd><p>The palette to be used for the cycle segregation levels</p></dd>
+<dd><p>The palette to be used for the cycle segregation levels,
+such as "-PuBuGn" or "npt" (default)</p></dd>
 
 </dl></div>
     <div class="section level2">

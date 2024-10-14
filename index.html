@@ -66,8 +66,7 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nptscot.github.io/osmactive/">osmactive</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-tmap/tmap" class="external-link">tmap</a></span><span class="op">)</span> <span class="co"># for mapping</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span> <span class="co"># for data manipulation</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span> <span class="co"># for spatial data</span></span>
-<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/s2.html" class="external-link">sf_use_s2</a></span><span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span> <span class="co"># for spatial data</span></span></code></pre></div>
 <p>Alternatively, you can load the package with the following for local development:</p>
 <div class="section level2">
 <h2 id="minimal-example">Minimal example<a class="anchor" aria-label="anchor" href="#minimal-example"></a>
@@ -83,15 +82,17 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">detailed_segregation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Cycle lane on carriageway               Level track             Mixed traffic </span></span>
-<span><span class="co">#&gt;                         1                        14                        52 </span></span>
-<span><span class="co">#&gt;     Separated cycle track </span></span>
-<span><span class="co">#&gt;                         4</span></span>
+<span><span class="co">#&gt;                         1                        13                        52 </span></span>
+<span><span class="co">#&gt;        Remote cycle track        Stepped or footway </span></span>
+<span><span class="co">#&gt;                         4                         1</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">cycle_segregation</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     Separated cycle track   Roadside infrastructure Cycle lane on carriageway </span></span>
-<span><span class="co">#&gt;                         4                        14                         1 </span></span>
-<span><span class="co">#&gt;             Mixed traffic </span></span>
-<span><span class="co">#&gt;                        52</span></span>
+<span><span class="co">#&gt;                     Remote cycle track           Separated cycle track (wide) </span></span>
+<span><span class="co">#&gt;                                      4                                      6 </span></span>
+<span><span class="co">#&gt; Separated cycle track (narrow/unknown)              Cycle lane on carriageway </span></span>
+<span><span class="co">#&gt;                                      8                                      1 </span></span>
+<span><span class="co">#&gt;                          Mixed traffic </span></span>
+<span><span class="co">#&gt;                                     52</span></span>
 <span><span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_shape.html" class="external-link">tm_shape</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_lines.html" class="external-link">tm_lines</a></span><span class="op">(</span>col <span class="op">=</span> <span class="st">"grey"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tm_shape.html" class="external-link">tm_shape</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span> <span class="op">+</span></span>
@@ -113,11 +114,13 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">leeds_zb</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Leeds"</span><span class="op">)</span></span>
 <span><span class="va">leeds</span> <span class="op">=</span> <span class="va">leeds_zb</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">circle_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">circle_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Leeds"</span>, boundary <span class="op">=</span> <span class="va">leeds</span>, boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
 <span><span class="co">#&gt; Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'</span></span>
-<span><span class="co">#&gt; Simple feature collection with 4163 features and 31 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 4163 features and 33 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTILINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639</span></span>
@@ -134,23 +137,31 @@
 <h2 id="edinburgh-example">Edinburgh example<a class="anchor" aria-label="anchor" href="#edinburgh-example"></a>
 </h2>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">edinburgh</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Edinburgh"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="va">edinburgh</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Edinburgh"</span><span class="op">)</span></span>
 <span><span class="va">edinburgh_3km</span> <span class="op">=</span> <span class="va">edinburgh</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Change number in next line to change zone size:</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">circle_id</span> <span class="op">&lt;=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Scotland"</span>, boundary <span class="op">=</span> <span class="va">edinburgh_3km</span>, boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80.</span></span>
+<span><span class="co">#&gt; ..90...100 - done.</span></span>
 <span><span class="co">#&gt; Reading layer `lines' from data source </span></span>
 <span><span class="co">#&gt;   `/home/robin/data/osm/geofabrik_scotland-latest.gpkg' using driver `GPKG'</span></span>
-<span><span class="co">#&gt; Simple feature collection with 44341 features and 31 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 44341 features and 33 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTILINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: -3.236391 ymin: 55.9264 xmax: -3.140354 ymax: 55.98029</span></span>
 <span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="reference/get_driving_network.html">get_driving_network_major</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
-<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
+<span>  <span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    user  system elapsed </span></span>
+<span><span class="co">#&gt;   0.371   0.000   0.371</span></span>
+<span><span class="co"># 0.269s with union, 0.071s without</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="reference/classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
 <span><span class="va">m</span> <span class="op">=</span> <span class="fu"><a href="reference/plot_osm_tmap.html">plot_osm_tmap</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
@@ -165,11 +176,12 @@
 <span><span class="va">dublin</span> <span class="op">=</span> <span class="va">dublin_zones</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">circle_id</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Republic of Ireland"</span>, boundary <span class="op">=</span> <span class="va">dublin</span>, boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<span><span class="co">#&gt; 0...10...20...30...40...50...60...</span></span>
+<span><span class="co">#&gt; 70...80...90...100 - done.</span></span>
 <span><span class="co">#&gt; Reading layer `lines' from data source </span></span>
 <span><span class="co">#&gt;   `/home/robin/data/osm/geofabrik_ireland-and-northern-ireland-latest.gpkg' </span></span>
 <span><span class="co">#&gt;   using driver `GPKG'</span></span>
-<span><span class="co">#&gt; Simple feature collection with 3723 features and 31 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 3723 features and 33 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTILINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: -6.275573 ymin: 53.3404 xmax: -6.245544 ymax: 53.35836</span></span>
@@ -193,10 +205,11 @@
 <span><span class="va">lisbon</span> <span class="op">=</span> <span class="va">lisbon</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_cast.html" class="external-link">st_cast</a></span><span class="op">(</span><span class="st">"POLYGON"</span><span class="op">)</span></span>
 <span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Portugal"</span>, boundary <span class="op">=</span> <span class="va">lisbon</span>, boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span>, force_vectortranslate <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
+<span><span class="co">#&gt; 0...10...20...30...40...50...60...70...</span></span>
+<span><span class="co">#&gt; 80...90...100 - done.</span></span>
 <span><span class="co">#&gt; Reading layer `lines' from data source </span></span>
 <span><span class="co">#&gt;   `/home/robin/data/osm/geofabrik_portugal-latest.gpkg' using driver `GPKG'</span></span>
-<span><span class="co">#&gt; Simple feature collection with 47866 features and 31 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 47866 features and 33 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTILINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
 <span><span class="co">#&gt; Bounding box:  xmin: -9.229835 ymin: 38.6914 xmax: -9.087336 ymax: 38.79747</span></span>
@@ -213,16 +226,19 @@
 <h2 id="london">London<a class="anchor" aria-label="anchor" href="#london"></a>
 </h2>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">london</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Southwark Station"</span>, n_circles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">london</span> <span class="op">=</span> <span class="fu">zonebuilder</span><span class="fu">::</span><span class="fu">zb_zone</span><span class="op">(</span><span class="st">"Southwark Station"</span>, n_circles <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">london</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_combine.html" class="external-link">st_union</a></span><span class="op">(</span><span class="va">london</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/valid.html" class="external-link">st_make_valid</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="va">london</span>, boundary <span class="op">=</span> <span class="va">london</span>, boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 0...10...20...30...40...50...60...70...80...90...100 - done.</span></span>
 <span><span class="co">#&gt; Reading layer `lines' from data source </span></span>
 <span><span class="co">#&gt;   `/home/robin/data/osm/geofabrik_greater-london-latest.gpkg' </span></span>
 <span><span class="co">#&gt;   using driver `GPKG'</span></span>
-<span><span class="co">#&gt; Simple feature collection with 5856 features and 31 fields</span></span>
+<span><span class="co">#&gt; Simple feature collection with 5856 features and 33 fields</span></span>
 <span><span class="co">#&gt; Geometry type: MULTILINESTRING</span></span>
 <span><span class="co">#&gt; Dimension:     XY</span></span>
-<span><span class="co">#&gt; Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009279 ymax: 51.51222</span></span>
+<span><span class="co">#&gt; Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009284 ymax: 51.51222</span></span>
 <span><span class="co">#&gt; Geodetic CRS:  WGS 84</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="reference/get_driving_network.html">get_driving_network_major</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
