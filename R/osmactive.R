@@ -185,6 +185,7 @@ distance_to_road = function(rnet, roads) {
 #' @param osm The input dataset for which segregation levels need to be calculated.
 #' @param min_distance The minimum distance to the road for a cycleway to be considered off-road.
 #' @param classification_type The classification type to be used. Currently only "Scotland" is supported.
+#' @param include_mixed_traffic Whether to include mixed traffic segments in the results.
 #' @return A an sf object with the new column `cycle_segregation` that contains the segregation levels.
 #' @export
 #' @examples
@@ -201,17 +202,28 @@ distance_to_road = function(rnet, roads) {
 classify_cycle_infrastructure = function(
   osm,
   min_distance = 10,
-  classification_type = "Scotland"
+  classification_type = "Scotland",
+  include_mixed_traffic = FALSE
   ) {
   if (classification_type == "Scotland") {
-    return(classify_cycle_infrastructure_scotland(osm, min_distance))
+    infra = classify_cycle_infrastructure_scotland(
+      osm,
+      min_distance,
+      include_mixed_traffic
+    )
+    return(infra)
   } else {
     stop("Classification type not supported yet. Please open an issue at github.com/nptscot/osmactive.")
   }
 }
-classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
+
+classify_cycle_infrastructure_scotland = function(
+  osm,
+  min_distance = 10,
+  include_mixed_traffic = FALSE
+  ) {
   segtypes = c("Level track", "Light segregation", "Stepped or footway")
-  osm |>
+  osm_classified = osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
@@ -226,12 +238,14 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-Road Track",
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-road Track",
       TRUE ~ detailed_segregation
     )) |>
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off-Road Track
+    # Add cycle_pedestrian_separation:
+    classify_shared_use() |>
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off-road Track
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-Road Track",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-road Track",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
@@ -247,13 +261,27 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% segtypes & is_wide(width) ~ "Segregated Track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width) ~ "Segregated Track (narrow)",
+      # Shared use:
+      (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") | 
+        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track") ~ "Shared use",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Off-Road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Painted Lane", "Mixed Traffic Street"),
+      levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane", "Mixed Traffic Street"), 
       ordered = TRUE
     ))
+  # Remove mixed traffic if not required:
+  if (!include_mixed_traffic) {
+    osm_classified = osm_classified |>
+      dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>
+      dplyr::mutate(cycle_segregation = factor(
+        cycle_segregation,
+        levels = c("Off-road Track", "Segregated Track (wide)", "Segregated Track (narrow)", "Shared use", "Painted Lane"), 
+        ordered = TRUE
+      ))
+  }
+  osm_classified
 }
 
 #' Classify ways by level of pedestrian/cyclist sharing
@@ -279,19 +307,27 @@ classify_cycle_infrastructure_scotland = function(osm, min_distance = 10) {
 #' osm = osm_edinburgh
 #' cycle_network = get_cycling_network(osm)
 #' cycle_network_shared = classify_shared_use(cycle_network)
-#' table(cycle_network_shared$cycle_segregation)
-#' plot(cycle_network_shared["cycle_segregation"])
+#' table(cycle_network_shared$cycle_pedestrian_separation)
+#' plot(cycle_network_shared["cycle_pedestrian_separation"])
+#' # interactive map:
+#' # mapview::mapview(cycle_network_shared, zcol = "cycle_pedestrian_separation")
 classify_shared_use = function(osm) {
   osm |>
-    dplyr::mutate(cycle_segregation = dplyr::case_when(
-      highway == "path" & bicycle == "designated" & foot == "designated" & segregated == "no" ~ "Shared use",
-      highway == "path" & bicycle == "designated" & foot == "designated" & segregated == "yes" ~ "Shared use",
-      highway == "pedestrian" ~ "Shared use",
+    dplyr::mutate(cycle_pedestrian_separation = dplyr::case_when(
+      # Walking is permitted:
+      (highway == "footway" | highway == "path" | highway == "pedestrian" | foot == "designated") &
+        # Bicycle also permitted:
+        (bicycle == "designated" | highway == "path" ) ~ "Shared use (not segregated)",
       TRUE ~ "Unknown"
     )) |>
-    dplyr::mutate(cycle_segregation = factor(
-      cycle_segregation,
-      levels = c("Shared use", "Unknown"),
+    dplyr::mutate(cycle_pedestrian_separation = dplyr::case_when(
+      # differentiate between segregated and non-segregated shared use:
+      cycle_pedestrian_separation == "Shared use (not segregated)" & segregated == "yes" ~ "Shared use (segregated)",
+      TRUE ~ cycle_pedestrian_separation
+    )) |>
+    dplyr::mutate(cycle_pedestrian_separation = factor(
+      cycle_pedestrian_separation,
+      levels = c("Shared use (segregated)", "Shared use (not segregated)", "Unknown"),
       ordered = TRUE
     ))
 }
@@ -374,7 +410,7 @@ plot_osm_tmap = function(
 #  'Cycle lane on carriageway': '#FF0000', // Red
 #  'Mixed traffic': '~EFD1C5', // Almond
   palette_npt = c(
-      "Off-Road Track" = "#4db92c",  # Mid/Light Green
+      "Off-road Track" = "#4db92c",  # Mid/Light Green
       "Segregated Track (wide)" = "#054d05",  # Dark Green
       "Segregated Track (narrow)" = "#87d66883",  # Orange
       "Painted Lane" = "#FF0000",  # Red
