@@ -102,23 +102,31 @@ m
 ## Edinburgh example
 
 ``` r
+devtools::load_all()
+library(tidyverse)
 edinburgh = zonebuilder::zb_zone("Edinburgh")
 edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
   filter(circle_id <= 2) |>
   sf::st_union()
 osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> 0...10...20...30...40...50...60...70...80.
+#> ..90...100 - done.
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_scotland-latest.gpkg' using driver `GPKG'
-#> Simple feature collection with 44341 features and 31 fields
+#> Simple feature collection with 44341 features and 33 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
 #> Bounding box:  xmin: -3.236391 ymin: 55.9264 xmax: -3.140354 ymax: 55.98029
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
+system.time({
+  cycle_net = distance_to_road(cycle_net, drive_net)
+})
+#>    user  system elapsed 
+#>   0.136   0.000   0.137
+# 0.269s with union, 0.071s without
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
@@ -186,15 +194,17 @@ m
 
 ``` r
 london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+london = sf::st_union(london) |>
+  sf::st_make_valid()
 osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_greater-london-latest.gpkg' 
 #>   using driver `GPKG'
-#> Simple feature collection with 5856 features and 31 fields
+#> Simple feature collection with 6168 features and 33 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009279 ymax: 51.51222
+#> Bounding box:  xmin: -0.1189676 ymin: 51.4957 xmax: -0.09016682 ymax: 51.51368
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network_major(osm)
