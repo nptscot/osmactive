@@ -10,6 +10,12 @@ et_active = function() {
     "cycleway:left",
     "cycleway:right",
     "cycleway:both",
+    "cycleway:left:bicycle",
+    "cycleway:right:bicycle",
+    "cycleway:both:bicycle",
+    "cycleway:left:segregated",
+    "cycleway:right:segregated",
+    "cycleway:both:segregated",
     "cycleway:surface",
     "lanes",
     "lanes:both_ways",
@@ -256,7 +262,18 @@ classify_cycle_infrastructure_scotland = function(
       stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Lane",
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
-    )) |>
+    ))
+      # For cycleway:left:segregated" and "cycleway:right:segregated"
+  if("cycleway_left_segregated" %in% names(osm_classified) & "cycleway_right_segregated" %in% names(osm_classified)) {
+      osm_classified = osm_classified |>
+  mutate(
+    detailed_segregation = dplyr::case_when(
+      cycleway_left_segregated == "yes" | cycleway_right_segregated == "yes" ~ "Light segregation",
+      TRUE ~ detailed_segregation
+    )
+  )
+  }
+     osm_classified = osm_classified |>
     clean_widths() |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% segtypes & is_wide(width) ~ "Segregated Track (wide)",
