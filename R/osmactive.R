@@ -10,19 +10,19 @@ et_active = function() {
     "cycleway:left",
     "cycleway:right",
     "cycleway:both",
+    "cycleway:surface",
     "lanes",
     "lanes:both_ways",
     "lanes:forward",
     "lanes:backward",
     "lanes:bus",
     "lanes:bus:conditional",
+    "lit", # useful to check if cycleways are lit
     "oneway",
     "width", # useful to ensure width of cycleways is at least 1.5m
-    "segregated", # classifies whether cycles and pedestrians are segregated on shared paths
+    "segregated",
     "sidewalk", # useful to ensure width of cycleways is at least 1.5m
     "footway",
-    # "highway", # included by default
-    # "name", # included by default
     "service",
     "surface",
     "tracktype",
