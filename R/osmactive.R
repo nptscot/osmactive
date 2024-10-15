@@ -143,14 +143,15 @@ get_cycling_network = function(
       !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
     ) |>
     # Remove all highway=path segments, unless surface is good:
-    dplyr::filter(!(highway == "path" &
-      !(stringr::str_detect(surface, "asphalt|pav|concrete|fine") |
-        stringr::str_detect(smoothness, "good|excellent")
-      ))) |>
+    dplyr::filter(!(
+      highway == "path" &
+      stringr::str_detect(surface, "asphalt|pav|concrete|fine", negate = TRUE) &
+      stringr::str_detect(smoothness, "good|excellent", negate = TRUE)
+      )) |>
     # Remove segments with poor surface:
-    dplyr::filter(!(stringr::str_detect(surface, "dirt|^gravel$|ground|grass|sand|unpaved|earth"))) |>
+    dplyr::filter(!surface %in% c("dirt", "ground", "unpaved", "grass", "compacted", "gravel", "sand")) |>
     # Remove segments with poor smoothness:
-    dplyr::filter(!(stringr::str_detect(smoothness, "bad|very_bad|horrible|very_horrible|impassable")))
+    dplyr::filter(!smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable"))
 }
 
 #' Calculate distance from route network segments to roads

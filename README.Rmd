@@ -122,17 +122,11 @@ m
 ## Leeds example
 
 ```{r leeds}
-leeds_zb = zonebuilder::zb_zone("Leeds")
-leeds_6km = leeds_zb |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
+osm = get_travel_network("Leeds")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
-names(cycle_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
-names(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
 ```
@@ -223,6 +217,9 @@ tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
 # upload:
 system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
+
+# Test for surfaces:
+table(cycle_net$surface)
 ```
 
 ## London

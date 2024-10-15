@@ -43,12 +43,14 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 #> 
-#>        Level track  Off Road Cycleway Painted Cycle Lane 
-#>                 14                  4                  1
+#>          Level track Mixed Traffic Street    Off Road Cycleway 
+#>                   13                    1                    4 
+#>   Painted Cycle Lane 
+#>                    1
 table(cycle_net$cycle_segregation)
 #> 
 #>   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
-#>                         6                         3                         8 
+#>                         6                         4                         7 
 #>                Shared use        Painted Cycle Lane 
 #>                         1                         1
 ```
@@ -65,12 +67,7 @@ m
 ## Leeds example
 
 ``` r
-leeds_zb = zonebuilder::zb_zone("Leeds")
-leeds_6km = leeds_zb |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
-#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+osm = get_travel_network("Leeds")
 #> Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'
 #> Simple feature collection with 39330 features and 45 fields
 #> Geometry type: MULTILINESTRING
@@ -80,56 +77,7 @@ osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
-names(cycle_net)
-#>  [1] "osm_id"                    "name"                     
-#>  [3] "highway"                   "man_made"                 
-#>  [5] "maxspeed"                  "oneway"                   
-#>  [7] "bicycle"                   "cycleway"                 
-#>  [9] "cycleway_left"             "cycleway_right"           
-#> [11] "cycleway_both"             "cycleway_left_bicycle"    
-#> [13] "cycleway_right_bicycle"    "cycleway_both_bicycle"    
-#> [15] "cycleway_left_segregated"  "cycleway_right_segregated"
-#> [17] "cycleway_both_segregated"  "cycleway_surface"         
-#> [19] "cycleway_width"            "cycleway_est_width"       
-#> [21] "cycleway_buffered_lane"    "lanes"                    
-#> [23] "lanes_both_ways"           "lanes_forward"            
-#> [25] "lanes_backward"            "lanes_bus"                
-#> [27] "lanes_bus_conditional"     "lit"                      
-#> [29] "width"                     "est_width"                
-#> [31] "segregated"                "foot"                     
-#> [33] "path"                      "sidewalk"                 
-#> [35] "footway"                   "service"                  
-#> [37] "surface"                   "tracktype"                
-#> [39] "smoothness"                "access"                   
-#> [41] "z_order"                   "other_tags"               
-#> [43] "geometry"                  "distance_to_road"
 cycle_net = classify_cycle_infrastructure(cycle_net)
-names(cycle_net)
-#>  [1] "osm_id"                      "name"                       
-#>  [3] "highway"                     "man_made"                   
-#>  [5] "maxspeed"                    "oneway"                     
-#>  [7] "bicycle"                     "cycleway_chars"             
-#>  [9] "cycleway"                    "cycleway_left"              
-#> [11] "cycleway_right"              "cycleway_both"              
-#> [13] "cycleway_left_bicycle"       "cycleway_right_bicycle"     
-#> [15] "cycleway_both_bicycle"       "cycleway_left_segregated"   
-#> [17] "cycleway_right_segregated"   "cycleway_both_segregated"   
-#> [19] "cycleway_surface"            "cycleway_width"             
-#> [21] "cycleway_est_width"          "cycleway_buffered_lane"     
-#> [23] "lanes"                       "lanes_both_ways"            
-#> [25] "lanes_forward"               "lanes_backward"             
-#> [27] "lanes_bus"                   "lanes_bus_conditional"      
-#> [29] "lit"                         "width"                      
-#> [31] "est_width"                   "segregated"                 
-#> [33] "foot"                        "path"                       
-#> [35] "sidewalk"                    "footway"                    
-#> [37] "service"                     "surface"                    
-#> [39] "tracktype"                   "smoothness"                 
-#> [41] "access"                      "z_order"                    
-#> [43] "other_tags"                  "distance_to_road"           
-#> [45] "detailed_segregation"        "cycle_pedestrian_separation"
-#> [47] "geometry"                    "width_clean"                
-#> [49] "cycle_segregation"
 m = plot_osm_tmap(cycle_net)
 m
 ```
@@ -258,3 +206,28 @@ m
 ```
 
 ![](man/figures/README-london-1.png)<!-- -->
+
+## Cambridge
+
+``` r
+cambridge = zonebuilder::zb_zone("Cambridge")
+cambridge = sf::st_union(cambridge) |>
+  sf::st_make_valid()
+osm = get_travel_network("Cambridge", boundary = cambridge, boundary_type = "clipsrc")
+#> 0...10...20...30...40...50...60...70...80...90...100 - done.
+#> Reading layer `lines' from data source 
+#>   `/home/robin/data/osm/bbbike_Cambridge.gpkg' using driver `GPKG'
+#> Simple feature collection with 49665 features and 45 fields
+#> Geometry type: MULTILINESTRING
+#> Dimension:     XY
+#> Bounding box:  xmin: -0.0399984 ymin: 52.12 xmax: 0.319972 ymax: 52.28
+#> Geodetic CRS:  WGS 84
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+![](man/figures/README-cambridge-1.png)<!-- -->

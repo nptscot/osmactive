@@ -34,3 +34,18 @@ cycle_net_classified = classify_cycle_infrastructure(cycle_net)
 cycle_net_classified |>
   pull(cycle_segregation) 
 ```
+
+Let's check out 'highway=path' tagged segments in the network in Leeds:
+
+```{r}
+cycle_net = get_cycling_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+tmap::tmap_mode("view")
+cycle_net_path = cycle_net |>
+  filter(highway == "path") 
+m = plot_osm_tmap(cycle_net_path)
+m
+# tmap::tmap_save(m, "path.html")
+# browseURL("path.html")
+```
