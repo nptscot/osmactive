@@ -23,13 +23,14 @@ library(dplyr)
 The following test checks to see if a known OSM way in Leeds, a footpath in Leeds in a path on which cycling is allowed and is common, is correctly identified, as Shared Use.
 
 ```{r}
-leeds = get_travel_network("Leeds")
-potternewton_path = leeds |>
+osm = get_travel_network("Leeds")
+potternewton_path = osm |>
   filter(osm_id == 306849934)
 cycle_net = get_cycling_network(potternewton_path)
-nrow(osm)
+nrow(cycle_net)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
-classify_cycle_infrastructure(cycle_net) |>
+cycle_net_classified = classify_cycle_infrastructure(cycle_net)
+cycle_net_classified |>
   pull(cycle_segregation) 
 ```
