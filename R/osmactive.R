@@ -233,38 +233,36 @@ classify_cycle_infrastructure_scotland = function(
     osm,
     min_distance = 10,
     include_mixed_traffic = FALSE) {
-  segtypes = c("Level track", "Light segregation", "Stepped or footway")
+  segtypes = c("Level track", "Light segregation")
   osm_classified = osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
-      highway == "pedestrian" ~ "Stepped or footway",
-      highway == "path" ~ "Stepped or footway",
+      highway %in% c("footway", "path", "Pedestrian") ~ "Footway",
       # these by default are not shared with traffic:
-      segregated == "yes" ~ "Stepped or footway",
-      segregated == "no" ~ "Stepped or footway",
+      segregated %in% c("yes", "no") ~ "Footway",
       TRUE ~ "Mixed Traffic Street"
     )) |>
     # ...including by name
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off Road Cycleway",
+        detailed_segregation %in% c("Level track", "Footway") ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     # Add cycle_pedestrian_separation:
     classify_shared_use() |>
     # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off Road Cycleway
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off Road Cycleway",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Footway") ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       stringr::str_detect(cycleway_chars, "lane|share_") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed Traffic Street" ~ "Light segregation",
-      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
-      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
+      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed Traffic Street" ~ "Footway",
+      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Footway",
       TRUE ~ detailed_segregation
     ))
   # For cycleway:left:segregated" and "cycleway:right:segregated"
@@ -283,6 +281,7 @@ classify_cycle_infrastructure_scotland = function(
       detailed_segregation %in% segtypes & is_wide(width_clean) ~ "Segregated Track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width_clean) ~ "Segregated Track (narrow)",
       # Shared use:
+      detailed_segregation == "Footway" ~ "Shared use",
       (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off Road Cycleway") |
         (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off Road Cycleway" & highway != "cycleway") ~ "Shared use",
       TRUE ~ detailed_segregation
@@ -622,8 +621,8 @@ level_of_service = function(osm) {
     dplyr::mutate(`Level of Service` = dplyr::case_when(
       detailed_segregation == "Remote cycle track" ~ "High",
       detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
-      detailed_segregation == "Stepped or footway" & final_speed <= 20 ~ "High",
-      detailed_segregation == "Stepped or footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
+      detailed_segregation == "Footway" & final_speed <= 20 ~ "High",
+      detailed_segregation == "Footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
       detailed_segregation == "Light segregation" & final_speed <= 20 ~ "High",
       detailed_segregation == "Light segregation" & final_speed == 30 & final_traffic < 4000 ~ "High",
       detailed_segregation == "Cycle lane on carriageway" & final_speed <= 20 & final_traffic < 4000 ~ "High",
@@ -632,8 +631,8 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 1000 ~ "High",
       detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
       detailed_segregation == "Level track" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
-      detailed_segregation == "Stepped or footway" & final_speed <= 40 ~ "Medium",
-      detailed_segregation == "Stepped or footway" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
+      detailed_segregation == "Footway" & final_speed <= 40 ~ "Medium",
+      detailed_segregation == "Footway" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 30 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 40 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Light segregation" & final_speed == 50 & final_traffic < 1000 ~ "Medium",
@@ -644,7 +643,7 @@ level_of_service = function(osm) {
       detailed_segregation == "Mixed traffic" & final_speed == 30 & final_traffic < 2000 ~ "Medium",
       detailed_segregation == "Mixed traffic" & final_speed == 40 & final_traffic < 1000 ~ "Medium",
       detailed_segregation == "Level track" ~ "Low",
-      detailed_segregation == "Stepped or footway" ~ "Low",
+      detailed_segregation == "Footway" ~ "Low",
       detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
       detailed_segregation == "Light segregation" & final_speed == 60 & final_traffic < 1000 ~ "Low",
       detailed_segregation == "Cycle lane on carriageway" & final_speed <= 50 ~ "Low",
