@@ -91,12 +91,12 @@ The package comes with example data for testing functions.
 You can test the functions as follows:
 
 ```{r minimal}
-osm <- osm_edinburgh
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-drive_net_major <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
+osm = osm_edinburgh
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+drive_net_major = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 table(cycle_net$cycle_segregation)
 ```
@@ -115,25 +115,25 @@ tm_shape(osm) +
 You can also create plots with the packaged `plot_osm_tmap()` function:
 
 ```{r minimal_plot_osm}
-m <- plot_osm_tmap(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
 ## Leeds example
 
 ```{r leeds}
-leeds_zb <- zonebuilder::zb_zone("Leeds")
-leeds_6km <- leeds_zb |>
+leeds_zb = zonebuilder::zb_zone("Leeds")
+leeds_6km = leeds_zb |>
   filter(circle_id <= 3) |>
   sf::st_union()
-osm <- get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
+osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
 names(cycle_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
 names(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
@@ -150,17 +150,17 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 ## Edinburgh example
 
 ```{r edinburgh}
-edinburgh <- zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km <- edinburgh |>
+edinburgh = zonebuilder::zb_zone("Edinburgh")
+edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
   filter(circle_id <= 2) |>
   sf::st_union()
-osm <- get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
@@ -178,16 +178,16 @@ system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
 ## Dublin example
 
 ```{r dublin}
-dublin_zones <- zonebuilder::zb_zone("Dublin")
-dublin_6km <- dublin_zones |>
+dublin_zones = zonebuilder::zb_zone("Dublin")
+dublin_6km = dublin_zones |>
   filter(circle_id <= 3) |>
   sf::st_union()
-osm <- get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+osm = get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
@@ -202,18 +202,18 @@ system("gh release upload v0.1 classify_cycle_infrastructure_dublin.html --clobb
 ## Lisbon example
 
 ```{r lisbon}
-u <- "https://ushift.tecnico.ulisboa.pt/content/data/lisbon_limit.geojson"
-f <- basename(u)
+u = "https://ushift.tecnico.ulisboa.pt/content/data/lisbon_limit.geojson"
+f = basename(u)
 if (!file.exists(f)) download.file(u, f)
-lisbon <- sf::read_sf(f)
-lisbon <- lisbon |>
+lisbon = sf::read_sf(f)
+lisbon = lisbon |>
   sf::st_cast("POLYGON")
-osm <- get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
@@ -228,15 +228,15 @@ system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobb
 ## London
 
 ```{r london}
-london <- zonebuilder::zb_zone("Southwark Station", n_circles = 1)
-london <- sf::st_union(london) |>
+london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+london = sf::st_union(london) |>
   sf::st_make_valid()
-osm <- get_travel_network(london, boundary = london, boundary_type = "clipsrc")
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
@@ -251,15 +251,15 @@ system("gh release upload v0.1 classify_cycle_infrastructure_london.html --clobb
 ## Cambridge
 
 ```{r cambridge}
-cambridge <- zonebuilder::zb_zone("Cambridge")
-cambridge <- sf::st_union(cambridge) |>
+cambridge = zonebuilder::zb_zone("Cambridge")
+cambridge = sf::st_union(cambridge) |>
   sf::st_make_valid()
-osm <- get_travel_network("Cambridge", boundary = cambridge, boundary_type = "clipsrc")
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+osm = get_travel_network("Cambridge", boundary = cambridge, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 ```
 
