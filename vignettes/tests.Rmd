@@ -1,0 +1,29 @@
+---
+title: "Tests of known OSM ways"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tests of known OSM ways}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(osmactive)
+```
+
+The following test checks to see if a known OSM way in Leeds, a footpath in Leeds in a path on which cycling is allowed and is common, is correctly identified.
+
+```{r}
+leeds = get_travel_network("Leeds")
+potternewton_path = leeds |>
+  filter(osm_id == 306849934)
+potternewton_cycling = get_cycling_network(potternewton_path)
+nrow(potternewton_cycling)
+```
