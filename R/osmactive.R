@@ -141,7 +141,12 @@ get_cycling_network = function(
     # Remove highway=path|pedestrian|footway without bicycle value of designated or yes:
     dplyr::filter(
       !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
-    )
+    ) |>
+    # Remove all highway=path segments, unless surface is good:
+    dplyr::filter(!(highway == "path" &
+      !(stringr::str_detect(surface, "asphalt|pav|concrete|fine") |
+        stringr::str_detect(smoothness, "good|excellent")
+      )))
 }
 
 #' Calculate distance from route network segments to roads
@@ -442,7 +447,7 @@ get_palette_npt = function() {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "bicycle", "lanes", "width", "other_tags"),
+    popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "bicycle", "lanes", "width", "surface", "other_tags"),
     lwd = 4,
     palette = get_palette_npt()) {
   # Stop if tmap is not installed or if the version is less than 3.99:
