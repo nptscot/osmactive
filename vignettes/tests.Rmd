@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(osmactive)
+# devtools::load_all() # for development
 ```
 
 The following test checks to see if a known OSM way in Leeds, a footpath in Leeds in a path on which cycling is allowed and is common, is correctly identified.

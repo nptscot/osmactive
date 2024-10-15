@@ -48,7 +48,7 @@ et_active = function() {
 exclude_highway_cycling = function() {
   to_exclude = paste0(
     "abandoned|bridleway|bus_guideway|byway|construction|corridor|disused|elevator|emergency|escalator|escap",
-    "|far|fixme|foot|gallop|historic|motorway|no|planned|platform|proposed|raceway|rest|road|services|steps|track"
+    "|far|fixme|gallop|historic|motorway|no|planned|platform|proposed|raceway|rest|road|services|steps|track"
   )
   return(to_exclude)
 }
@@ -134,7 +134,6 @@ get_cycling_network = function(
     osm,
     ex_c = exclude_highway_cycling(),
     ex_b = exclude_bicycle_cycling()) {
-  browser()
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
