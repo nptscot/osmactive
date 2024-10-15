@@ -403,13 +403,21 @@ is_wide = function(x, min_width = 2) {
   x >= min_width
 }
 
+#' Get the palette for the NPT cycle segregation levels
+#' @return A palette for the NPT cycle segregation levels
+#' @export
+#' @examples
+#' cols = get_palette_npt()
+#' jsonlite::toJSON(as.list(cols), pretty = TRUE)
+#' col_labs = c("OffRd", "SegW", "SegN", "Share", "Paint")
+#' barplot(seq_along(cols), col = cols, names.arg = col_labs)
 get_palette_npt = function() {
   palette_npt = c(
     "Off-road Track" = "#054d05", # Dark Green
     "Segregated Track (wide)" = "#3a9120", # Medium Green
     "Segregated Track (narrow)" = "#87d668", # Light Green
-    "Painted Lane" = "#FF0000", # Red
-    "Shared use" = "#ffbf00" # Amber
+    "Shared use" = "#ffbf00", # Amber
+    "Painted Lane" = "#FF0000" # Red
   )
   return(palette_npt)
 }
