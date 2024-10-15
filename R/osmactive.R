@@ -417,23 +417,12 @@ plot_osm_tmap = function(
     popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
     lwd = 4,
     palette = "npt") {
-  # Previously:
-  #  'Separated cycle track': '#008000', // Green
-  #  'Roadside infrastructure': '#FFBF00', // Amber
-  #  'Cycle lane on carriageway': '#FF0000', // Red
-  #  'Mixed traffic': '#EFD1C5', // Almond
-  # JS code:
-  #  'Remote cycle track': '#008000', // Green
-  #  'Separated cycle track (wide)': '#7BCCB5', // Green
-  #  'Separated cycle track (narrow/unknown)': '#8B4513', // Browny red
-  #  'Cycle lane on carriageway': '#FF0000', // Red
-  #  'Mixed traffic': '~EFD1C5', // Almond
   palette_npt = c(
-    "Off-road Track" = "#4db92c", # Mid/Light Green
-    "Segregated Track (wide)" = "#054d05", # Dark Green
-    "Segregated Track (narrow)" = "#87d66883", # Orange
+    "Off-road Track" = "#054d05", # Dark Green
+    "Segregated Track (wide)" = "#3a9120", # Medium Green
+    "Segregated Track (narrow)" = "#87d668", # Light Green
     "Painted Lane" = "#FF0000", # Red
-    "Shared use" = "#f0b97b" # Grey/Neutral
+    "Shared use" = "#ffbf00" # Amber
   )
   if (palette == "npt") {
     palette = palette_npt
