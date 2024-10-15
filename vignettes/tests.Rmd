@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(osmactive)
+library(dplyr)
 # devtools::load_all() # for development
 ```
 
