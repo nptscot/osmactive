@@ -139,7 +139,9 @@ get_cycling_network = function(
     # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle) | !stringr::str_detect(string = bicycle, pattern = ex_b)) |>
     # Remove highway=path without bicycle value of designated:
-    dplyr::filter(highway != "path" & bicycle != "designated") |>
+    dplyr::filter(
+      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
+    ) |>
     # Remove highway=pedestrian without bicycle value of designated:
     dplyr::filter(
       !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "designated"))
@@ -466,9 +468,9 @@ plot_osm_tmap = function(
     # Truncate the other_tags column to everything before the 5th comma and
     # add "..." to the other_tags column if it contains more than 5 commas:
     dplyr::mutate(other_tags = dplyr::case_when(
-        stringr::str_count(other_tags, ",") > 5 ~
-            paste0(stringr::str_extract(other_tags, "([^,]*,){0,4}[^,]*"), " ..."),
-        TRUE ~ other_tags
+      stringr::str_count(other_tags, ",") > 5 ~
+        paste0(stringr::str_extract(other_tags, "([^,]*,){0,4}[^,]*"), " ..."),
+      TRUE ~ other_tags
     )) |>
     dplyr::select(all_of(popup.vars), cycle_segregation)
   tmap::tm_shape(Infrastructure) +
