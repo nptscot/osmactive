@@ -8,14 +8,14 @@ osm_with_traffic_volumes_random = osm |>
   transmute(
     osm_id = osm_id,
     traffic_volume = case_when(
-        highway == "primary" ~ round(runif(n(), 1000, 6000)),
-        highway == "secondary" ~ round(runif(n(), 500, 5000)),
-        highway == "tertiary" ~ round(runif(n(), 200, 4000)),
-        TRUE ~ round(runif(n(), 0, 3000))
+      highway == "primary" ~ round(runif(n(), 1000, 6000)),
+      highway == "secondary" ~ round(runif(n(), 500, 5000)),
+      highway == "tertiary" ~ round(runif(n(), 200, 4000)),
+      TRUE ~ round(runif(n(), 0, 3000))
     )
   )
 
-plot(osm_with_traffic_volumes_random["traffic_volume"])andom
+plot(osm_with_traffic_volumes_random["traffic_volume"])
 
 # Hard-coded values
 osm_with_traffic_volumes = osm |>
@@ -27,7 +27,7 @@ osm_with_traffic_volumes = osm |>
       highway == "tertiary" ~ 3000,
       TRUE ~ 1000
     )
-)
+  )
 plot(osm_with_traffic_volumes["traffic_volume"])
 
 # Save the data
