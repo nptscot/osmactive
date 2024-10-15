@@ -43,13 +43,13 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 #> 
-#>        Level track     Off-road Track       Painted Lane Stepped or footway 
+#>        Level track  Off Road Cycleway Painted Cycle Lane Stepped or footway 
 #>                 13                  4                  1                  1
 table(cycle_net$cycle_segregation)
 #> 
-#>   Segregated Track (wide)            Off-road Track Segregated Track (narrow) 
+#>   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
 #>                         6                         4                         8 
-#>                Shared use              Painted Lane 
+#>                Shared use        Painted Cycle Lane 
 #>                         0                         1
 ```
 
@@ -174,7 +174,7 @@ m
 
 ![](man/figures/README-edinburgh-1.png)<!-- -->
 
-<!-- Save an interactive version of the map to check the results as follows: -->
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
 
 ## Dublin example
 

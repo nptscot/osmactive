@@ -164,7 +164,7 @@ m = plot_osm_tmap(cycle_net)
 m
 ```
 
-<!-- Save an interactive version of the map to check the results as follows: -->
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
 
 ```{r}
 #| include: false

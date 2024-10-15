@@ -249,22 +249,22 @@ classify_cycle_infrastructure_scotland = function(
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-road Track",
+        detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     # Add cycle_pedestrian_separation:
     classify_shared_use() |>
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off-road Track
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off Road Cycleway
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off-road Track",
+      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Stepped or footway") ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Lane",
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed Traffic Street" ~ "Light segregation",
       stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Lane",
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     ))
@@ -284,13 +284,13 @@ classify_cycle_infrastructure_scotland = function(
       detailed_segregation %in% segtypes & is_wide(width_clean) ~ "Segregated Track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width_clean) ~ "Segregated Track (narrow)",
       # Shared use:
-      (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") |
-        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track" & highway != "cycleway") ~ "Shared use",
+      (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off Road Cycleway") |
+        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off Road Cycleway" & highway != "cycleway") ~ "Shared use",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Segregated Track (wide)", "Off-road Track", "Segregated Track (narrow)", "Shared use", "Painted Lane", "Mixed Traffic Street"),
+      levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared use", "Painted Cycle Lane", "Mixed Traffic Street"),
       ordered = TRUE
     ))
   # Remove mixed traffic if not required:
@@ -300,7 +300,7 @@ classify_cycle_infrastructure_scotland = function(
       dplyr::mutate(cycle_segregation = as.character(cycle_segregation)) |>
       dplyr::mutate(cycle_segregation = factor(
         cycle_segregation,
-        levels = c("Segregated Track (wide)", "Off-road Track", "Segregated Track (narrow)", "Shared use", "Painted Lane"),
+        levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared use", "Painted Cycle Lane"),
         ordered = TRUE
       ))
   }
@@ -429,10 +429,10 @@ is_wide = function(x, min_width = 2) {
 get_palette_npt = function() {
   palette_npt = c(
     "Segregated Track (wide)" = "#054d05", # Dark Green
-    "Off-road Track" = "#3a9120", # Medium Green
+    "Off Road Cycleway" = "#3a9120", # Medium Green
     "Segregated Track (narrow)" = "#87d668", # Light Green
     "Shared use" = "#ffbf00", # Amber
-    "Painted Lane" = "#FF0000" # Red
+    "Painted Cycle Lane" = "#FF0000" # Red
   )
   return(palette_npt)
 }
