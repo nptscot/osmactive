@@ -15,6 +15,7 @@ BugReports: https://github.com/nptscot/osmactive/issues
 Imports: 
     dplyr,
     geos,
+    jsonlite,
     osmextract,
     sf,
     stringr,

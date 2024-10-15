@@ -17,6 +17,9 @@ et_active = function() {
     "cycleway:right:segregated",
     "cycleway:both:segregated",
     "cycleway:surface",
+    "cycleway:width",
+    "cycleway:est_width",
+    "cycleway:buffered_lane",
     "lanes",
     "lanes:both_ways",
     "lanes:forward",
@@ -361,8 +364,13 @@ classify_shared_use = function(osm) {
 #' osm$width
 #' osm_cleaned$width
 clean_widths = function(osm) {
+  # If cycleway_width is present, use it:
+  if ("cycleway_width" %in% names(osm)) {
+    cycleway_width_not_nas = !is.na(osm$cycleway_width)
+    osm$width[cycleway_width_not_nas] = osm$cycleway_width[cycleway_width_not_nas]
+  }
   # Check if the est_width column is present and skip if not:
-  if (!"est_width" %in% names(osm)) {
+  if (!"est_width" %in% names(osm) || !"cycleway_est_width" %in% names(osm)) {
     suppressWarnings({
       osm$width_clean = as.numeric(osm$width)
     })
@@ -371,6 +379,9 @@ clean_widths = function(osm) {
   suppressWarnings({
     width = as.numeric(osm$width)
     est_width = as.numeric(osm$est_width)
+    cycleway_est_width = as.numeric(osm$cycleway_est_width)
+    # when cycleway_est_width is present, use it:
+    est_width[!is.na(cycleway_est_width)] = cycleway_est_width[!is.na(cycleway_est_width)]
   })
   width[is.na(width)] = 0
   est_width[is.na(est_width)] = 0
@@ -380,7 +391,6 @@ clean_widths = function(osm) {
   )
   osm
 }
-
 
 #' Classify Separated cycle track by width
 #'
@@ -433,7 +443,7 @@ get_palette_npt = function() {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
+    popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
     lwd = 4,
     palette = get_palette_npt()) {
   # Stop if tmap is not installed or if the version is less than 3.99:
@@ -442,6 +452,10 @@ plot_osm_tmap = function(
   }
   if (utils::packageVersion("tmap") < "3.99") {
     stop("Please update tmap to version 3.99 or higher.")
+  }
+  # Add clean width if available:
+  if ("width_clean" %in% names(cycle_network_classified)) {
+    popup.vars = c(popup.vars, "width_clean")
   }
   # Subset popup.vars to include only those that are present in the data:
   popup.vars = popup.vars[popup.vars %in% names(cycle_network_classified)]
@@ -453,6 +467,11 @@ plot_osm_tmap = function(
     # dplyr::mutate(
     #   other_tags = stringr::str_replace_all(other_tags, ",", "\\\\n")
     # ) |>
+    # Add "..." to the other_tags column if it is not empty:
+    dplyr::mutate(other_tags = dplyr::case_when(
+      other_tags != "" ~ paste0(other_tags, " ..."),
+      TRUE ~ ""
+    )) |>
     dplyr::select(all_of(popup.vars), cycle_segregation)
   tmap::tm_shape(Infrastructure) +
     tmap::tm_lines(

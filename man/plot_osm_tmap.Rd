@@ -6,8 +6,8 @@
 \usage{
 plot_osm_tmap(
   cycle_network_classified,
-  popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway",
-    "cycleway", "lanes", "width", "other_tags"),
+  popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed",
+    "highway", "cycleway", "lanes", "width", "other_tags"),
   lwd = 4,
   palette = get_palette_npt()
 )
