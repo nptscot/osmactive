@@ -138,13 +138,9 @@ get_cycling_network = function(
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle) | !stringr::str_detect(string = bicycle, pattern = ex_b)) |>
-    # Remove highway=path without bicycle value of designated:
+    # Remove highway=path|pedestrian|footway without bicycle value of designated or yes:
     dplyr::filter(
-      !(highway == "path" & !stringr::str_detect(string = bicycle, pattern = "designated"))
-    ) |>
-    # Remove highway=pedestrian without bicycle value of designated:
-    dplyr::filter(
-      !(highway == "pedestrian" & !stringr::str_detect(string = bicycle, pattern = "designated"))
+      !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
     )
 }
 
@@ -247,14 +243,14 @@ classify_cycle_infrastructure_scotland = function(
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       # highways named towpaths or paths are assumed to be off-road
       stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Footway") ~ "Off Road Cycleway",
+        detailed_segregation %in% segtypes ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     # Add cycle_pedestrian_separation:
     classify_shared_use() |>
     # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off Road Cycleway
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      distance_to_road > min_distance & detailed_segregation %in% c("Level track", "Footway") ~ "Off Road Cycleway",
+      distance_to_road > min_distance & detailed_segregation %in% segtypes ~ "Off Road Cycleway",
       TRUE ~ detailed_segregation
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
@@ -446,7 +442,7 @@ get_palette_npt = function() {
 #' @export
 plot_osm_tmap = function(
     cycle_network_classified,
-    popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
+    popup.vars = c("name", "osm_id", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "bicycle", "lanes", "width", "other_tags"),
     lwd = 4,
     palette = get_palette_npt()) {
   # Stop if tmap is not installed or if the version is less than 3.99:
