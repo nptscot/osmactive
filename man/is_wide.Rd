@@ -4,7 +4,7 @@
 \alias{is_wide}
 \title{Classify Separated cycle track by width}
 \usage{
-is_wide(x, min_width = 1.5)
+is_wide(x, min_width = 2)
 }
 \arguments{
 \item{x}{A numeric vector with the width of the cycleway (m)}
