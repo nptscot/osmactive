@@ -285,7 +285,7 @@ classify_cycle_infrastructure_scotland = function(
       detailed_segregation %in% segtypes & !is_wide(width_clean) ~ "Segregated Track (narrow)",
       # Shared use:
       (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off-road Track") |
-        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track") ~ "Shared use",
+        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off-road Track" & highway != "cycleway") ~ "Shared use",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
@@ -297,6 +297,7 @@ classify_cycle_infrastructure_scotland = function(
   if (!include_mixed_traffic) {
     osm_classified = osm_classified |>
       dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>
+      dplyr::mutate(cycle_segregation = as.character(cycle_segregation)) |>
       dplyr::mutate(cycle_segregation = factor(
         cycle_segregation,
         levels = c("Segregated Track (wide)", "Off-road Track", "Segregated Track (narrow)", "Shared use", "Painted Lane"),

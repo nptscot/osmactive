@@ -47,8 +47,8 @@ table(cycle_net$detailed_segregation)
 #>                 13                  4                  1                  1
 table(cycle_net$cycle_segregation)
 #> 
-#>            Off-road Track   Segregated Track (wide) Segregated Track (narrow) 
-#>                         4                         6                         8 
+#>   Segregated Track (wide)            Off-road Track Segregated Track (narrow) 
+#>                         6                         4                         8 
 #>                Shared use              Painted Lane 
 #>                         0                         1
 ```
