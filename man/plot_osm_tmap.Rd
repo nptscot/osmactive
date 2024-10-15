@@ -9,7 +9,7 @@ plot_osm_tmap(
   popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway",
     "cycleway", "lanes", "width", "other_tags"),
   lwd = 4,
-  palette = "npt"
+  palette = get_palette_npt()
 )
 }
 \arguments{

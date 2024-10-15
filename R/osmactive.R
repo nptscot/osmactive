@@ -403,6 +403,17 @@ is_wide = function(x, min_width = 2) {
   x >= min_width
 }
 
+get_palette_npt = function() {
+  palette_npt = c(
+    "Off-road Track" = "#054d05", # Dark Green
+    "Segregated Track (wide)" = "#3a9120", # Medium Green
+    "Segregated Track (narrow)" = "#87d668", # Light Green
+    "Painted Lane" = "#FF0000", # Red
+    "Shared use" = "#ffbf00" # Amber
+  )
+  return(palette_npt)
+}
+
 #' Create a tmap object for visualizing the classified cycle network
 #'
 #' @param cycle_network_classified An sf object with the classified cycle network
@@ -416,22 +427,12 @@ plot_osm_tmap = function(
     cycle_network_classified,
     popup.vars = c("name", "cycle_segregation", "distance_to_road", "maxspeed", "highway", "cycleway", "lanes", "width", "other_tags"),
     lwd = 4,
-    palette = "npt") {
-  palette_npt = c(
-    "Off-road Track" = "#054d05", # Dark Green
-    "Segregated Track (wide)" = "#3a9120", # Medium Green
-    "Segregated Track (narrow)" = "#87d668", # Light Green
-    "Painted Lane" = "#FF0000", # Red
-    "Shared use" = "#ffbf00" # Amber
-  )
-  if (palette == "npt") {
-    palette = palette_npt
-  }
+    palette = get_palette_npt()) {
   # Stop if tmap is not installed or if the version is less than 3.99:
   if (!requireNamespace("tmap", quietly = TRUE)) {
     stop("tmap is not installed. Please install tmap to use this function.")
   }
-  if (packageVersion("tmap") < "3.99") {
+  if (utils::packageVersion("tmap") < "3.99") {
     stop("Please update tmap to version 3.99 or higher.")
   }
   # Subset popup.vars to include only those that are present in the data:
