@@ -43,14 +43,14 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 #> 
-#>        Level track  Off Road Cycleway Painted Cycle Lane Stepped or footway 
-#>                 13                  4                  1                  1
+#>        Level track  Off Road Cycleway Painted Cycle Lane 
+#>                 14                  4                  1
 table(cycle_net$cycle_segregation)
 #> 
 #>   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
-#>                         6                         4                         8 
+#>                         6                         3                         8 
 #>                Shared use        Painted Cycle Lane 
-#>                         0                         1
+#>                         1                         1
 ```
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
@@ -244,10 +244,10 @@ osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_greater-london-latest.gpkg' 
 #>   using driver `GPKG'
-#> Simple feature collection with 6168 features and 45 fields
+#> Simple feature collection with 5856 features and 45 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -0.1189676 ymin: 51.4957 xmax: -0.09016682 ymax: 51.51368
+#> Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009284 ymax: 51.51222
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
