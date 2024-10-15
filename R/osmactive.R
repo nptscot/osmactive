@@ -261,10 +261,9 @@ classify_cycle_infrastructure_scotland = function(
     )) |>
     tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
+      stringr::str_detect(cycleway_chars, "lane|share_") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed Traffic Street" ~ "Light segregation",
       stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
-      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Stepped or footway",
       TRUE ~ detailed_segregation
     ))
