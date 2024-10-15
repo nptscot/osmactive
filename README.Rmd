@@ -10,8 +10,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   message = FALSE,
-  warning = FALSE,
-  cache = FALSE
+  warning = FALSE
+  , cache = FALSE
 )
 ```
 
@@ -90,7 +90,7 @@ devtools::load_all()
 The package comes with example data for testing functions.
 You can test the functions as follows:
 
-```{r minimal}
+```{r minimal, eval=FALSE}
 osm = osm_edinburgh
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
@@ -122,12 +122,10 @@ m
 ## Leeds example
 
 ```{r leeds}
-leeds_zb = zonebuilder::zb_zone("Leeds")
-leeds = leeds_zb |>
-  filter(circle_id == 1) |>
-  sf::st_union() |>
-  sf::st_make_valid()
-osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
+leeds_6km = leeds_zb |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
@@ -137,18 +135,6 @@ m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
-leeds_6km = leeds_zb |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-names(cycle_net)
-drive_net = get_driving_network(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
 
@@ -159,7 +145,6 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 ```
 
 ## Edinburgh example
-
 
 ```{r edinburgh}
 edinburgh = zonebuilder::zb_zone("Edinburgh")
@@ -190,21 +175,6 @@ system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
 ## Dublin example
 
 ```{r dublin}
-dublin_zones = zonebuilder::zb_zone("Dublin")
-dublin = dublin_zones |>
-  filter(circle_id == 1)
-osm = get_travel_network("Republic of Ireland", boundary = dublin, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
-m
-```
-
-```{r}
-#| eval: false
-#| echo: false
 dublin_6km = dublin_zones |>
   filter(circle_id <= 3) |>
   sf::st_union()
@@ -214,6 +184,11 @@ drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_dublin.html")
 browseURL("classify_cycle_infrastructure_dublin.html")
 # upload:
@@ -239,8 +214,7 @@ m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
 # upload:
@@ -263,8 +237,7 @@ m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_london.html")
 browseURL("classify_cycle_infrastructure_london.html")
 # upload:

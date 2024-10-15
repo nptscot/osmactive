@@ -42,15 +42,7 @@ drive_net_major = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
-#> 
-#>        Level track     Off-road Track       Painted Lane Stepped or footway 
-#>                 13                  4                  1                  1
 table(cycle_net$cycle_segregation)
-#> 
-#>            Off-road Track   Segregated Track (wide) Segregated Track (narrow) 
-#>                         4                         6                         8 
-#>                Shared use              Painted Lane 
-#>                         0                         1
 ```
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
@@ -65,18 +57,16 @@ m
 ## Leeds example
 
 ``` r
-leeds_zb = zonebuilder::zb_zone("Leeds")
-leeds = leeds_zb |>
-  filter(circle_id == 1) |>
-  sf::st_union() |>
-  sf::st_make_valid()
-osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
+leeds_6km = leeds_zb |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
 #> 0...10...20...30...40...50...60...70...80...90...100 - done.
 #> Reading layer `lines' from data source `/home/robin/data/osm/bbbike_Leeds.gpkg' using driver `GPKG'
-#> Simple feature collection with 4163 features and 42 fields
+#> Simple feature collection with 39330 features and 42 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -1.558963 ymin: 53.78843 xmax: -1.528622 ymax: 53.80639
+#> Bounding box:  xmin: -1.634843 ymin: 53.74351 xmax: -1.452746 ymax: 53.85133
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
@@ -87,6 +77,16 @@ m
 ```
 
 ![](man/figures/README-leeds-1.png)<!-- -->
+
+``` r
+tmap_save(m, "classify_cycle_infrastructure_leeds.html")
+browseURL("classify_cycle_infrastructure_leeds.html")
+
+system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobber")
+
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/classify_cycle_infrastructure_leeds.html
+```
 
 ## Edinburgh example
 
@@ -121,19 +121,19 @@ m
 ## Dublin example
 
 ``` r
-dublin_zones = zonebuilder::zb_zone("Dublin")
-dublin = dublin_zones |>
-  filter(circle_id == 1)
-osm = get_travel_network("Republic of Ireland", boundary = dublin, boundary_type = "clipsrc")
+dublin_6km = dublin_zones |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
 #> 0...10...20...30...40...50...60...
 #> 70...80...90...100 - done.
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_ireland-and-northern-ireland-latest.gpkg' 
 #>   using driver `GPKG'
-#> Simple feature collection with 3723 features and 42 fields
+#> Simple feature collection with 50319 features and 42 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -6.275573 ymin: 53.3404 xmax: -6.245544 ymax: 53.35836
+#> Bounding box:  xmin: -6.350653 ymin: 53.29547 xmax: -6.170875 ymax: 53.40329
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
@@ -185,10 +185,10 @@ osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
 #> Reading layer `lines' from data source 
 #>   `/home/robin/data/osm/geofabrik_greater-london-latest.gpkg' 
 #>   using driver `GPKG'
-#> Simple feature collection with 5856 features and 42 fields
+#> Simple feature collection with 6168 features and 42 fields
 #> Geometry type: MULTILINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -0.1188785 ymin: 51.49424 xmax: -0.09009284 ymax: 51.51222
+#> Bounding box:  xmin: -0.1189676 ymin: 51.4957 xmax: -0.09016682 ymax: 51.51368
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
