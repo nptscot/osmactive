@@ -15,13 +15,13 @@ BugReports: https://github.com/nptscot/osmactive/issues
 Imports: 
     dplyr,
     geos,
-    jsonlite,
     osmextract,
     sf,
     stringr,
     tidyr
 Suggests: 
     knitr,
+    jsonlite,
     rmarkdown,
     tmap (>= 3.9)
 Remotes: 

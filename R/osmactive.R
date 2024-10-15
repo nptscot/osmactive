@@ -208,6 +208,10 @@ distance_to_road = function(rnet, roads) {
 #' library(sf)
 #' plot(netc["cycle_segregation"])
 #' plot(netc["distance_to_road"])
+#' plot_osm_tmap(netc)
+#' # Interactive map:
+#' tmap_mode("view")
+#' plot_osm_tmap(netc)
 classify_cycle_infrastructure = function(
     osm,
     min_distance = 10,
