@@ -38,7 +38,9 @@ plot(osm)
 
 # # Keep only most relevant columns
 osm = osm |>
-  select(osm_id, name, highway, cycleway, bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, other_tags)
+  select(osm_id, name, highway, matches("cycleway"), bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, other_tags)
+names(osm)
+
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network

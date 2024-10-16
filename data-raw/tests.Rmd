@@ -54,9 +54,25 @@ Leith Walk, should be Segregated Track (narrow).
 It is on part of it, with the following tags for way [22587411](https://www.openstreetmap.org/way/22587411).
 
 ```{r}
-osm = get_travel_network("Edinburgh")
-leith_walk_narrow = osm |>
-  filter(osm_id == 22587411)
+osm = get_travel_network("Edinburgh", force_download = TRUE)
+nrow(osm)
+sum(osm$cycleway_left == "separate", na.rm = TRUE)
+# Full cycle network:
+cycle_net = get_cycling_network(osm)
+nrow(cycle_net)
+table(cycle_net$cycleway_right)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+tmap::tmap_save(m, "leith_walk_full.html")
+browseURL("leith_walk_full.html")
+```
+
+```{r}
+leith_walk_narrow = cycle_net |>
+  filter(osm_id == 1209807764)
+get_cycling_network(leith_walk_narrow)
 leith_walk_narrow_minimal = leith_walk_narrow |>
   select_if(~ !all(is.na(.))) |>
   sf::st_drop_geometry()
@@ -64,17 +80,19 @@ leith_walk_narrow_minimal
 ```
 
 ```{r, echo=FALSE}
-#     osm_id       name highway maxspeed oneway cycleway_left lit surface z_order
-# 1 22587411 Leith Walk primary   20 mph    yes         track yes asphalt       7
-#      other_tags
-# 1 "ref"=>"A900"
+#       osm_id  highway oneway                            cycleway_chars lit
+# 1 1209807764 cycleway    yes NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA yes
+#   width surface smoothness z_order distance_to_road detailed_segregation
+# 1     1 asphalt       good       0              9.1          Level track
+#   cycle_pedestrian_separation width_clean         cycle_segregation
+# 1                     Unknown           1 Segregated Track (narrow)
 ```
 
-Another part of the same corridor, way 578114866, is classified as Shared Footway: 
+Another part of the same corridor, way 1214008544, is classified as Shared Footway: 
 
 ```{r}
-leith_walk_footway = osm |>
-  filter(osm_id == 578114866)
+leith_walk_footway = cycle_net |>
+  filter(osm_id == 1214008544)
 leith_walk_footway_minimal = leith_walk_footway |>
   select_if(~ !all(is.na(.))) |>
   sf::st_drop_geometry()
