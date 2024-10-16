@@ -13,7 +13,7 @@ classify_shared_use(osm)
 An sf object with the classified cycle network
 }
 \description{
-Ways on which bicycles and pedestrians share space are classified as "Shared use".
+Ways on which bicycles and pedestrians share space are classified as "Shared Footway".
 According to
 }
 \details{

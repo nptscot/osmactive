@@ -286,15 +286,15 @@ classify_cycle_infrastructure_scotland = function(
     dplyr::mutate(cycle_segregation = dplyr::case_when(
       detailed_segregation %in% segtypes & is_wide(width_clean) ~ "Segregated Track (wide)",
       detailed_segregation %in% segtypes & !is_wide(width_clean) ~ "Segregated Track (narrow)",
-      # Shared use:
-      detailed_segregation == "Footway" ~ "Shared use",
+      # Shared Footway:
+      detailed_segregation == "Footway" ~ "Shared Footway",
       (cycle_pedestrian_separation != "Unknown" & detailed_segregation != "Off Road Cycleway") |
-        (cycle_pedestrian_separation == "Shared use (not segregated)" & detailed_segregation == "Off Road Cycleway" & highway != "cycleway") ~ "Shared use",
+        (cycle_pedestrian_separation == "Shared Footway (not segregated)" & detailed_segregation == "Off Road Cycleway" & highway != "cycleway") ~ "Shared Footway",
       TRUE ~ detailed_segregation
     )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
-      levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared use", "Painted Cycle Lane", "Mixed Traffic Street"),
+      levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared Footway", "Painted Cycle Lane", "Mixed Traffic Street"),
       ordered = TRUE
     ))
   # Remove mixed traffic if not required:
@@ -304,7 +304,7 @@ classify_cycle_infrastructure_scotland = function(
       dplyr::mutate(cycle_segregation = as.character(cycle_segregation)) |>
       dplyr::mutate(cycle_segregation = factor(
         cycle_segregation,
-        levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared use", "Painted Cycle Lane"),
+        levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared Footway", "Painted Cycle Lane"),
         ordered = TRUE
       ))
   }
@@ -313,7 +313,7 @@ classify_cycle_infrastructure_scotland = function(
 
 #' Classify ways by level of pedestrian/cyclist sharing
 #'
-#' Ways on which bicycles and pedestrians share space are classified as "Shared use".
+#' Ways on which bicycles and pedestrians share space are classified as "Shared Footway".
 #' According to
 #'
 #' tagging includes:
@@ -344,17 +344,17 @@ classify_shared_use = function(osm) {
       # Walking is permitted:
       (highway == "footway" | highway == "path" | highway == "pedestrian" | foot == "designated") &
         # Bicycle also permitted:
-        (bicycle == "designated" | highway == "path") ~ "Shared use (not segregated)",
+        (bicycle == "designated" | highway == "path") ~ "Shared Footway (not segregated)",
       TRUE ~ "Unknown"
     )) |>
     dplyr::mutate(cycle_pedestrian_separation = dplyr::case_when(
       # differentiate between segregated and non-segregated shared use:
-      cycle_pedestrian_separation == "Shared use (not segregated)" & segregated == "yes" ~ "Shared use (segregated)",
+      cycle_pedestrian_separation == "Shared Footway (not segregated)" & segregated == "yes" ~ "Shared Footway (segregated)",
       TRUE ~ cycle_pedestrian_separation
     )) |>
     dplyr::mutate(cycle_pedestrian_separation = factor(
       cycle_pedestrian_separation,
-      levels = c("Shared use (segregated)", "Shared use (not segregated)", "Unknown"),
+      levels = c("Shared Footway (segregated)", "Shared Footway (not segregated)", "Unknown"),
       ordered = TRUE
     ))
 }
@@ -435,7 +435,7 @@ get_palette_npt = function() {
     "Segregated Track (wide)" = "#054d05", # Dark Green
     "Off Road Cycleway" = "#3a9120", # Medium Green
     "Segregated Track (narrow)" = "#87d668", # Light Green
-    "Shared use" = "#ffbf00", # Amber
+    "Shared Footway" = "#ffbf00", # Amber
     "Painted Cycle Lane" = "#FF0000" # Red
   )
   return(palette_npt)
