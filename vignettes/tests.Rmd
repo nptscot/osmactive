@@ -32,7 +32,7 @@ drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net_classified = classify_cycle_infrastructure(cycle_net)
 cycle_net_classified |>
-  pull(cycle_segregation) 
+  pull(cycle_segregation)
 ```
 
 Let's check out 'highway=path' tagged segments in the network in Leeds:
@@ -43,9 +43,52 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 tmap::tmap_mode("view")
 cycle_net_path = cycle_net |>
-  filter(highway == "path") 
+  filter(highway == "path")
 m = plot_osm_tmap(cycle_net_path)
 m
 # tmap::tmap_save(m, "path.html")
 # browseURL("path.html")
+```
+
+Leith Walk, should be Segregated Track (narrow).
+It is on part of it, with the following tags for way [22587411](https://www.openstreetmap.org/way/22587411).
+
+```{r}
+osm = get_travel_network("Edinburgh")
+leith_walk_narrow = osm |>
+  filter(osm_id == 22587411) |>
+  # Drop all columns that are NA:
+  select_if(~ !all(is.na(.))) |>
+  sf::st_drop_geometry()
+leith_walk_narrow
+```
+
+```{r, echo=FALSE}
+#     osm_id       name highway maxspeed oneway cycleway_left lit surface z_order
+# 1 22587411 Leith Walk primary   20 mph    yes         track yes asphalt       7
+#      other_tags
+# 1 "ref"=>"A900"
+```
+
+Another part of the same corridor, way 578114866, is classified as Shared Footway: 
+
+
+
+
+```{r}
+leith_walk = osm |>
+  filter(name == "Leith Walk")
+cycle_net = get_cycling_network(leith_walk)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+cycle_net |>
+  pull(cycle_segregation)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+tmap::tmap_save(m, "leith_walk.html")
+browseURL("leith_walk.html")
 ```

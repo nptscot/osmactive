@@ -151,7 +151,15 @@ get_cycling_network = function(
     # Remove segments with poor surface:
     dplyr::filter(!surface %in% c("dirt", "ground", "unpaved", "grass", "compacted", "gravel", "sand")) |>
     # Remove segments with poor smoothness:
-    dplyr::filter(!smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable"))
+    dplyr::filter(!smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")) |>
+    # Remove any segments with cycleway*=="separate"
+    # They are mapped as separate geometries that should be included
+    dplyr::filter(
+      cycleway != "separate" &
+        cycleway_left != "separate" &
+        cycleway_right != "separate" &
+        cycleway_both != "separate"
+    )
 }
 
 #' Calculate distance from route network segments to roads
@@ -267,7 +275,6 @@ classify_cycle_infrastructure_scotland = function(
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       stringr::str_detect(cycleway_chars, "lane|share_") & detailed_segregation == "Mixed Traffic Street" ~ "Painted Cycle Lane",
       stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed Traffic Street" ~ "Light segregation",
-      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed Traffic Street" ~ "Footway",
       stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed Traffic Street" ~ "Footway",
       TRUE ~ detailed_segregation
     ))
