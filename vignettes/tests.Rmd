@@ -56,11 +56,11 @@ It is on part of it, with the following tags for way [22587411](https://www.open
 ```{r}
 osm = get_travel_network("Edinburgh")
 leith_walk_narrow = osm |>
-  filter(osm_id == 22587411) |>
-  # Drop all columns that are NA:
+  filter(osm_id == 22587411)
+leith_walk_narrow_minimal = leith_walk_narrow |>
   select_if(~ !all(is.na(.))) |>
   sf::st_drop_geometry()
-leith_walk_narrow
+leith_walk_narrow_minimal
 ```
 
 ```{r, echo=FALSE}
@@ -72,8 +72,31 @@ leith_walk_narrow
 
 Another part of the same corridor, way 578114866, is classified as Shared Footway: 
 
+```{r}
+leith_walk_footway = osm |>
+  filter(osm_id == 578114866)
+leith_walk_footway_minimal = leith_walk_footway |>
+  select_if(~ !all(is.na(.))) |>
+  sf::st_drop_geometry()
+leith_walk_footway_minimal
+```
 
+```{r, echo=FALSE}
+#      osm_id       name highway maxspeed oneway cycleway_left cycleway_right lit
+# 1 578114866 Leith Walk primary   20 mph    yes      separate             no yes
+#   surface z_order
+# 1 asphalt       7
+#                                                                                       other_tags
+# 1 "name:left"=>"Crighton Place","ref"=>"A900","sidewalk:left"=>"separate","sidewalk:right"=>"no"
+```
 
+Let's compare them:
+
+```{r}
+waldo::compare(leith_walk_narrow, leith_walk_footway)
+```
+
+Highway=path should be
 
 ```{r}
 leith_walk = osm |>
