@@ -47,6 +47,6 @@ plot(netc["cycle_segregation"])
 plot(netc["distance_to_road"])
 plot_osm_tmap(netc)
 # Interactive map:
-tmap_mode("view")
-plot_osm_tmap(netc)
+# tmap_mode("view")
+# plot_osm_tmap(netc)
 }

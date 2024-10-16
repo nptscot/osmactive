@@ -142,24 +142,22 @@ get_cycling_network = function(
     dplyr::filter(
       !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
     ) |>
-    # Remove all highway=path segments, unless surface is good:
-    dplyr::filter(!(
-      highway == "path" &
-      stringr::str_detect(surface, "asphalt|pav|concrete|fine", negate = TRUE) &
-      stringr::str_detect(smoothness, "good|excellent", negate = TRUE)
-      )) |>
-    # Remove segments with poor surface:
-    dplyr::filter(!surface %in% c("dirt", "ground", "unpaved", "grass", "compacted", "gravel", "sand")) |>
-    # Remove segments with poor smoothness:
-    dplyr::filter(!smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")) |>
+    # Remove all highway=path segments if surface is not defined:
+    dplyr::filter(!(highway == "path" & is.na(surface))) |>
+    # Remove poor quality surfaces:
+    dplyr::filter(
+      ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt")
+    ) |>
+    # Remove poor quality smoothness:
+    dplyr::filter(
+      ! smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")
+    ) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
-    dplyr::filter(
-      cycleway != "separate" &
-        cycleway_left != "separate" &
-        cycleway_right != "separate" &
-        cycleway_both != "separate"
-    )
+    dplyr::filter(!cycleway %in% "separate") |>
+    dplyr::filter(!cycleway_left %in% "separate") |>
+    dplyr::filter(!cycleway_right %in% "separate") |>
+    dplyr::filter(!cycleway_both %in% "separate")
 }
 
 #' Calculate distance from route network segments to roads
@@ -224,8 +222,8 @@ distance_to_road = function(rnet, roads) {
 #' plot(netc["distance_to_road"])
 #' plot_osm_tmap(netc)
 #' # Interactive map:
-#' tmap_mode("view")
-#' plot_osm_tmap(netc)
+#' # tmap_mode("view")
+#' # plot_osm_tmap(netc)
 classify_cycle_infrastructure = function(
     osm,
     min_distance = 10,
@@ -252,9 +250,8 @@ classify_cycle_infrastructure_scotland = function(
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
       highway == "cycleway" ~ "Level track",
-      highway %in% c("footway", "path", "Pedestrian") ~ "Footway",
-      # these by default are not shared with traffic:
-      segregated %in% c("yes", "no") ~ "Footway",
+      highway %in% c("footway", "path", "Pedestrian") & segregated %in% c("no", NA) ~ "Footway",
+      segregated %in% "yes" ~ "Level track",
       TRUE ~ "Mixed Traffic Street"
     )) |>
     # ...including by name
@@ -281,7 +278,7 @@ classify_cycle_infrastructure_scotland = function(
   # For cycleway:left:segregated" and "cycleway:right:segregated"
   if ("cycleway_left_segregated" %in% names(osm_classified) & "cycleway_right_segregated" %in% names(osm_classified)) {
     osm_classified = osm_classified |>
-      mutate(
+      dplyr::mutate(
         detailed_segregation = dplyr::case_when(
           cycleway_left_segregated == "yes" | cycleway_right_segregated == "yes" ~ "Light segregation",
           TRUE ~ detailed_segregation
