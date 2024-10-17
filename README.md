@@ -46,13 +46,13 @@ table(cycle_net$detailed_segregation)
 #>          Level track Mixed Traffic Street    Off Road Cycleway 
 #>                   13                    1                    4 
 #>   Painted Cycle Lane 
-#>                    1
+#>                    3
 table(cycle_net$cycle_segregation)
 #> 
 #>   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
-#>                         6                         4                         7 
-#>                Shared use        Painted Cycle Lane 
-#>                         1                         1
+#>                         7                         4                         6 
+#>            Shared Footway        Painted Cycle Lane 
+#>                         1                         3
 ```
 
 You can also create plots with the packaged `plot_osm_tmap()` function:
@@ -97,20 +97,13 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 ## Edinburgh example
 
 ``` r
-edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km = edinburgh |>
-  # Change number in next line to change zone size:
-  filter(circle_id <= 2) |>
-  sf::st_union()
-osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
-#> 0...10...20...30...40...50...60...70...80.
-#> ..90...100 - done.
+osm = get_travel_network("Edinburgh")
 #> Reading layer `lines' from data source 
-#>   `/home/robin/data/osm/geofabrik_scotland-latest.gpkg' using driver `GPKG'
-#> Simple feature collection with 44341 features and 45 fields
-#> Geometry type: MULTILINESTRING
+#>   `/home/robin/data/osm/bbbike_Edinburgh.gpkg' using driver `GPKG'
+#> Simple feature collection with 223516 features and 45 fields
+#> Geometry type: LINESTRING
 #> Dimension:     XY
-#> Bounding box:  xmin: -3.236391 ymin: 55.9264 xmax: -3.140354 ymax: 55.98029
+#> Bounding box:  xmin: -3.579998 ymin: 55.7 xmax: -2.77 ymax: 56.1
 #> Geodetic CRS:  WGS 84
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)

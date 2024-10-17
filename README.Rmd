@@ -63,6 +63,7 @@ styler.equals::style_file("README.Rmd")
 
 ```{r, eval=FALSE, echo=FALSE}
 # For testing:
+devtools::document()
 devtools::check()
 ```
 
@@ -144,12 +145,7 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 ## Edinburgh example
 
 ```{r edinburgh}
-edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km = edinburgh |>
-  # Change number in next line to change zone size:
-  filter(circle_id <= 2) |>
-  sf::st_union()
-osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+osm = get_travel_network("Edinburgh")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
