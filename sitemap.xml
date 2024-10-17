@@ -8,6 +8,7 @@
 <url><loc>https://nptscot.github.io/osmactive/authors.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/index.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/classify_cycle_infrastructure.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/classify_shared_use.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/clean_speeds.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/clean_widths.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/distance_to_road.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>https://nptscot.github.io/osmactive/reference/et_active.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/get_cycling_network.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/get_driving_network.html</loc></url>
+<url><loc>https://nptscot.github.io/osmactive/reference/get_palette_npt.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/get_travel_network.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/index.html</loc></url>
 <url><loc>https://nptscot.github.io/osmactive/reference/is_wide.html</loc></url>
