@@ -17,6 +17,7 @@ Clean cycleway widths (use est_widths when available and width otherwise)
 }
 \examples{
 osm = osm_edinburgh
+osm$width
 osm$est_width = NA
 osm$est_width[1:3] = 2
 osm_cleaned = clean_widths(osm)

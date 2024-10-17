@@ -21,6 +21,7 @@ Imports:
     tidyr
 Suggests: 
     knitr,
+    jsonlite,
     rmarkdown,
     tmap (>= 3.9)
 Remotes: 

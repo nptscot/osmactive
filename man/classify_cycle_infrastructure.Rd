@@ -7,7 +7,8 @@
 classify_cycle_infrastructure(
   osm,
   min_distance = 10,
-  classification_type = "Scotland"
+  classification_type = "Scotland",
+  include_mixed_traffic = FALSE
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ classify_cycle_infrastructure(
 \item{min_distance}{The minimum distance to the road for a cycleway to be considered off-road.}
 
 \item{classification_type}{The classification type to be used. Currently only "Scotland" is supported.}
+
+\item{include_mixed_traffic}{Whether to include mixed traffic segments in the results.}
 }
 \value{
 A an sf object with the new column \code{cycle_segregation} that contains the segregation levels.
@@ -42,4 +45,8 @@ netc = classify_cycle_infrastructure(netd)
 library(sf)
 plot(netc["cycle_segregation"])
 plot(netc["distance_to_road"])
+plot_osm_tmap(netc)
+# Interactive map:
+# tmap_mode("view")
+# plot_osm_tmap(netc)
 }

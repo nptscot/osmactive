@@ -33,13 +33,14 @@ osm_york_way_buffer = osm_york_way |>
 
 plot(osm_york_way_buffer)
 
-
 osm = osm[osm_york_way_buffer, ]
 plot(osm)
 
 # # Keep only most relevant columns
-osm = osm %>%
-  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, other_tags)
+osm = osm |>
+  select(osm_id, name, highway, matches("cycleway"), bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, other_tags)
+names(osm)
+
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
