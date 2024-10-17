@@ -142,8 +142,8 @@ get_cycling_network = function(
     dplyr::filter(
       !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
     ) |>
-    # Remove all highway=path segments if surface is not defined:
-    dplyr::filter(!(highway == "path" & is.na(surface))) |>
+    # Remove all highway=path|footway segments if surface is not defined:
+    dplyr::filter(!(highway %in% c("path", "footway") & is.na(surface))) |>
     # Remove poor quality surfaces:
     dplyr::filter(
       ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt")
