@@ -629,7 +629,7 @@ estimate_traffic = function(osm) {
 level_of_service = function(osm) {
   osm = osm |>
     dplyr::mutate(`Level of Service` = dplyr::case_when(
-      detailed_segregation == "Remote cycle track" ~ "High",
+      detailed_segregation == "Off Road Cycleway" ~ "High",
       detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
       detailed_segregation == "Footway" & final_speed <= 20 ~ "High",
       detailed_segregation == "Footway" & final_speed == 30 & final_traffic < 4000 ~ "High",
