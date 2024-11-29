@@ -59,6 +59,8 @@ remotes::install_github("Robinlovelace/styler.equals")
 styler.equals::style_pkg()
 # And the README:
 styler.equals::style_file("README.Rmd")
+# build readme:
+devtools::build_readme()
 ```
 
 ```{r, eval=FALSE, echo=FALSE}

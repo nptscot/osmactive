@@ -146,7 +146,7 @@ get_cycling_network = function(
     dplyr::filter(!(highway %in% c("path", "footway") & is.na(surface))) |>
     # Remove poor quality surfaces:
     dplyr::filter(
-      ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt")
+      ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood")
     ) |>
     # Remove poor quality smoothness:
     dplyr::filter(
