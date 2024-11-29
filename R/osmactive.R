@@ -155,9 +155,9 @@ get_cycling_network = function(
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
     dplyr::filter(!cycleway %in% "separate") |>
-    dplyr::filter(!cycleway_left %in% "separate") |>
-    dplyr::filter(!cycleway_right %in% "separate") |>
-    dplyr::filter(!cycleway_both %in% "separate")
+    dplyr::filter(!cycleway_left %in% "separate" & lanes != 1) |>
+    dplyr::filter(!cycleway_right %in% "separate" & lanes != 1) |>
+    dplyr::filter(!cycleway_both %in% "separate" & lanes != 1)
 }
 
 #' Calculate distance from route network segments to roads
