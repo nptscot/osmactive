@@ -134,7 +134,6 @@ get_cycling_network = function(
     osm,
     ex_c = exclude_highway_cycling(),
     ex_b = exclude_bicycle_cycling()) {
-  browser()
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
