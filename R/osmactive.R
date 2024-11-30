@@ -134,6 +134,7 @@ get_cycling_network = function(
     osm,
     ex_c = exclude_highway_cycling(),
     ex_b = exclude_bicycle_cycling()) {
+  browser()
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
@@ -154,10 +155,10 @@ get_cycling_network = function(
     ) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
-    dplyr::filter(!cycleway %in% "separate") |>
-    dplyr::filter(!cycleway_left %in% "separate" & lanes != 1) |>
-    dplyr::filter(!cycleway_right %in% "separate" & lanes != 1) |>
-    dplyr::filter(!cycleway_both %in% "separate" & lanes != 1)
+    # dplyr::filter(!(cycleway %in% "separate" & oneway == "yes")) |>
+    # dplyr::filter(!(cycleway_both %in% "separate" & lanes == 1)) |>
+    dplyr::filter(!(cycleway_left %in% "separate" & oneway %in% "yes")) |>
+    dplyr::filter(!(cycleway_right %in% "separate" & oneway %in% "yes"))
 }
 
 #' Calculate distance from route network segments to roads
