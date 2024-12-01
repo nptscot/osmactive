@@ -1,0 +1,16 @@
+The aim of the code below is to test which ways are omitted by the `get_cycling_network` function.
+
+
+```{r}
+devtools::load_all()
+library(tidyverse)
+osm_national = get_travel_network("Scotland", force_download = T)
+osm_trinity_crescent = osm_national |>
+  filter(name == "Trinity Crescent") 
+mapview::mapview(osm_trinity_crescent)
+
+# Use browser() for interactive debugging in the following line:
+devtools::load_all()
+osm_trinity_filtered = get_cycling_network(osm_trinity_crescent)
+mapview::mapview(osm_trinity_filtered)
+```
