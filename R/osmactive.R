@@ -226,7 +226,7 @@ distance_to_road = function(rnet, roads) {
 #' # plot_osm_tmap(netc)
 classify_cycle_infrastructure = function(
     osm,
-    min_distance = 10,
+    min_distance = 20,
     classification_type = "Scotland",
     include_mixed_traffic = FALSE) {
   if (classification_type == "Scotland") {
@@ -243,7 +243,7 @@ classify_cycle_infrastructure = function(
 
 classify_cycle_infrastructure_scotland = function(
     osm,
-    min_distance = 10,
+    min_distance = 20,
     include_mixed_traffic = FALSE) {
   segtypes = c("Level track", "Light segregation")
   osm_classified = osm |>
