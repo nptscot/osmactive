@@ -1,8 +1,8 @@
 ---
-title: "Classify Cycle by Design road volumes"
+title: "Scottish Cycling by Design classification"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Classify Cycle by Design road volumes}
+  %\VignetteIndexEntry{Scottish Cycling by Design classification}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
