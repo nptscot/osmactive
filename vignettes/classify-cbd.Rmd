@@ -46,8 +46,12 @@ cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
-# m
+central_edinburgh = osm_edinburgh |>
+  sf::st_union() |>
+  sf::st_centroid() |>
+  sf::st_buffer(3000)
+m = plot_osm_tmap(cycle_net[central_edinburgh, ])
+m
 ```
 
 We can pick out specific bits of infrastructure, e.g. those mentioned in issue [#67](https://github.com/nptscot/osmactive/issues/67): 
