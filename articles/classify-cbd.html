@@ -66,7 +66,34 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nptscot.github.io/osmactive/">osmactive</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nptscot.github.io/osmactive/">osmactive</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Linking to GEOS 3.10.2, GDAL 3.4.1, PROJ 8.2.1; sf_use_s2() is TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">osm</span> <span class="op">=</span> <span class="va">osm_edinburgh</span></span>
+<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in get(paste0(generic, ".", class), envir = get_method_env()) : </span></span>
+<span><span class="co">#&gt;   object 'type_sum.accel' not found</span></span>
+<span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
+<span><span class="va">drive_net_major</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
+<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span><span class="op">)</span></span>
+<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">detailed_segregation</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;          Level track Mixed Traffic Street    Off Road Cycleway </span></span>
+<span><span class="co">#&gt;                   16                    1                    1 </span></span>
+<span><span class="co">#&gt;   Painted Cycle Lane </span></span>
+<span><span class="co">#&gt;                    3</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">cycle_segregation</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) </span></span>
+<span><span class="co">#&gt;                         8                         1                         8 </span></span>
+<span><span class="co">#&gt;            Shared Footway        Painted Cycle Lane </span></span>
+<span><span class="co">#&gt;                         1                         3</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osm_tmap.html">plot_osm_tmap</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
+<span><span class="va">m</span></span></code></pre></div>
+<p><img src="classify-cbd_files/figure-html/minimal_plot_osm-1.png" width="700"></p>
   </main>
 </div>
 
