@@ -20,6 +20,8 @@ library(sf)
 tmap::tmap_mode("view")
 ```
 
+The default classification is the Cycling by Design guidance from the Scottish Government. This is a detailed classification system that includes the following categories, based on a minimal example dataset:
+
 ```{r}
 osm = osm_edinburgh
 cycle_net = get_cycling_network(osm)
@@ -33,5 +35,41 @@ table(cycle_net$cycle_segregation)
 
 ```{r minimal_plot_osm}
 m = plot_osm_tmap(cycle_net)
+m
+```
+
+Let's try running the code on a larger example, covering Edinburgh:
+
+```{r edinburgh}
+osm = get_travel_network("Edinburgh")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+# m
+```
+
+We can pick out specific bits of infrastructure, e.g. those mentioned in issue [#67](https://github.com/nptscot/osmactive/issues/67): 
+
+> https://www.openstreetmap.org/way/1137759929 shows up as this right now, but this looks like a narrow segregated / stepped track to me. https://www.openstreetmap.org/way/1209807768 is another case that doesn't seem like off-road.
+
+> My idea of off-road cycleway were things like https://www.openstreetmap.org/way/7973833 and https://www.openstreetmap.org/way/265320503 -- things with no parallel road nearby.
+
+Let's pull out those bits of infrastructure:
+
+```{r}
+cycle_net_included = cycle_net |>
+  subset(osm_id %in% c(1137759929, 1209807768, 7973833, 265320503))
+names(cycle_net_included)
+cycle_net_included[c("osm_id", "distance_to_road", "cycle_segregation")] |>
+  sf::st_drop_geometry() |>
+  knitr::kable()
+```
+
+We can also plot these as follows:
+
+```{r}
+m = plot_osm_tmap(cycle_net_included)
 m
 ```
