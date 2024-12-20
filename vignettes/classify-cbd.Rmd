@@ -16,4 +16,21 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(osmactive)
+library(sf)
+```
+
+```{r}
+osm = osm_edinburgh
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+drive_net_major = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+table(cycle_net$detailed_segregation)
+table(cycle_net$cycle_segregation)
+```
+
+```{r minimal_plot_osm}
+m = plot_osm_tmap(cycle_net)
+m
 ```

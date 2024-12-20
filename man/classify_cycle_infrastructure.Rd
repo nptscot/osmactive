@@ -6,7 +6,7 @@
 \usage{
 classify_cycle_infrastructure(
   osm,
-  min_distance = 10,
+  min_distance = 20,
   classification_type = "Scotland",
   include_mixed_traffic = FALSE
 )
