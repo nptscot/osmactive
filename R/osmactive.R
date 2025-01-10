@@ -80,7 +80,9 @@ count_bus_lanes = function(osm) {
   # summary(n_bus_lanes)
   n_bus_designated = grepl("designated", osm$bus) |>
     as.numeric()
-  n_bus_lanes = n_bus_lanes + n_bus_designated
+  n_psv_designated = grepl("designated", osm$psv) |>
+  as.numeric()
+  n_bus_lanes = n_bus_lanes + n_bus_designated + n_psv_designated
   n_bus_lanes
 }
 
