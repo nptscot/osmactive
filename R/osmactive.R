@@ -2,8 +2,7 @@
 #'
 #' @export
 et_active = function() {
-  c(
-    "maxspeed",
+  c("maxspeed",
     "oneway",
     "bicycle",
     "cycleway",
@@ -24,8 +23,6 @@ et_active = function() {
     "lanes:both_ways",
     "lanes:forward",
     "lanes:backward",
-    "lanes:bus",
-    "lanes:bus:conditional",
     "lit", # useful to check if cycleways are lit
     "oneway",
     "width", # To check if width is compliant with guidance
@@ -40,9 +37,67 @@ et_active = function() {
     "tracktype",
     "surface",
     "smoothness",
-    "access"
+    "access",
+    # Additional tags with info on psv and bus lanes:
+    "bus",
+    "psv",
+    "lanes:psv",
+    "lanes:bus",
+    "lanes:bus:conditional",
+    "lanes:bus:backward",
+    "lanes:bus:forward",
+    "lanes:psv:backward",
+    "lanes:psv:forward",
+    "lanes:psv:conditional",
+    "lanes:psv:conditional:backward",
+    "lanes:psv:conditional:forward",
+    "lanes:psv:conditional:both_ways",
+    "lanes:psv:both_ways",
+    "lanes:psv:backward",
+    "lanes:psv:forward"
   )
 }
+
+#' Count how many bus lanes there are
+#' @param osm An sf object with the road network
+#' @return The number of bus lanes
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' count_bus_lanes(osm)
+count_bus_lanes = function(osm) {
+  osm = sf::st_drop_geometry(osm)
+  names_matching_psv_bus = grepl("lanes_bus|lanes_psv", names(osm))
+  message("Matched these columns: ", names(osm)[names_matching_psv_bus])
+  # Count the number of bus lanes per row:
+  osm_lanes = osm[names_matching_psv_bus]
+  # Convert to numeric and sum the number of bus lanes:
+  suppressWarnings({
+    osm_lanes_numeric = lapply(osm_lanes, as.numeric) |>
+      as.data.frame()
+  })
+  n_bus_lanes = rowSums(osm_lanes_numeric, na.rm = TRUE)
+  # summary(n_bus_lanes)
+  n_bus_designated = grepl("designated", osm$bus) |>
+    as.numeric()
+  n_bus_lanes = n_bus_lanes + n_bus_designated
+  n_bus_lanes
+}
+
+# # # Test if lanes:psv:backwards is present
+
+# osm = get_travel_network("edinburgh")
+# osm_example = "242732804"
+# # # osm = net |>
+# # #   dplyr::filter(osm_id == osm_example)
+# osm$other_tags[1]
+# table(osm$lanes_psv_backward)
+# table(osm$n_bus_lanes)
+# # Another test:
+# osm_princes_street = osm |>
+#   dplyr::filter(name == "Princes Street")
+# summary(osm_princes_street$n_bus_lanes)
+# osm_princes_street$bus
 
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
@@ -93,6 +148,8 @@ get_travel_network = function(
     # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
     dplyr::filter(is.na(service)) |>
     dplyr::select(-dplyr::matches(columns_to_remove))
+  osm_highways$n_bus_lanes = count_bus_lanes(osm_highways)
+  osm_highways
 }
 
 #' Get the OSM driving network
