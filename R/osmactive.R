@@ -40,6 +40,7 @@ et_active = function() {
     "access",
     # Additional tags with info on psv and bus lanes:
     "bus",
+    "busway",
     "psv",
     "lanes:psv",
     "lanes:bus",
@@ -79,7 +80,7 @@ count_bus_lanes = function(osm) {
   n_bus_lanes = rowSums(osm_lanes_numeric, na.rm = TRUE)
   # summary(n_bus_lanes)
   n_bus_designated = grepl("designated", osm$bus) |>
-    as.numeric()
+    as.numeric() + grepl("lane", osm$busway) 
   n_psv_designated = grepl("designated", osm$psv) |>
   as.numeric()
   n_bus_lanes = n_bus_lanes + n_bus_designated + n_psv_designated
@@ -89,9 +90,9 @@ count_bus_lanes = function(osm) {
 # # # Test if lanes:psv:backwards is present
 
 # osm = get_travel_network("edinburgh")
-# osm_example = "242732804"
-# # # osm = net |>
-# # #   dplyr::filter(osm_id == osm_example)
+# osm_example = "Corstorphine Road"
+# osm_f = osm |>
+#   dplyr::filter(name == osm_example)
 # osm$other_tags[1]
 # table(osm$lanes_psv_backward)
 # table(osm$n_bus_lanes)
@@ -100,7 +101,10 @@ count_bus_lanes = function(osm) {
 #   dplyr::filter(name == "Princes Street")
 # summary(osm_princes_street$n_bus_lanes)
 # osm_princes_street$bus
-
+# osm_bus = osm |>
+#   dplyr::filter(n_bus_lanes > 0)
+# mapview::mapview(osm_bus, zcol = "n_bus_lanes")
+# write osm_bus to file:S
 # Exclude highway values for utility cycling
 exclude_highway_cycling = function() {
   to_exclude = paste0(
