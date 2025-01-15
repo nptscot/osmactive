@@ -31,6 +31,9 @@ It implements the query
 relation["route"="bus"](\{\{bbox\}\});
 out geom;
 }\if{html}{\out{</div>}}
+
+See \href{https://overpass-turbo.eu/s/1Xaf}{overpass-turbo.eu}
+for an example of the query in action.
 }
 \examples{
 # r = get_bus_routes("Edinburgh")

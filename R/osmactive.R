@@ -751,6 +751,9 @@ level_of_service = function(osm) {
 #' out geom;
 #' ```
 #' 
+#' See [overpass-turbo.eu](https://overpass-turbo.eu/s/1Xaf)
+#' for an example of the query in action.
+#' 
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
 #' @param query A query to be passed to `osmextract::oe_get()`
 #' @param extra_tags A vector of extra tags to be included in the OSM extract
