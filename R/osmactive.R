@@ -741,6 +741,40 @@ level_of_service = function(osm) {
   osm
 }
 
+#' Function to get multilinestrings representing bus routes
+#' 
+#' It implements the query
+#' 
+#' ```
+#' [out:json][timeout:25];
+#' relation["route"="bus"]({{bbox}});
+#' out geom;
+#' ```
+#' 
+#' @param place A place name or a bounding box passed to `osmextract::oe_get()`
+#' @param query A query to be passed to `osmextract::oe_get()`
+#' @param extra_tags A vector of extra tags to be included in the OSM extract
+#' @param ... Additional arguments passed to `osmextract::oe_get()`
+#' @return An sf object with the bus routes
+#' @export
+#' @examples
+#' # r = get_bus_routes("Edinburgh")
+#' r = get_bus_routes("Isle of Wight")
+#' plot(r["osm_id"])
+get_bus_routes = function(
+    place,
+    query = "SELECT * FROM multilinestrings WHERE route == 'bus'",
+    extra_tags = "route",
+    ...) {
+  osm_bus = osmextract::oe_get(
+    place = place,
+    query = query,
+    extra_tags = extra_tags,
+    ...
+  )
+  osm_bus
+}
+
 
 #' Data from edinburgh's OSM network
 #'
