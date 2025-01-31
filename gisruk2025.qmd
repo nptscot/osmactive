@@ -42,6 +42,8 @@ format:
 bibliography: references.bib
 ---
 
+<!-- See https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf for rendered version of this paper. -->
+
 ```{r}
 #| include: false
 # install pak if not installed:
