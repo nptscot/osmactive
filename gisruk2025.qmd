@@ -44,6 +44,12 @@ format:
 bibliography: references.bib
 ---
 
+<!-- Short description
+
+Please enter a short statement for a general audience or social media platform that describes the content of your submission.  -->
+
+<!-- New methods and open source tools for active travel planning are presented, integrating diverse street network datasets. Implemented in the `osmactive` R package and `anime` Rust crate, and showcased in the Network Planning Tool for Scotland. -->
+
 <!-- See https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf for rendered version of this paper. -->
 
 ```{r}
@@ -209,6 +215,8 @@ The Street Space layer divides roads into three groups, depending on whether the
   The available space is sufficient to accommodate the desirable minimum width of cycle infrastructure, providing a more comfortable design for all users. -->
 ```
 
+{{< pagebreak >}}
+
 # Introduction
 
 Active travel is an accessible and cost-effective way to replace short car trips and make transport systems more sustainable.
@@ -340,6 +348,8 @@ relation["route"="bus"]({{bbox}});
 
 ![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes}
 
+<!-- {{< pagebreak >}} -->
+
 # Results
 
 The result of the data engineering, data integration, modelling and visualisation steps described above is datasets that are visualised interactively in the NPT web application, using `pmtiles` for efficient rendering of large datasets [@gonçalves2023].
@@ -353,7 +363,7 @@ The key components of the NPT are:
 
 ![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
 
-{{< pagebreak >}}
+<!-- {{< pagebreak >}} -->
 
 # Conclusion
 
@@ -401,3 +411,13 @@ Dustin Carlino is an independent researcher and software developer, specialising
 Josiah Parry is a Senior Product Engineer at Environmental Systems Research Institute, Inc (Esri) and an open source software developer.
 
 Rosa Félix is a researcher at the University of Lisbon and specialises geographic methods for transport planning, with a focus on active travel and decarbonisation.
+
+<!-- I confirm that this submission has been approved by all authors
+Would you like to be considered for the GoFundGeo Grant?
+
+The GISRUK & OSGeo:UK GoFundGeo grant is an annual £500 award for GISRUK presenters (oral or poster) who present a tool or technique that has potential for wide uptake in the open source geospatial (OSGeo) community. The purpose of the grant is to help the recipient to make their approach easily adoptable through the provision of open source code repository and/or tool (e.g. a QGIS plugin). This grant is open to all, but with a focus on ECRs.
+
+
+If you would like your submission to be considered for this award, please specify how the £500 grant would enable you to do to develop your code or method into a reusable tool.
+
+It would allow the osmactive R package to be developed to match the guidance for minimum standards in other countries, including Portugal (led by Rosa Félix) and Norway (led by Ray Pritchard), for the benefit of transport planners worldwide. We will do a call for community input to crowd source input from the OSM and active travel advocacy groups internationally as part of the grant process, which will fund a hackathon (travel and sustenance) on the package. See https://github.com/nptscot/osmactive for details. -->
