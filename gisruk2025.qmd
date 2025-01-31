@@ -74,6 +74,9 @@ list.files("~/OneDrive/projects-all/atumscotland/phase3")
 # file.copy("os_blog_post.docx", "~/OneDrive/projects-all/atumscotland/phase3", overwrite = TRUE)
 list.files( "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-all\\atumscotland\\phase3")
 file.copy("os_blog_post.docx", "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-all\\atumscotland\\phase3", overwrite = TRUE)
+# Upload to gh
+quarto::quarto_render("gisruk2025.qmd")
+system("gh release upload v0.1 gisruk2025.pdf")
 ```
 
 <!-- # Spec: blog post to publish on Ordnance Survey's website outlining how we have used their products to improve strategic cycle network planning in Scotland -->
@@ -355,15 +358,49 @@ This three-way categorisation was made for each of the following scenarios:
 
 The resulting data was visualised in the NPT's street space layer, as shown in @fig-street-space.
 
+![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
+
+
+{{< pagebreak >}}
+
 # Conclusion
 
 The Network Planning Tool for Scotland is a cutting-edge web application designed for strategic cycle network planning.
 A unique feature of the NPT is its integration of multiple layers into a single tool, overcoming limitations of previous strategic network planning tools, which generally focus either on behaviour data or physical infrastructure.
 The new street space layer represents a step change in access to combined carriageway and corridor widths, the first time this data has been made available at a national level, to the best of our knowledge.
 
-![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
-
 In future work we plan to improve the NPT by incorporating new datasets from a variety of sources, including [Scotland's Spatial Hub](https://data.spatialhub.scot).
 We also plan to roll-out the methods in new places and welcome feedback from the community on how to improve the tool.
 
 # References
+
+::: {#refs}
+:::
+
+# Acknowledgements {.appendix .unnumbered}
+
+<!-- Acknowledgement should be made of any funding bodies who have supported the work reported in the paper, of those who have given permission for their work to be reproduced or of individuals whose particular assistance is due recognition. Acknowledge data providers here where appropriate. -->
+
+Thanks to Transport Scotland for funding the development of the Network Planning Tool for Scotland, and to the many users who have provided feedback on the tool.
+Thanks to Sustrans Scotland, and Matt Davis and Angus Calder in particular, for collaborating on the project.
+
+# Biographies {.appendix .unnumbered}
+
+<!-- All contributing authors should include a biography of no more than 50 words each outlining their career stage and research interests. -->
+
+Robin Lovelace is Professor of Transport Data Science at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation, with a focus on modeling transport systems, active travel, and decarbonisation.
+
+Zhao Wang is a researcher at the Leeds Institute for Transport Studies (ITS).
+Zhao specializes in machine learning, data science and geocomputation for transport planning and engineering.
+
+Hussein Mahfouz is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation for transport planning and engineering, with a focus on Demand Responsive Transport (DRT).
+
+Juan Jose Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
+
+Martin Lucas-Smith is a Director at CycleStreets Ltd and specialises in open data and open source software for cycling.
+
+Dustin Carlino is an independent researcher and software developer, specialising in open source software development and geographic data science.
+
+Josiah Parry is a Senior Product Engineer at Environmental Systems Research Institute, Inc (Esri) and an open source software developer.
+
+Rosa Félix is a researcher at the University of Lisbon and specialises geographic methods for transport planning, with a focus on active travel and decarbonisation.
