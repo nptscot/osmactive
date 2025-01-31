@@ -332,7 +332,7 @@ The Street Space layer in the NPT offers unprecedented insights into Scotland's 
 By highlighting where there is enough space for different safe cycling infrastructure options, the tool can help local authorities and other stakeholders make more informed decisions about where to invest in cycling infrastructure.
 This is the first time such detailed, nationwide information on street space has been made available in Scotland.
 
-![](images/paste-9.png)
+![](street_space.png)
 
 *Figure 2 Street Space layer in Network Planning Tool for Scotland.*
 
