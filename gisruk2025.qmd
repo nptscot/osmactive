@@ -386,6 +386,10 @@ We also plan to roll-out the methods in new places and welcome feedback from the
 Thanks to Transport Scotland for funding the development of the Network Planning Tool for Scotland, and to the many users who have provided feedback on the tool.
 Thanks to Sustrans Scotland, and Matt Davis and Angus Calder in particular, for collaborating on the project.
 
+Thanks to the OpenStreetMap community for creating and maintaining the data that underpins the NPT.
+<!-- Contains OS data © Crown copyright and database rights 2025 OS licence number 100046668. -->
+Thanks to Ordnance Survey for providing the MasterMap data that underpins the NPT (contains OS data © Crown copyright and database rights 2025 OS licence number 100046668).
+
 # Biographies {.appendix .unnumbered}
 
 <!-- All contributing authors should include a biography of no more than 50 words each outlining their career stage and research interests. -->
