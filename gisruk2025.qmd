@@ -28,17 +28,17 @@ author:
 abstract: |
   Evidence on street networks and their potential changes under future scenarios is crucial for active travel planning. However, most active travel models rely on oversimplified street representations, using single variables like 'quietness', neglecting key factors such as footway widths. This paper introduces new methods for classifying street networks for active travel, integrating diverse datasets from OpenStreetMap and official sources. Implemented in open source software packages `osmactive` and `anime`, these methods are scalable and reproducible. The results are showcased in a web application hosted at www.npt.scot, demonstrating how geographic data science can drive high-impact research.
 # implemented in open source software packages including `osmactive` R package and the `anime` Rust crate
-keywords: [network simplification, transport planning, urban analytics, geocomputation, reproducible research]
+keywords: [network analysis, transport planning, OpenStreetMap, active travel, reproducible research]
 execute: 
   echo: false
   message: false
   warning: false
 #   eval: false
-format: gfm
+# format: gfm
 # quarto add sdesabbata/quarto-gisruk
-# format:
-#   gisruk-pdf:
-#     keep-tex: true
+format:
+  gisruk-pdf:
+    keep-tex: true
 bibliography: references.bib
 ---
 
@@ -287,18 +287,20 @@ The corridor width is important because it determines whether, in cases where th
 
 ## Cycle infrastructure width requirements
 
-The CbD guidance specifies the minimum width required for cycle infrastructure, which is summarised in the table below:
+The CbD guidance specifies the minimum width required for cycle infrastructure, which is summarised in table @tbl-cbd.
 
 | Cycle infrastructure type  | Absolute minimum width | Desirable minimum width |
 |--------------------------|-----------------------|------------------------|
 | Unidirectional cycle track | 1.5 m                  | 2.0 m                   |
 | Bidirectional cycle track  | 2.0 m                  | 3.0 m                   |
 
+: Table illustrating the minimum width requirements for cycle infrastructure according to the Cycling by Design (CbD) guidance. {#tbl-cbd}
+
 As the table shows, the desirable minimum width is greater than the absolute minimum width, providing a more comfortable design for all users.
 
 ## Buffers for cycle infrastructure
 
-The CbD guidance specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure.
+The CbD guidance specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure (@tbl-buffers).
 
 | Road type / Speed limit | Buffer width |
 |-------------------------|--------------|
@@ -307,6 +309,8 @@ The CbD guidance specifies buffers that must be accounted for when calculating t
 | 50 mph                  | 2.0 m        |
 | 60 mph                  | 2.5 m        |
 | 70 mph                  | 3.5 m        |
+
+: Table illustrating the buffer widths for cycle infrastructure based on road type and speed limit according to the Cycling by Design (CbD) guidance. {#tbl-buffers}
 
 Speed limit data taken from OSM was used to determine the buffer width for each road segment.
 
@@ -322,7 +326,7 @@ Based on the Active Travel England cross section check tool, part of [Active Tra
 <!-- https://overpass-turbo.eu/s/1Xaf -->
 
 The number of bus lanes was determined from the OSM data with the function [`get_bus_routes()`](https://nptscot.github.io/osmactive/reference/get_bus_routes.html) in the R package `osmactive` that we developed for this project.
-The results are illustrated in the figure below for Edinburgh, which can also be extracted with the following [Overpass Turbo query](https://overpass-turbo.eu/s/1Xaf):
+The results are illustrated in @fig-edinburgh-bus-lanes, which can also be reproduced with the following [Overpass Turbo query](https://overpass-turbo.eu/s/1Xaf):
 
 ```         
 relation["route"="bus"]({{bbox}});
@@ -332,9 +336,7 @@ relation["route"="bus"]({{bbox}});
 
 <!-- wget https://private-user-images.githubusercontent.com/1825120/403049322-97f3ce0e-7d0f-42ab-b2d5-e7557c4ebece.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Mzc5OTg1NDcsIm5iZiI6MTczNzk5ODI0NywicGF0aCI6Ii8xODI1MTIwLzQwMzA0OTMyMi05N2YzY2UwZS03ZDBmLTQyYWItYjJkNS1lNzU1N2M0ZWJlY2UucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDEyNyUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTAxMjdUMTcxNzI3WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9OGRlODM0ODhkYTkzNDUyMzcxYWZkMzFlY2M4Yjk3YmE3ODQzMTU0ZGM0MjVmMTU5ZGU5MzBlMzVhZDM3Y2MyNSZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.seGt2frqknDrrU5Y6pgptC24sgXGhn06pQ3t-diXmLA -O edinburgh_bus_lanes.png -->
 
-![](edinburgh_bus_lanes.png)
-
-*Figure 1 Bus routes in Edinburgh, extracted from OpenStreetMap.*
+![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes}
 
 ## Categorisation based on available width
 
@@ -351,18 +353,17 @@ This three-way categorisation was made for each of the following scenarios:
 -   1x bidirectional cycle track built on the carriageway
 -   1x bidirectional cycle track built on the corridor
 
-The results are illustrated below.
+The resulting data was visualised in the NPT's street space layer, as shown in @fig-street-space.
 
 # Conclusion
 
-The Street Space layer in the NPT offers unprecedented insights into Scotland's road network for strategic active travel network planning.
-By highlighting where there is enough space for different safe cycling infrastructure options, the tool can help local authorities and other stakeholders make more informed decisions about where to invest in cycling infrastructure.
-This is the first time such detailed, nationwide information on street space has been made available in Scotland.
+The Network Planning Tool for Scotland is a cutting-edge web application designed for strategic cycle network planning.
+A unique feature of the NPT is its integration of multiple layers into a single tool, overcoming limitations of previous strategic network planning tools, which generally focus either on behaviour data or physical infrastructure.
+The new street space layer represents a step change in access to combined carriageway and corridor widths, the first time this data has been made available at a national level, to the best of our knowledge.
 
-![](street_space.png)
+![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
 
-*Figure 2 Street Space layer in Network Planning Tool for Scotland.*
+In future work we plan to improve the NPT by incorporating new datasets from a variety of sources, including [Scotland's Spatial Hub](https://data.spatialhub.scot).
+We also plan to roll-out the methods in new places and welcome feedback from the community on how to improve the tool.
 
-This is the first time that such detailed information on road widths has been made available for active travel planning nationwide in Scotland.
-We hope to improve the NPT's street space layer in the future for example by incorporating on-street parking data from [Scotland's Spatial Hub](https://data.spatialhub.scot).
-The resulting evidence will help local authorities and other stakeholders to make more informed decisions about where to invest in cycling infrastructure, and to make the case for reallocating road space to active travel.
+# References
