@@ -44,9 +44,11 @@ format:
 bibliography: references.bib
 ---
 
+```{=html}
 <!-- Short description
 
 Please enter a short statement for a general audience or social media platform that describes the content of your submission.  -->
+```
 
 <!-- New methods and open source tools for active travel planning are presented, integrating diverse street network datasets. Implemented in the `osmactive` R package and `anime` Rust crate, and showcased in the Network Planning Tool for Scotland. -->
 
@@ -358,7 +360,7 @@ The key components of the NPT are:
 -   The "Route network" layer, presenting data on cycling potential on OSM-based and simplified [@lovelace_reproducible_2024] network layers.
 -   The "Infrastructure and traffic" layer, which includes data on motor traffic levels and cycle infrastructure.
 -   The "Street space" layer, which categorises roads in accordance with the Cycling by Design guidance, specifying the methodology for classifying road spaces and cycle infrastructure, presented in @fig-street-space.
--   The "Core network" layer, representing a cohesive network that could be a priority when planning new infrastructure.
+-   The "Core network" layer, representing a cohesive network that could be a priority when planning new infrastructure, building on previous work [@szell2021].
 -   The [Network Planning Workspace (NPW)](https://nptscot.github.io/npw/) web application, which allows users to explore the data and create custom scenarios of infrastructure change.
 
 ![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
@@ -412,6 +414,7 @@ Josiah Parry is a Senior Product Engineer at Environmental Systems Research Inst
 
 Rosa Félix is a researcher at the University of Lisbon and specialises geographic methods for transport planning, with a focus on active travel and decarbonisation.
 
+```{=html}
 <!-- I confirm that this submission has been approved by all authors
 Would you like to be considered for the GoFundGeo Grant?
 
@@ -421,3 +424,4 @@ The GISRUK & OSGeo:UK GoFundGeo grant is an annual £500 award for GISRUK presen
 If you would like your submission to be considered for this award, please specify how the £500 grant would enable you to do to develop your code or method into a reusable tool.
 
 It would allow the osmactive R package to be developed to match the guidance for minimum standards in other countries, including Portugal (led by Rosa Félix) and Norway (led by Ray Pritchard), for the benefit of transport planners worldwide. We will do a call for community input to crowd source input from the OSM and active travel advocacy groups internationally as part of the grant process, which will fund a hackathon (travel and sustenance) on the package. See https://github.com/nptscot/osmactive for details. -->
+```
