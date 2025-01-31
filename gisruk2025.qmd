@@ -231,10 +231,7 @@ After importing the four route network datasets outlined above, we integrated th
 -   Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
 -   Pavement widths were calculated from the OS MasterMap Topography dataset using the function `get_pavement_widths()` from the `osmactive` package. This function calculates the width of manmade roadside features associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment.
 -   The `get_bus_routes()` function from the `osmactive` package was used to determine the number of bus lanes on each road segment.
-
-In terms of methods, we collaborated with ESRI researcher Josiah Parry who developed a new algorithm to efficiently join the networks, based on alignment and proximity.
-<!-- Partial matches are represented by source and target weights for each matching pair of linestrings. --> <!-- Technical version: --> <!-- The use of spatial indexes makes the implementation highly efficient compared with the [`rnet_join()`](https://docs.ropensci.org/stplanr/reference/rnet_join.html) function in the R package `stplanr` that we were using previously. --> <!-- Simple version: --> The use of spatial indexes makes the implementation highly efficient compared with the [R implementation](https://docs.ropensci.org/stplanr/reference/rnet_join.html) that we were using previously.
-See the [josiahparry/ANIME codebase on GitHub](https://github.com/JosiahParry/anime) for details of the new algorithm and its implementation as an R (and planned Python) interface to the new [`anime` Rust crate](https://crates.io/crates/anime).
+-   We used the `anime` Rust crate to efficiently join the networks, based on alignment and proximity. The use of spatial indexes makes the implementation highly efficient compared with the [`rnet_join()`](https://docs.ropensci.org/stplanr/reference/rnet_join.html) function in the R package `stplanr` that we were using previously. See the [josiahparry/ANIME codebase on GitHub](https://github.com/JosiahParry/anime) for details of the new algorithm and its implementation as an R (and planned Python) interface to the new [`anime` Rust crate](https://crates.io/crates/anime).
 
 ```{r}
 #| label: bristol
@@ -264,16 +261,11 @@ system("gh release upload v0.1 cycle_net_bristol.html --clobber")
 # https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
 ```
 
-![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at [https://github.com/nptscot/osmactive/releases](https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html).](images/paste-1.png){#fig-bristol}
+![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at [github.com/nptscot/osmactive/releases](https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html).](images/paste-1.png){#fig-bristol}
 
 # Road width measurements
 
 Two key measurements are needed to assess whether existing roads can accommodate cycle infrastructure: carriageway width and corridor width, as defined below.
-
-## Carriageway width
-
-The carriageway width is the width available within the carriageway, often referred to as the "curb-to-curb" width, excluding roadside features such as footways.
-Fortunately, Ordnance Survey MasterMap Highways provides this data nationally to public sector organisations under the Public Sector Geospatial Agreement (PSGA).
 
 Accurate and available carriageway width measurements are important because they determine if proposed infrastructure can fit solely within the carriageway, without the need for moving curbs or other roadside features.
 As outlined in the Scottish Cycling by Design (CbD) guidance document, there are three main types of cycle infrastructure that run along (or "adjacent to" as the CbD guidance puts it) the carriageway:
@@ -283,30 +275,17 @@ As outlined in the Scottish Cycling by Design (CbD) guidance document, there are
 -   Cycle track at footway level
 
 The first two options are recommended, reducing the potential for conflict between cyclists and pedestrians.
-The first option, cycle track that is at carriage level, has additional advantages over stepped cycleway, being often cheaper to construct, with no new tarmac required in many cases, and with advantages for users outlined in the following [quote from the CbD guidance](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=76):
-
-> Cycle tracks at carriageway level will often be preferred where a new cycle track is to be formed from space previously given to the road carriageway, and where it is not practical or desirable to form a stepped cycle track.
-> They enable the existing carriageway crossfall to be maintained, which can be beneficial for drainage purposes.
-> Where this is the case, regular gaps in the kerbed reserve are required to ensure continuity of surface water flow.
-> Cycle tracks at carriageway level are particularly appropriate where there are multiple side roads or minor accesses along the route, simplifying crossings without requiring level changes for the cycle user.
+The first option, cycle track that is at carriage level, has additional advantages over stepped cycleway, being often cheaper to construct [with no new tarmac required in many cases](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=76).
 
 However, cycle tracks at carriageway level require sufficient width on the existing carriageway to accommodate the cycle infrastructure.
-How can local authority transport planners and other stakeholders know if there is enough space on the carriageway to accommodate cycle infrastructure?
-This is an important question that has implications for the design and potential costs of new cycling infrastructure.
-The CbD guidance is clear on how much width is required, but it can be time consuming to interpret this guidance for every road in a local authority area, hence the street space layer in the NPT.
 
-## Corridor width
-
-<!-- Query to get pavements: filter(descriptive_group == "Roadside", make == "Manmade") -->
-
-We define the corridor width as the width of the carrieageway plus any built roadside features, such as footways.
-Given Ordnance Survey's MasterMap Topography dataset contains this data, in the form of polygons representing roadside features that are "manmade".
-Specifically, the following [`dplyr` query](https://dplyr.tidyverse.org/) was used to extract the width of manmade roadside features: `filter(descriptive_group == "Roadside", make == "Manmade")`.
-From that point, we calculated the width of pavements associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment.
+Corridor is the width of the carrieageway plus any built roadside features, such as footways.
+The following [`dplyr` query](https://dplyr.tidyverse.org/) was used to extract the width of manmade roadside features: `filter(descriptive_group == "Roadside", make == "Manmade")`.
+From that point, we calculated the width of pavements associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment, as implemented in the `get_pavement_widths()` function in the `osmactive` package.
 
 The corridor width is important because it determines whether, in cases where there is insufficient space on the carriageway, part of the footway or other manmade roadside features may be reallocated for cycle infrastructure, while still maintaining recommended minimum widths for pedestrians.
 
-# Cycle infrastructure width requirements
+## Cycle infrastructure width requirements
 
 The CbD guidance specifies the minimum width required for cycle infrastructure, which is summarised in the table below:
 
@@ -316,15 +295,8 @@ The CbD guidance specifies the minimum width required for cycle infrastructure, 
 | Bidirectional cycle track  | 2.0 m                  | 3.0 m                   |
 
 As the table shows, the desirable minimum width is greater than the absolute minimum width, providing a more comfortable design for all users.
-Although the width requirements for a single unidirectional cycle track are less than for a bidirectional cycle track, the latter has the advantage of requiring less space overall, as it only requires one track, rather than two.
 
-In most cases, two unidirectional cycle tracks represent the best design from a safety perspective, as they reduce the need for cyclists to cross the road (cyclists on a unidirectional track can always turn left at a junction without crossing the road, while those on a bidirectional track must cross the road to turn left half the time, depending on which side of the road the bidirectional track is on).
-Unidirectional cycle tracks also reduce the potential for cyclist-cyclist collisions: separating vehicles that may be moving at 20 km in opposite directions is common sense, especially along corridors with high cycling potential where the volume of cyclists is likely to lead to overtaking.
-
-One could assume that the table above plus information on road widths provides everything you need to find out if there is enough space for cycle infrastructure on a given road.
-However, the CbD guidance also specifies buffers, the recommended width of which depends on the speed of motor traffic on the road.
-
-# Buffers for cycle infrastructure
+## Buffers for cycle infrastructure
 
 The CbD guidance specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure.
 
@@ -338,7 +310,7 @@ The CbD guidance specifies buffers that must be accounted for when calculating t
 
 Speed limit data taken from OSM was used to determine the buffer width for each road segment.
 
-# Bus routes and road traffic assumptions
+## Bus routes and road traffic assumptions
 
 The minimum space requirements for motor traffic depend on the uses of the road, including whether it is a bus route and whether there are dedicated bus lanes.
 Based on the Active Travel England cross section check tool, part of [Active Travel England's open access Excel-based design tools](https://www.gov.uk/government/publications/active-travel-england-design-assistance-tools) (see [acteng.github.io/inspectorate_tools/](https://acteng.github.io/inspectorate_tools/) for web-based versions), we assumed the following widths for motor traffic:
@@ -364,10 +336,9 @@ relation["route"="bus"]({{bbox}});
 
 *Figure 1 Bus routes in Edinburgh, extracted from OpenStreetMap.*
 
-# Categorisation based on available width
+## Categorisation based on available width
 
-As with many data science tasks, the pre-processing stage is the most time-consuming.
-After calculating the carriageway and corridor widths, plus key information on the minimum buffer width requirements and motor traffic space, we categorised roads into three groups based on the available width:
+After the previous steps we categorised roads into three groups based on the available width:
 
 -   Not enough space: The available space is insufficient to fit even the absolute minimum width of cycle infrastructure.
 -   Absolute minimum: The available space is enough to accommodate the absolute minimum width of cycle infrastructure, but it does not meet the desirable minimum.
@@ -395,5 +366,3 @@ This is the first time such detailed, nationwide information on street space has
 This is the first time that such detailed information on road widths has been made available for active travel planning nationwide in Scotland.
 We hope to improve the NPT's street space layer in the future for example by incorporating on-street parking data from [Scotland's Spatial Hub](https://data.spatialhub.scot).
 The resulting evidence will help local authorities and other stakeholders to make more informed decisions about where to invest in cycling infrastructure, and to make the case for reallocating road space to active travel.
-
-To explore the Network Planning Tool for Scotland and discover how the Street Space layer can inform cycling infrastructure projects local areas you know in Scotland visit: https://www.npt.scot/#/streetspace/.
