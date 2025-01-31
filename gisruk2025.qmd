@@ -22,6 +22,9 @@ author:
   - name: Josiah Parry
     affiliation: Environmental Systems Research Institute (Esri), Redlands, CA, USA 
     orcid: 0000-0001-9910-865X
+  - name: Rosa Félix
+    affiliation: University of Lisbon
+    orcid: 0000-0002-5642-6006
 abstract: |
   Evidence on street networks and their potential changes under future scenarios is crucial for active travel planning. However, most active travel models rely on oversimplified street representations, using single variables like 'quietness', neglecting key factors such as footway widths. This paper introduces new methods for classifying street networks for active travel, integrating diverse datasets from OpenStreetMap and official sources. Implemented in open source software packages `osmactive` and `anime`, these methods are scalable and reproducible. The results are showcased in a web application hosted at www.npt.scot, demonstrating how geographic data science can drive high-impact research.
 # implemented in open source software packages including `osmactive` R package and the `anime` Rust crate
@@ -261,7 +264,7 @@ system("gh release upload v0.1 cycle_net_bristol.html --clobber")
 # https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
 ```
 
-![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at...](images/paste-1.png){#fig-bristol}
+![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at [https://github.com/nptscot/osmactive/releases](https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html).](images/paste-1.png){#fig-bristol}
 
 # Road width measurements
 
