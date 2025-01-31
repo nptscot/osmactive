@@ -31,11 +31,11 @@ execute:
   message: false
   warning: false
 #   eval: false
-format: gfm
+# format: gfm
 # quarto add sdesabbata/quarto-gisruk
-# format:
-#   gisruk-pdf:
-#     keep-tex: true
+format:
+  gisruk-pdf:
+    keep-tex: true
 bibliography: references.bib
 ---
 
@@ -185,9 +185,9 @@ The Street Space layer divides roads into three groups, depending on whether the
 
 Active travel is an accessible and cost-effective way to replace short car trips and make transport systems more sustainable.
 The Network Planning Tool (NPT) for Scotland is a new web-based strategic network planning tool that estimates cycling potential down to the street level.
-The NPT builds on the functionality of the Propensity to Cycle Tool (PCT) and related tools [@lovelace2017][@goodman2019][@lovelace2024][@félix2025], offering a detailed nationwide cycling potential analysis for Scotland.
+The NPT builds on the functionality of the Propensity to Cycle Tool (PCT) and related tools [@lovelace2017; @goodman2019; @lovelace2024; @félix2025], offering a detailed nationwide cycling potential analysis for Scotland.
 The NPT is funded by Transport Scotland and developed by the University of Leeds in collaboration with Sustrans Scotland.
-The tool is open-source and hosted at [github.come/nptscot](https://github.com/nptscot), enabling others to learn from and contribute.
+The tool is open-source and hosted at [github.come/nptscot](https://github.com/nptscot), enabling others to learn from and contribute to the underlying methods to help make transport planning more open and participatory [@lovelace2020a].
 
 A unique feature of the NPT is its integration of multiple layers into a single tool, overcoming limitations of previous strategic network planning tools, which generally focus either on behaviour data (such as the PCT) or physical infrastructure [@vybornova2024; @vierø2024].
 The NPT brings together more than a dozen datasets, including Ordnance Survey Mastermap and OpenStreetmap data products to provide comprehensive data on the potential for mode shift, infrastructure, modelled motor traffic levels, and street space at the network level.
