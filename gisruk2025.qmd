@@ -80,7 +80,7 @@ list.files( "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-al
 file.copy("os_blog_post.docx", "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-all\\atumscotland\\phase3", overwrite = TRUE)
 # Upload to gh
 quarto::quarto_render("gisruk2025.qmd")
-system("gh release upload v0.1 gisruk2025.pdf")
+system("gh release upload v0.1 gisruk2025.pdf --clobber")
 ```
 
 <!-- # Spec: blog post to publish on Ordnance Survey's website outlining how we have used their products to improve strategic cycle network planning in Scotland -->
@@ -345,25 +345,18 @@ relation["route"="bus"]({{bbox}});
 
 ![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes}
 
-## Categorisation based on available width
+# Results
 
-After the previous steps we categorised roads into three groups based on the available width:
+The result of the data engineering, data integration, modelling and visualisation steps described above is datasets that are visualised interactively in the NPT web application, using `pmtiles` for efficient rendering of large datasets [@gonçalves2023].
+The key components of the NPT are:
 
--   Not enough space: The available space is insufficient to fit even the absolute minimum width of cycle infrastructure.
--   Absolute minimum: The available space is enough to accommodate the absolute minimum width of cycle infrastructure, but it does not meet the desirable minimum.
--   Desirable minimum: The available space is sufficient to accommodate the desirable minimum width of cycle infrastructure, providing a more comfortable design for all users.
-
-This three-way categorisation was made for each of the following scenarios:
-
--   2x unidirectional cycle tracks built on the carriageway
--   2x unidirectional cycle tracks built on the corridor
--   1x bidirectional cycle track built on the carriageway
--   1x bidirectional cycle track built on the corridor
-
-The resulting data was visualised in the NPT's street space layer, as shown in @fig-street-space.
+-   The "Route network" layer, presenting data on cycling potential on OSM-based and simplified [@lovelace_reproducible_2024] network layers.
+-   The "Infrastructure and traffic" layer, which includes data on motor traffic levels and cycle infrastructure.
+-   The "Street space" layer, which categorises roads in accordance with the Cycling by Design guidance, specifying the methodology for classifying road spaces and cycle infrastructure, presented in @fig-street-space.
+-   The "Core network" layer, representing a cohesive network that could be a priority when planning new infrastructure.
+-   The [Network Planning Workspace (NPW)](https://nptscot.github.io/npw/) web application, which allows users to explore the data and create custom scenarios of infrastructure change.
 
 ![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
-
 
 {{< pagebreak >}}
 
@@ -389,8 +382,7 @@ Thanks to Transport Scotland for funding the development of the Network Planning
 Thanks to Sustrans Scotland, and Matt Davis and Angus Calder in particular, for collaborating on the project.
 
 Thanks to the OpenStreetMap community for creating and maintaining the data that underpins the NPT.
-<!-- Contains OS data © Crown copyright and database rights 2025 OS licence number 100046668. -->
-Thanks to Ordnance Survey for providing the MasterMap data that underpins the NPT (contains OS data © Crown copyright and database rights 2025 OS licence number 100046668).
+<!-- Contains OS data © Crown copyright and database rights 2025 OS licence number 100046668. --> Thanks to Ordnance Survey for providing the MasterMap data that underpins the NPT (contains OS data © Crown copyright and database rights 2025 OS licence number 100046668).
 
 # Biographies {.appendix .unnumbered}
 
