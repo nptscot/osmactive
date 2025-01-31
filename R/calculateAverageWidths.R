@@ -1,4 +1,4 @@
-calculateAverageWidths = function(road_geojson_path, roadside_geojson_path, crs = "EPSG:27700", buffer_dist = 15, segment_length = 20) {
+get_pavement_widths = function(road_geojson_path, roadside_geojson_path, crs = "EPSG:27700", buffer_dist = 15, segment_length = 20) {
 
   # Read and transform GeoJSON files using sf
   roads_sf = sf::st_read(road_geojson_path) |>

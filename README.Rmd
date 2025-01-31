@@ -265,3 +265,26 @@ browseURL("classify_cycle_infrastructure_cambridge.html")
 # upload:
 system("gh release upload v0.1 classify_cycle_infrastructure_cambridge.html --clobber")
 ```
+
+## Bristol example
+
+```{r bristol}
+osm = get_travel_network("Edinburgh")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
+
+```{r}
+#| include: false
+tmap_save(m, "cycle_net_bristol.html")
+browseURL("cycle_net_bristol.html")
+system("gh release upload v0.1 cycle_net_bristol.html --clobber")
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
+```

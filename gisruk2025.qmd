@@ -1,6 +1,6 @@
 ---
 conference: GISRUK 2025
-# title: "Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning"
+title: "Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning"
 author: 
   - name: Robin Lovelace
     affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
@@ -39,9 +39,27 @@ format:
 bibliography: references.bib
 ---
 
+```{r}
+#| include: false
+# install pak if not installed:
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak")
+}
+pak::pkg_install("tidyverse", ask = FALSE)
+
+github_pkgs = c(
+  "nptscot/osmactive",
+  "josiahparry/anime/r"
+)
+pak::pkg_install(github_pkgs, ask = FALSE)
+library(tidyverse)
+library(osmactive)
+library(tmap)
+```
+
 <!-- Workaround for bug in gfm rendering of titles by quarto: -->
 
-# Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning
+<!-- # Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning -->
 
 ```{r}
 #| eval: false
@@ -203,12 +221,47 @@ We used four key datasets representing the road network for this project:
 -   OS Mastermap Topography, the most detailed vector dataset that includes detailed information on the geometry of many features of the man-made environment, including curb lines. In the OS Topo layer roads and other pieces of transport infrastructure such as footways (pavements) are represented not as corridor or lane centerlines, but as polygons.
 -   OpenStreetMap, a crowdsourced dataset that is continuously updated by community volunteers. The dataset is rich, with tags for width and smoothness of infrastructure, but is not as consistent as the OS datasets.
 
-Ordnance Survey’s MasterMap Highways and Topography datasets provide unparalleled accuracy and detail, ensuring reliable measurements for road widths and corridor spaces.
-This level of precision is critical for planning safe and effective cycling infrastructure.
+Ordnance Survey’s MasterMap Highways and Topography datasets provide unparalleled accuracy and detail, but are a struggle to import using consumer-grade hardware and standard tools such as QGIS.
+To overcome this issue we developed [the `mastermapr` package](https://github.com/acteng/mastermapr) in collaboration with the government agency Active Travel England (ATE), to efficiently and flexibly imports MasterMap datasets (50 GB compressed).
+After importing the four route network datasets outlined above, we integrated them using the following steps:
+
+-   Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
+-   Pavement widths were calculated from the OS MasterMap Topography dataset using the function `get_pavement_widths()` from the `osmactive` package. This function calculates the width of manmade roadside features associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment.
+-   The `get_bus_routes()` function from the `osmactive` package was used to determine the number of bus lanes on each road segment.
 
 In terms of methods, we collaborated with ESRI researcher Josiah Parry who developed a new algorithm to efficiently join the networks, based on alignment and proximity.
 <!-- Partial matches are represented by source and target weights for each matching pair of linestrings. --> <!-- Technical version: --> <!-- The use of spatial indexes makes the implementation highly efficient compared with the [`rnet_join()`](https://docs.ropensci.org/stplanr/reference/rnet_join.html) function in the R package `stplanr` that we were using previously. --> <!-- Simple version: --> The use of spatial indexes makes the implementation highly efficient compared with the [R implementation](https://docs.ropensci.org/stplanr/reference/rnet_join.html) that we were using previously.
 See the [josiahparry/ANIME codebase on GitHub](https://github.com/JosiahParry/anime) for details of the new algorithm and its implementation as an R (and planned Python) interface to the new [`anime` Rust crate](https://crates.io/crates/anime).
+
+```{r}
+#| label: bristol
+#| eval: false
+#| echo: true
+osm = get_travel_network("bristol")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+plot_osm_tmap(cycle_net)
+```
+
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
+
+```{r}
+#| include: false
+#| eval: false
+m = plot_osm_tmap(cycle_net)
+m +
+  tm_layout(legend.position = c("right", "top"))
+m
+tmap_save(m, "cycle_net_bristol.html")
+browseURL("cycle_net_bristol.html")
+system("gh release upload v0.1 cycle_net_bristol.html --clobber")
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
+```
+
+![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at...](images/paste-1.png){#fig-bristol}
 
 # Road width measurements
 
