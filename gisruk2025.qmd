@@ -11,7 +11,7 @@ author:
   - name: Hussein Mahfouz
     affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
     orcid: 0000-0002-6043-8616
-  - name: Juan Jose Fonseca Zamora
+  - name: Juan Pablo Fonseca Zamora
     affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
     orcid: 0009-0006-7042-3828
   - name: Angus Calder
