@@ -4,7 +4,7 @@ The aim of the code below is to test which ways are omitted by the `get_cycling_
 ```{r}
 devtools::load_all()
 library(tidyverse)
-osm_national = get_travel_network("Scotland", force_download = T)
+osm_national = get_travel_network("Scotland")
 osm_trinity_crescent = osm_national |>
   filter(name == "Trinity Crescent") 
 mapview::mapview(osm_trinity_crescent)
