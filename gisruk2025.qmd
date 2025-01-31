@@ -34,11 +34,11 @@ execute:
   message: false
   warning: false
 #   eval: false
-# format: gfm
+format: gfm
 # quarto add sdesabbata/quarto-gisruk
-format:
-  gisruk-pdf:
-    keep-tex: true
+# format:
+#   gisruk-pdf:
+#     keep-tex: true
 bibliography: references.bib
 ---
 
