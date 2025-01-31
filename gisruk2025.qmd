@@ -403,7 +403,7 @@ Zhao specializes in machine learning, data science and geocomputation for transp
 
 Hussein Mahfouz is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation for transport planning and engineering, with a focus on Demand Responsive Transport (DRT).
 
-Juan Jose Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
+Juan Pablo Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
 
 Angus Calder is a Senior Mobility Planner at Sustrans Scotland and specialises in active travel planning and infrastructure design.
 
