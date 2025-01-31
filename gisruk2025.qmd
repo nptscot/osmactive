@@ -243,7 +243,6 @@ After importing the four route network datasets outlined above, we integrated th
 
 Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
 
-
 ```{r}
 #| label: bristol
 #| eval: false
@@ -279,18 +278,15 @@ system("gh release upload v0.1 cycle_net_bristol.html --clobber")
 Two key measurements are needed to assess whether existing roads can accommodate cycle infrastructure: carriageway width and corridor width, as defined below.
 
 Accurate and available carriageway width measurements are important because they determine if proposed infrastructure can fit solely within the carriageway, without the need for moving curbs or other roadside features.
-As outlined in the Scottish Cycling by Design (CbD) guidance document, there are three main types of cycle infrastructure that run along (or "adjacent to" as the CbD guidance puts it) the carriageway:
+The Scottish Cycling by Design (CbD) guidance document outlines three types of cycle infrastructure that run along the carriageway, building on Department for Transport guidance [@departmentfortransport2020]:
 
 -   Cycle track at carriageway level
 -   Stepped cycle track
 -   Cycle track at footway level
 
-The first two options are recommended, reducing the potential for conflict between cyclists and pedestrians.
-The first option, cycle track that is at carriage level, has additional advantages over stepped cycleway, being often cheaper to construct [with no new tarmac required in many cases](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=76).
+The first option, cycle track that is at carriage level, has additional advantages over stepped cycleway, being often cheaper to construct [with no new tarmac required in many cases](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=76) but requires sufficient width on the existing carriageway to accommodate the cycle infrastructure.
 
-However, cycle tracks at carriageway level require sufficient width on the existing carriageway to accommodate the cycle infrastructure.
-
-Corridor is the width of the carrieageway plus any built roadside features, such as footways.
+Corridor width captures the carriageway plus any built roadside features, such as footways.
 The following [`dplyr` query](https://dplyr.tidyverse.org/) was used to extract the width of manmade roadside features: `filter(descriptive_group == "Roadside", make == "Manmade")`.
 From that point, we calculated the width of pavements associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment, as implemented in the `get_pavement_widths()` function in the `osmactive` package.
 
