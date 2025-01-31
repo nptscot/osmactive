@@ -53,7 +53,7 @@ usethis::use_github_action("check-standard")
 usethis::use_vignette("classifying-cycle-infrastructure")
 # Add example datasets
 usethis::use_data_raw("osm_edinburgh")
-usethis::use_vignette("classify-volumes", "Classify Cycle by Design road volumes")
+usethis::use_vignette("classify-cbd", "Scottish Cycling by Design classification")
 # Style the package
 remotes::install_github("Robinlovelace/styler.equals")
 styler.equals::style_pkg()
