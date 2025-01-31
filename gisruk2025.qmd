@@ -11,7 +11,7 @@ author:
   - name: Hussein Mahfouz
     affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
     orcid: 0000-0002-6043-8616
-  - name: Juan Jose Fonseca Zamora
+  - name: Juan Pablo Fonseca Zamora
     affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
     orcid: 0009-0006-7042-3828
   - name: Angus Calder
@@ -395,7 +395,7 @@ Zhao specializes in machine learning, data science and geocomputation for transp
 
 Hussein Mahfouz is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation for transport planning and engineering, with a focus on Demand Responsive Transport (DRT).
 
-Juan Jose Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
+Juan Pablo Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
 
 Angus Calder is a Senior Mobility Planner at Sustrans Scotland and specialises in active travel planning and infrastructure design.
 
