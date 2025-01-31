@@ -235,10 +235,14 @@ Ordnance Survey’s MasterMap Highways and Topography datasets provide unparalle
 To overcome this issue we developed [the `mastermapr` package](https://github.com/acteng/mastermapr) in collaboration with the government agency Active Travel England (ATE), to efficiently and flexibly imports MasterMap datasets (50 GB compressed).
 After importing the four route network datasets outlined above, we integrated them using the following steps:
 
--   Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
 -   Pavement widths were calculated from the OS MasterMap Topography dataset using the function `get_pavement_widths()` from the `osmactive` package. This function calculates the width of manmade roadside features associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment.
 -   The `get_bus_routes()` function from the `osmactive` package was used to determine the number of bus lanes on each road segment.
 -   We used the `anime` Rust crate to efficiently join the networks, based on alignment and proximity. The use of spatial indexes makes the implementation highly efficient compared with the [`rnet_join()`](https://docs.ropensci.org/stplanr/reference/rnet_join.html) function in the R package `stplanr` that we were using previously. See the [josiahparry/ANIME codebase on GitHub](https://github.com/JosiahParry/anime) for details of the new algorithm and its implementation as an R (and planned Python) interface to the new [`anime` Rust crate](https://crates.io/crates/anime).
+
+## Classifying OpenStreetNetwork ways
+
+Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
+
 
 ```{r}
 #| label: bristol
@@ -270,7 +274,7 @@ system("gh release upload v0.1 cycle_net_bristol.html --clobber")
 
 ![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at [github.com/nptscot/osmactive/releases](https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html).](images/paste-1.png){#fig-bristol}
 
-# Road width measurements
+## Road width measurements
 
 Two key measurements are needed to assess whether existing roads can accommodate cycle infrastructure: carriageway width and corridor width, as defined below.
 
@@ -290,11 +294,10 @@ Corridor is the width of the carrieageway plus any built roadside features, such
 The following [`dplyr` query](https://dplyr.tidyverse.org/) was used to extract the width of manmade roadside features: `filter(descriptive_group == "Roadside", make == "Manmade")`.
 From that point, we calculated the width of pavements associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment, as implemented in the `get_pavement_widths()` function in the `osmactive` package.
 
+## Minimum cycle track and buffer widths
+
 The corridor width is important because it determines whether, in cases where there is insufficient space on the carriageway, part of the footway or other manmade roadside features may be reallocated for cycle infrastructure, while still maintaining recommended minimum widths for pedestrians.
-
-## Cycle infrastructure width requirements
-
-The CbD guidance specifies the minimum width required for cycle infrastructure, which is summarised in table @tbl-cbd.
+CbD guidance on widths is summarised in table @tbl-cbd.
 
 | Cycle infrastructure type  | Absolute minimum width | Desirable minimum width |
 |--------------------------|-----------------------|------------------------|
@@ -303,11 +306,7 @@ The CbD guidance specifies the minimum width required for cycle infrastructure, 
 
 : Table illustrating the minimum width requirements for cycle infrastructure according to the Cycling by Design (CbD) guidance. {#tbl-cbd}
 
-As the table shows, the desirable minimum width is greater than the absolute minimum width, providing a more comfortable design for all users.
-
-## Buffers for cycle infrastructure
-
-The CbD guidance specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure (@tbl-buffers).
+CbD also specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure (@tbl-buffers).
 
 | Road type / Speed limit | Buffer width |
 |-------------------------|--------------|
