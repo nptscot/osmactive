@@ -781,6 +781,62 @@ get_bus_routes = function(
 }
 
 
+#' Function to assign default speed limits
+#' 
+#' 
+#' @param osm_data An sf object with the road network
+#' @return An sf object with the default speed limits in the column `maxspeed`
+#' @export
+#' 
+get_maxspeed_uk = function(osm_data) {
+  # Define default speed limits (in mph) based on highway types
+  default_speed_limits = c(
+    motorway = "70 mph",
+    motorway_link = "70 mph",
+    trunk = "60 mph",
+    trunk_link = "60 mph",
+    primary = "60 mph",
+    primary_link = "60 mph",
+    secondary = "60 mph",
+    secondary_link = "60 mph",
+    tertiary = "60 mph",
+    tertiary_link = "60 mph",
+    unclassified = "60 mph",
+    residential = "30 mph",
+    living_street = "20 mph",
+    service = "30 mph",
+    track = "15 mph",
+    pedestrian = "5 mph",
+    footway = "5 mph",
+    path = "5 mph",
+    cycleway = "15 mph",
+    steps = "5 mph",
+    construction = "5 mph",
+    road = "30 mph"
+  )
+
+  # Function to assign default speed limit based on highway type
+  assign_default_speed = function(highway_type) {
+    if (!is.na(highway_type) && highway_type %in% names(default_speed_limits)) {
+      return(default_speed_limits[[highway_type]])
+    } else {
+      return(NA_character_) 
+    }
+  }
+
+  # Apply the function to the OSM data
+  osm_data = osm_data |>
+    mutate(
+      maxspeed = if_else(
+        is.na(maxspeed),
+        sapply(highway, assign_default_speed),
+        maxspeed
+      )
+    )
+
+  return(osm_data)
+}
+
 #' Data from edinburgh's OSM network
 #'
 #'
