@@ -1,0 +1,45 @@
+---
+title: "ATRAPA paper"
+bibliography: "atrapa.bib"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ATRAPA paper}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r setup}
+library(osmactive)
+```
+
+# Abstract
+
+Placeholder for abstract.
+
+# Introduction
+
+Placeholder for introduction.
+
+# Methods
+
+Placeholder for methods.
+
+# Results
+
+Placeholder for results.
+
+# Discussion
+
+Placeholder for discussion.
+
+# References
