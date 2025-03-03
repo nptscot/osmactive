@@ -152,18 +152,18 @@ cycle_net = get_cycling_network(osm_cloch_road_1km)
 drive_net = get_driving_network(osm_cloch_road_1km)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
-# # Make changes to osmactive code then reload with
-# # devtools::load_all()
-osm_classified_coch = osm_classified |>
-  filter(osm_id == 757849580)
-# osm_classified_coch$cycle_pedestrian_separation
-# # [1] Shared Footway (not segregated)
-# # 3 Levels: Shared Footway (segregated) < ... < Unknown
-# osm_classified_coch$cycle_segregation
-osm_classified = osm_classified_coch
+# # # Make changes to osmactive code then reload with
+devtools::load_all()
+# osm_classified_coch = osm_classified |>
+#   filter(osm_id == 757849580)
+# # osm_classified_coch$cycle_pedestrian_separation
+# # # [1] Shared Footway (not segregated)
+# # # 3 Levels: Shared Footway (segregated) < ... < Unknown
+# # osm_classified_coch$cycle_segregation
+# osm_classified = osm_classified_coch
 cycle_net_cloch_road = cycle_net |>
   filter(osm_id == 757849580)
-cycle_net_cloch_road$cycle_segregation
+cycle_net_cloch_road$cycle_segregation # Should be shared footway
 m = plot_osm_tmap(cycle_net)
 m
 ```
