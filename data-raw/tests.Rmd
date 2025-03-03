@@ -165,5 +165,12 @@ cycle_net_cloch_road = cycle_net |>
   filter(osm_id == 757849580)
 cycle_net_cloch_road$cycle_segregation # Should be shared footway
 m = plot_osm_tmap(cycle_net)
+tmap::tmap_mode("view")
 m
+tmap::tmap_save(m, "cloch_road.html")
+# Save the cycle_net
+sf::write_sf(cycle_net, "cycle_net_cloch_road.geojson")
+system("gh release list")
+system("gh release upload v0.1 cycle_net_cloch_road.geojson cloch_road.html --clobber")
+# See result online at https://github.com/nptscot/osmactive/releases/tag/v0.1/cycle_net_cloch_road.geojson
 ```
