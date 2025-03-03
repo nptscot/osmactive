@@ -348,7 +348,6 @@ classify_cycle_infrastructure_scotland = function(
         )
       )
   }
-  browser()
   osm_classified = osm_classified |>
     clean_widths() |>
     dplyr::mutate(cycle_segregation = dplyr::case_when(
