@@ -811,3 +811,77 @@ NULL
 
 # Ignore globals:
 utils::globalVariables(c("exclude_highway_cycling", "exclude_bicycle_cycling", "exclude_highway_driving", "highway", "cycle_segregation", "other_tags"))
+
+#' Get the OSM network functions
+#'
+#' @param place A place name or a bounding box passed to `osmextract::oe_get()`
+#' @param extra_tags A vector of extra tags to be included in the OSM extract
+#' @param ... Additional arguments passed to `osmextract::oe_get()`
+#' @return A sf object with the OSM network
+#' @export
+get_points = function(
+    place,
+    extra_tags = c(
+      "traffic_calming",
+      "crossing"
+    ),
+    ...
+    ) {
+  osm_points = osmextract::oe_get(
+    place = place,
+    extra_tags = extra_tags,
+    layer = "points",
+    ...
+  )
+  osm_points
+}
+
+# devtools::load_all()
+# osm_points = get_points("Edinburgh")
+# traffic_calming = get_traffic_calming_measures(osm_points)
+# plot(traffic_calming["traffic_calming"])
+# mapview::mapview(traffic_calming, zcol = "traffic_calming")
+
+
+#' Get the OSM network functions
+#'
+#' @param osm_points An sf object with the OSM network
+#' @param filter Whether to filter the results to only include traffic calming measures
+#' @return A data frame with the OSM network relevant for active travel
+#' @export
+#' @examples
+#' osm_points = get_points("Edinburgh")
+#' traffic_calming = get_traffic_calming(osm_points)
+#' head(traffic_calming)
+#' plot(traffic_calming["traffic_calming"])
+get_traffic_calming = function(
+  osm_points,
+  filter = TRUE
+  ) {
+  res = osm_points |>
+      dplyr::transmute(
+        osm_id,
+        traffic_calming_binary = !is.na(traffic_calming),
+        traffic_calming
+      )
+  if (filter) {
+    res = res |>
+      dplyr::filter(traffic_calming_binary)
+  }
+  return(res)
+}
+
+
+#' Get the OSM cycling network
+#'
+#' @param osm An OSM network object
+#' @return A sf object with the OSM network relevant for active travel
+#'   with columns containing information on traffic calming measures,
+#'   crossings, cycle infrastructure, and more.
+#' @export
+get_active_travel_network = function(
+    osm
+    ) {
+  osm_cycle_network = get_cycling_network(osm)
+  # taffic_calming_measures = get_traffic_calming_measures(osm_cycle_network)
+}

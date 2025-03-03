@@ -1,9 +1,9 @@
 ## code to prepare `osm_edinburgh` dataset goes here
 
-remotes::install_github("nptscot/osmactive")
-library(osmactive)
+devtools::load_all()
 # Or
-# devtools::load_all()
+# remotes::install_github("nptscot/osmactive")
+# library(osmactive)
 library(dplyr)
 library(tmap)
 library(sf)
@@ -18,7 +18,7 @@ edinburgh_sf = sf::st_sf(
 edinburgh_3km = edinburgh_sf |>
   sf::st_buffer(3000)
 
-osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+osm = get_travel_network("Edinburgh", boundary = edinburgh_3km, boundary_type = "clipsrc")
 names(osm)
 
 osm_york_way = osm |>
@@ -38,9 +38,9 @@ plot(osm)
 
 # # Keep only most relevant columns
 osm = osm |>
-  select(osm_id, name, highway, matches("cycleway"), bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, other_tags)
+  select(osm_id, name, highway, matches("cycleway"), bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, traffic_calming, other_tags)
 names(osm)
-
+table(osm$traffic_calming)
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
