@@ -38,6 +38,8 @@ et_active = function() {
     "surface",
     "smoothness",
     "access",
+    # Traffic calming:
+    "traffic_calming",
     # Additional tags with info on psv and bus lanes:
     "bus",
     "busway",
