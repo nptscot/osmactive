@@ -133,3 +133,44 @@ m
 tmap::tmap_save(m, "leith_walk.html")
 browseURL("leith_walk.html")
 ```
+
+# 757849580
+
+```{r}
+cloch_lighthouse = zonebuilder::zb_zone("Cloch Lighthouse", n_circles = 3)
+cloch_lighthouse_union = sf::st_union(cloch_lighthouse)
+osm = get_travel_network("Scotland", boundary = cloch_lighthouse_union, boundary_type = "clipsrc")
+osm_cloch_road = osm |>
+  filter(osm_id == 757849580)
+osm_cloch_road_1km = osm_cloch_road |>
+  sf::st_buffer(1000)
+osm_cloch_road_1km = osm |>
+  sf::st_intersection(osm_cloch_road_1km)
+plot(osm_cloch_road_1km$geometry)
+mapview::mapview(osm_cloch_road_1km)
+cycle_net = get_cycling_network(osm_cloch_road_1km)
+drive_net = get_driving_network(osm_cloch_road_1km)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+# # # Make changes to osmactive code then reload with
+devtools::load_all()
+# osm_classified_coch = osm_classified |>
+#   filter(osm_id == 757849580)
+# # osm_classified_coch$cycle_pedestrian_separation
+# # # [1] Shared Footway (not segregated)
+# # # 3 Levels: Shared Footway (segregated) < ... < Unknown
+# # osm_classified_coch$cycle_segregation
+# osm_classified = osm_classified_coch
+cycle_net_cloch_road = cycle_net |>
+  filter(osm_id == 757849580)
+cycle_net_cloch_road$cycle_segregation # Should be shared footway
+m = plot_osm_tmap(cycle_net)
+tmap::tmap_mode("view")
+m
+tmap::tmap_save(m, "cloch_road.html")
+# Save the cycle_net
+sf::write_sf(cycle_net, "cycle_net_cloch_road.geojson")
+system("gh release list")
+system("gh release upload v0.1 cycle_net_cloch_road.geojson cloch_road.html --clobber")
+# See result online at https://github.com/nptscot/osmactive/releases/tag/v0.1/cycle_net_cloch_road.geojson
+```

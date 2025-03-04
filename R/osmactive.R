@@ -359,6 +359,12 @@ classify_cycle_infrastructure_scotland = function(
         (cycle_pedestrian_separation == "Shared Footway (not segregated)" & detailed_segregation == "Off Road Cycleway" & highway != "cycleway") ~ "Shared Footway",
       TRUE ~ detailed_segregation
     )) |>
+    # Switch non off-road cycleways to "Shared Footway" if they are not segregated:
+    dplyr::mutate(cycle_segregation = dplyr::case_when(
+      cycle_segregation %in% c("Segregated Track (wide)", "Segregated Track (narrow)") &
+        cycle_pedestrian_separation == "Shared Footway (not segregated)" ~ "Shared Footway",
+      TRUE ~ cycle_segregation
+    )) |>
     dplyr::mutate(cycle_segregation = factor(
       cycle_segregation,
       levels = c("Segregated Track (wide)", "Off Road Cycleway", "Segregated Track (narrow)", "Shared Footway", "Painted Cycle Lane", "Mixed Traffic Street"),
