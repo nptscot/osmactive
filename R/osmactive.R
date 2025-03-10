@@ -207,6 +207,7 @@ get_cycling_network = function(
     osm,
     ex_c = exclude_highway_cycling(),
     ex_b = exclude_bicycle_cycling()) {
+  browser()
   osm |>
     dplyr::filter(!stringr::str_detect(string = highway, pattern = ex_c)) |>
     # Exclude roads where cycling is banned, plus mtb paths and related tags
@@ -217,7 +218,7 @@ get_cycling_network = function(
       !(highway %in% c("path", "footway", "pedestrian") & (
         surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood") |
         smoothness %in% c("very_bad", "horrible", "very_horrible", "impassable") |
-        (!stringr::str_detect(string = bicycle, pattern = "designated|yes") & is.na(surface))
+        !stringr::str_detect(string = bicycle, pattern = "designated|yes")
       )
     )
     ) |>
