@@ -206,15 +206,12 @@ get_cycling_network = function(
       !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
     ) |>
     # Remove all highway=path|footway segments if surface is not defined:
-    dplyr::filter(!(highway %in% c("path", "footway") & is.na(surface))) |>
-    # Remove poor quality surfaces:
     dplyr::filter(
-      ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood")
-    ) |>
-    # Remove poor quality smoothness:
-    dplyr::filter(
-      ! smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")
-    ) |>
+      !(highway %in% c("path", "footway") & (
+        surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood") |
+        smoothness %in% c("very_bad", "horrible", "very_horrible", "impassable")
+      )
+    )) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
     # dplyr::filter(!(cycleway %in% "separate" & oneway == "yes")) |>
