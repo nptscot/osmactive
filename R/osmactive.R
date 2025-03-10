@@ -202,16 +202,15 @@ get_cycling_network = function(
     # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle) | !stringr::str_detect(string = bicycle, pattern = ex_b)) |>
     # Remove highway=path|pedestrian|footway without bicycle value of designated or yes:
+    # Or segments if surface is not defined:
     dplyr::filter(
-      !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
-    ) |>
-    # Remove all highway=path|footway segments if surface is not defined:
-    dplyr::filter(
-      !(highway %in% c("path", "footway") & (
+      !(highway %in% c("path", "footway", "pedestrian") & (
         surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood") |
-        smoothness %in% c("very_bad", "horrible", "very_horrible", "impassable")
+        smoothness %in% c("very_bad", "horrible", "very_horrible", "impassable") |
+        (!stringr::str_detect(string = bicycle, pattern = "designated|yes") & is.na(surface))
       )
-    )) |>
+    )
+    ) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
     # dplyr::filter(!(cycleway %in% "separate" & oneway == "yes")) |>
