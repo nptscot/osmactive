@@ -2,8 +2,10 @@
 #'
 #' @export
 et_active = function() {
-  c("maxspeed",
+  c("name",
+    "ref",
     "oneway",
+     "maxspeed",
     "bicycle",
     "cycleway",
     "cycleway:left",
@@ -15,10 +17,16 @@ et_active = function() {
     "cycleway:left:segregated",
     "cycleway:right:segregated",
     "cycleway:both:segregated",
+    "cycleway:lane",
+    "cycleway:left:lane",
+    "cycleway:right:lane",
+    "cycleway:both:lane",
     "cycleway:surface",
     "cycleway:width",
     "cycleway:est_width",
     "cycleway:buffered_lane",
+    # Use relations not tags for networks:
+    # "lcn",
     "lanes",
     "lanes:both_ways",
     "lanes:forward",
@@ -31,11 +39,13 @@ et_active = function() {
     "foot",
     "path",
     "sidewalk",
+    "sidewalk:left",
+    "sidewalk:right",
+    "sidewalk:both"
     "footway",
     "service",
     "surface",
     "tracktype",
-    "surface",
     "smoothness",
     "access",
     # Additional tags with info on psv and bus lanes:
