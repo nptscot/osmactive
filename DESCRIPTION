@@ -23,7 +23,8 @@ Suggests:
     knitr,
     jsonlite,
     rmarkdown,
-    tmap (>= 3.9)
+    tmap (>= 3.9),
+    quarto
 Remotes: 
     r-tmap/tmap
 Encoding: UTF-8
