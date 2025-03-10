@@ -35,7 +35,7 @@ execute:
   echo: false
   message: false
   warning: false
-#   eval: false
+  eval: false
 # format: gfm
 # quarto add sdesabbata/quarto-gisruk
 format:
