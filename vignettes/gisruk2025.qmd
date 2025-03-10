@@ -55,6 +55,11 @@ Please enter a short statement for a general audience or social media platform t
 <!-- See https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf for rendered version of this paper. -->
 
 ```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+```{r}
 #| include: false
 # install pak if not installed:
 if (!requireNamespace("pak", quietly = TRUE)) {
