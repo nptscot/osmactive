@@ -1,5 +1,5 @@
 ---
-conference: GISRUK 2025
+# conference: GISRUK 2025
 title: "Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning"
 author: 
   - name: Robin Lovelace
@@ -27,32 +27,36 @@ author:
   - name: Rosa Félix
     affiliation: University of Lisbon
     orcid: 0000-0002-5642-6006
-abstract: |
-  Evidence on street networks and their potential changes under future scenarios is crucial for active travel planning. However, most active travel models rely on oversimplified street representations, using single variables like 'quietness', neglecting key factors such as footway widths. This paper introduces new methods for classifying street networks for active travel, integrating diverse datasets from OpenStreetMap and official sources. Implemented in open source software packages `osmactive` and `anime`, these methods are scalable and reproducible. The results are showcased in a web application hosted at www.npt.scot, demonstrating how geographic data science can drive high-impact research.
-# implemented in open source software packages including `osmactive` R package and the `anime` Rust crate
-keywords: [network analysis, transport planning, OpenStreetMap, active travel, reproducible research]
-execute: 
-  echo: false
-  message: false
-  warning: false
+# abstract: |
+#   Evidence on street networks and their potential changes under future scenarios is crucial for active travel planning. However, most active travel models rely on oversimplified street representations, using single variables like 'quietness', neglecting key factors such as footway widths. This paper introduces new methods for classifying street networks for active travel, integrating diverse datasets from OpenStreetMap and official sources. Implemented in open source software packages `osmactive` and `anime`, these methods are scalable and reproducible. The results are showcased in a web application hosted at www.npt.scot, demonstrating how geographic data science can drive high-impact research.
+# # implemented in open source software packages including `osmactive` R package and the `anime` Rust crate
+# keywords: [network analysis, transport planning, OpenStreetMap, active travel, reproducible research]
+# execute: 
+#   echo: false
+#   message: false
+#   warning: false
 #   eval: false
-# format: gfm
-# quarto add sdesabbata/quarto-gisruk
-format:
-  gisruk-pdf:
-    keep-tex: true
-bibliography: references.bib
+# # format: gfm
+# # quarto add sdesabbata/quarto-gisruk
+# format:
+#   gisruk-pdf:
+#     keep-tex: true
+# bibliography: references.bib
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Typologies of cycle infrastructure}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
-```{=html}
-<!-- Short description
-
-Please enter a short statement for a general audience or social media platform that describes the content of your submission.  -->
-```
 
 <!-- New methods and open source tools for active travel planning are presented, integrating diverse street network datasets. Implemented in the `osmactive` R package and `anime` Rust crate, and showcased in the Network Planning Tool for Scotland. -->
 
 <!-- See https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf for rendered version of this paper. -->
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = FALSE)
+```
 
 ```{r}
 #| include: false
@@ -91,134 +95,6 @@ quarto::quarto_render("gisruk2025.qmd")
 system("gh release upload v0.1 gisruk2025.pdf --clobber")
 ```
 
-<!-- # Spec: blog post to publish on Ordnance Survey's website outlining how we have used their products to improve strategic cycle network planning in Scotland -->
-
-```{=html}
-<!-- # Background
-
-From the manual at https://github.com/nptscot/nptscot.github.io/blob/dev/manual/index.md?plain=1:
-
-Welcome to the Network Planning Tool (NPT) for Scotland, a cutting-edge web application designed for strategic cycle network planning. Funded by Transport Scotland and developed by the University of Leeds in collaboration with Sustrans Scotland. It builds on the functionality of the [Propensity to Cycle Tool](https://www.pct.bike/) for England and Wales, offering a detailed nationwide cycling potential analysis for Scotland, down to the street level ([Lovelace et al. 2017](https://www.jtlu.org/index.php/jtlu/article/view/862)). We invite users to explore its comprehensive features and contribute feedback for continuous improvement.
-
-### NPT overview
-
-The NPT is Scotland’s nationwide web-based strategic network planning tool that estimates cycling potential down to the street level.
-
-The easiest way to access the NPT website is hosted at [www.npt.scot](http://www.npt.scot).
-
-The NPT includes:
-
-1.  the [map user interface](https://www.npt.scot/), 
-2.  a series of open access [data downloads](https://www.npt.scot/data) that can be analysed in GIS software or statistical software, 
-3.  the [code base](https://github.com/nptscot/) that can be modified to fix bugs, add new features, and develop new scenarios.
-
-The NPT is an open-source tool, meaning the source code is transparent and in the public domain for others to learn from and build on. The code underlying the project is available to be copied and improved by the community.
-
-The online interface can serve many needs, including gaining insight into the network of routes where cycling potential is highest and quantifying the benefits of cycling uptake. However, we recommend that intermediate and advanced users download data on zones, routes and route networks for in-house analysis.
-
-The NPT allows users to visualise results baseline data and how cycling would change under different scenarios. The journey purposes and scenarios are described in detail below.
-
-## NPT user interface guide
-
-The NPT's user interface is intuitive, featuring map controls for easy navigation and layer controls to customize data visibility. Whether you're interested in the baseline cycling data or exploring various "what-if" scenarios like "Go Dutch" or ebike adoption, the tool provides a flexible platform for in-depth analysis.
-
-... 
-
-
-### Street space -->
-```
-
-```{=html}
-<!-- From index.html:
-
-                <p>Street width category in relation to guidance from the Cycling by Design (CbD) guidance.<button aria-label="Help on cycle infrastructure types info" class="helpbutton" data-help="streetspace"><i class="fa fa-question-circle" aria-hidden="true"></i></button></p>  
-                <div class="layertools layertools-streetspace">
-                    <div class="legend">
-                        <div class="l_r">
-                            <div class="lb"><span style="background-color: #dd7777;"></span>Not enough space</div>
-                            <div class="lb"><span style="background-color: #f9c647;"></span>Enough space (absolute minimum)</div>
-                            <div class="lb"><span style="background-color: #f29551;"></span>Enough space (minimum)</div>
-                            <div class="lb"><span style="background-color: #75a375;"></span>Plenty of space</div>
-                        </div>
-                    </div>
-                </div>
-
--->
-```
-
-```{=html}
-<!-- The Street Space layer categorises roads in accordance with the [Cycling by Design guidance](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=68). It specifies the methodology for classifying road spaces and cycle infrastructure. The sections below describe the measurement methods for roads, the cycle infrastructure types considered, and the assumptions regarding bus routes and road types.
-
-#### Road width measurements
-
-Two key measurements are taken to assess whether existing roads can accommodate cycle infrastructure:
-
-##### Carriageway width 
-   
-- **Definition:** The width available within the carriageway only.
-- **Excludes:** Manmade roadside area such as footways.
-- **Usage:** Determines if cycle infrastructure can fit solely within the carriageway.
-
-##### Corridor width (Edge to edge)
-
-- **Definition:** The total width of the corridor, encompassing both the carriageway and manmade roadside features (e.g., pavements). 
-- **Usage:** Where local policy allows, part of the footway or other manmade roadside features may be reallocated for cycle infrastructure, provided that minimum safe footway widths are maintained.
-
-#### Cycle infrastructure width requirements
-
-Two main types of cycle infrastructure are considered, depending on the street configuration:
-
-Unidirectional Cycle Tracks (2 × 1-Way Protected Cycle Tracks):
-  - *Absolute Minimum Width:* 1.5 m  
-  - *Desirable Minimum Width:* 2.0 m  
-
-Bidirectional Cycle Tracks (1 × 2-Way Protected Cycle Track):
-  - *Absolute Minimum Width:* 2.0 m
-  - *Desirable Minimum Width:* 3.0 m
-
-#### Buffers for cycle infrastructure
-
-Buffers are applied based on road speed and traffic conditions, as specified in Table 3.8 of the Cycling by Design document. These buffers must be accounted for when calculating the effective available width for cycle infrastructure.
-
-
-#### Bus routes and road traffic assumptions
-
-##### Bus routes and dedicated bus lanes
-
-Bus routes and dedicated bus lanes are key factors in determining the available space for cycle infrastructure:
-
-- **Non-bus routes:**  
-  The motor traffic space is considered as **2 × 2.75 m**.
-
-- **Bus routes without dedicated bus lanes:**  
-  The motor traffic space is considered as **2 × 3.2 m**.
-
-- **Bus routes with dedicated bus lanes:**  
-  The motor traffic space is considered as **2 × 3.2 m** plus an additional space of **`n_bus_lanes` × 3.2 m** for the dedicated bus lanes.
-
-##### Road types
-
-Roads are categorised based on their traffic configuration and bus route status:
-- Two‐way for motor traffic (non–bus route)
-- Two‐way for motor traffic (bus route without dedicated bus lanes)
-- Two‐way for motor traffic (bus route with dedicated bus lanes)
-
-#### Categorisation based on available width
-
-The Street Space layer divides roads into three groups, depending on whether the available width (carriageway width or corridor width) can accommodate the cycle infrastructure:
-
-- **Not enough space:**
-  The available space is insufficient to fit even the absolute minimum width of cycle infrastructure.
-
-- **Absolute minimum:**
-  The available space is enough to accommodate the absolute minimum width of cycle infrastructure, but it does not meet the desirable minimum.
-
-- **Desirable minimum:**
-  The available space is sufficient to accommodate the desirable minimum width of cycle infrastructure, providing a more comfortable design for all users. -->
-```
-
-{{< pagebreak >}}
-
 # Introduction
 
 Active travel is an accessible and cost-effective way to replace short car trips and make transport systems more sustainable.
@@ -241,7 +117,7 @@ We used four key datasets representing the road network for this project:
 -   OS Mastermap Topography, the most detailed vector dataset that includes detailed information on the geometry of many features of the man-made environment, including curb lines. In the OS Topo layer roads and other pieces of transport infrastructure such as footways (pavements) are represented not as corridor or lane centerlines, but as polygons.
 -   OpenStreetMap, a crowdsourced dataset that is continuously updated by community volunteers. The dataset is rich, with tags for width and smoothness of infrastructure, but is not as consistent as the OS datasets.
 
-Ordnance Survey’s MasterMap Highways and Topography datasets provide unparalleled accuracy and detail, but are a struggle to import using consumer-grade hardware and standard tools such as QGIS.
+Ordnance Survey's MasterMap Highways and Topography datasets provide unparalleled accuracy and detail, but are a struggle to import using consumer-grade hardware and standard tools such as QGIS.
 To overcome this issue we developed [the `mastermapr` package](https://github.com/acteng/mastermapr) in collaboration with the government agency Active Travel England (ATE), to efficiently and flexibly imports MasterMap datasets (50 GB compressed).
 After importing the four route network datasets outlined above, we integrated them using the following steps:
 

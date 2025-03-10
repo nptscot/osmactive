@@ -2,8 +2,10 @@
 #'
 #' @export
 et_active = function() {
-  c("maxspeed",
+  c("name",
+    "ref",
     "oneway",
+     "maxspeed",
     "bicycle",
     "cycleway",
     "cycleway:left",
@@ -15,10 +17,16 @@ et_active = function() {
     "cycleway:left:segregated",
     "cycleway:right:segregated",
     "cycleway:both:segregated",
+    "cycleway:lane",
+    "cycleway:left:lane",
+    "cycleway:right:lane",
+    "cycleway:both:lane",
     "cycleway:surface",
     "cycleway:width",
     "cycleway:est_width",
     "cycleway:buffered_lane",
+    # Use relations not tags for networks:
+    # "lcn",
     "lanes",
     "lanes:both_ways",
     "lanes:forward",
@@ -31,11 +39,13 @@ et_active = function() {
     "foot",
     "path",
     "sidewalk",
+    "sidewalk:left",
+    "sidewalk:right",
+    "sidewalk:both",
     "footway",
     "service",
     "surface",
     "tracktype",
-    "surface",
     "smoothness",
     "access",
     # Additional tags with info on psv and bus lanes:
@@ -202,18 +212,14 @@ get_cycling_network = function(
     # Exclude roads where cycling is banned, plus mtb paths and related tags
     dplyr::filter(is.na(bicycle) | !stringr::str_detect(string = bicycle, pattern = ex_b)) |>
     # Remove highway=path|pedestrian|footway without bicycle value of designated or yes:
+    # Or segments if surface is not defined:
     dplyr::filter(
-      !(highway %in% c("path", "pedestrian", "footway") & !stringr::str_detect(string = bicycle, pattern = "designated|yes"))
-    ) |>
-    # Remove all highway=path|footway segments if surface is not defined:
-    dplyr::filter(!(highway %in% c("path", "footway") & is.na(surface))) |>
-    # Remove poor quality surfaces:
-    dplyr::filter(
-      ! surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood")
-    ) |>
-    # Remove poor quality smoothness:
-    dplyr::filter(
-      ! smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")
+      !(highway %in% c("path", "footway", "pedestrian") & (
+        surface %in% c("ground", "unpaved", "grass", "compacted", "gravel", "sand", "dirt", "wood") |
+        smoothness %in% c("very_bad", "horrible", "very_horrible", "impassable") |
+        !stringr::str_detect(string = bicycle, pattern = "designated|yes")
+      )
+    )
     ) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
