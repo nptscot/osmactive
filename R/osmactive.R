@@ -213,7 +213,7 @@ get_cycling_network = function(
     ) |>
     # Remove poor quality smoothness:
     dplyr::filter(
-      ! smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable")
+      ! (smoothness %in% c("bad", "very_bad", "horrible", "very_horrible", "impassable") & surface != "sett")
     ) |>
     # Remove any segments with cycleway*=="separate"
     # They are mapped as separate geometries that should be included
