@@ -41,7 +41,7 @@ et_active = function() {
     "sidewalk",
     "sidewalk:left",
     "sidewalk:right",
-    "sidewalk:both"
+    "sidewalk:both",
     "footway",
     "service",
     "surface",
