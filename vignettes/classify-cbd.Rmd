@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 timeout(3000)
 library(osmactive)
+library(tidyverse)
 library(sf)
 tmap::tmap_mode("view")
 ```
@@ -77,4 +78,68 @@ We can also plot these as follows:
 ```{r}
 m = plot_osm_tmap(cycle_net_included)
 m
+```
+
+# Level of service
+
+The level of service associated with each link can be calculated based on the Level of Service table in the Cycling by Design guidance:
+
+![]()
+
+A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories:
+
+```{r}
+# table(cycle_net$cycle_segregation)
+#   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
+#                       214                       973                       859 
+#            Shared Footway        Painted Cycle Lane 
+#                      3325                       522 
+los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
+# names(los_table)
+#  [1] "Motor Traffic Speed (85th percentile)"
+#  [2] "Speed Limit (mph)"                    
+#  [3] "Two-way traffic flow (pcu per day)"   
+#  [4] "Two-way traffic flow (pcu per hour)"  
+#  [5] "Mixed Traffic Street"                 
+#  [6] "Detached or Remote Cycle Track"       
+#  [7] "Cycle Track at Carriageway Level"     
+#  [8] "Stepped or Footway Level Cycle Track" 
+#  [9] "Light Segregation"                    
+# [10] "Cycle Lane"   
+los_table_npt = los_table |>
+  transmute(
+    `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
+    `Speed Limit (mph)` = `Speed Limit (mph)`,
+    AADT = `Two-way traffic flow (pcu per day)`,
+    `Mixed Traffic Street`,
+    `Off road cycleway` = `Detached or Remote Cycle Track`,
+    `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
+    `Segregated Track (narrow)` = `Light Segregation`
+  )
+los_table_npt |>
+  knitr::kable()
+```
+
+We can convert this table into a 'long' format for use internally.
+
+```{r}
+los_table_long = los_table_npt |>
+  pivot_longer(cols = -c(`Speed (85th kph)`, `Speed Limit (mph)`, AADT),
+               names_to = "infrastructure",
+               values_to = "level_of_service")
+los_table_long
+# write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
+```
+
+
+```{r}
+#| eval: false
+# Check for level track on York Place
+# devtools::load_all()
+osm_check = "1137759929"
+york_place = cycle_net |>
+  filter(osm_id == osm_check)
+cycle_net_los = level_of_service(york_place)
+library(tmap)
+mapview::mapview(cycle_net_los, zcol = "Level of Service")
 ```
