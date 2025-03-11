@@ -276,7 +276,8 @@ duplicated(los_table_long_mini_updated)
 los_table_complete = los_table_long_mini_updated |>
   # Remove All traffic level:
   filter(AADT != "All") |>
-  distinct(`Speed Limit (mph)`, `AADT`, cycle_segregation) |>
+  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
+  summarise(level_of_service = max(level_of_service)) |>
   arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
 write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
 usethis::use_data(los_table_complete, overwrite = TRUE)
