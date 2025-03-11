@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+timeout(3000)
 library(osmactive)
 library(sf)
 tmap::tmap_mode("view")
