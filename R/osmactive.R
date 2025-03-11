@@ -824,6 +824,18 @@ estimate_traffic = function(osm) {
 #' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
 #' @export
 level_of_service = function(osm) {
+  # Add final_speed column if not present:
+  if (!"final_speed" %in% names(osm)) {
+    osm = clean_speeds(osm)
+    osm = osm |>
+      dplyr::rename(final_speed = maxspeed_clean)
+  }
+  if (!"final_traffic" %in% names(osm)) {
+    osm = estimate_traffic(osm)
+    osm = osm |>
+      dplyr::rename(final_traffic = assumed_volume)
+  }
+  # TODO: check these rules:
   osm = osm |>
     dplyr::mutate(
       `Level of Service` = dplyr::case_when(
@@ -898,38 +910,26 @@ level_of_service = function(osm) {
           final_speed == 40 &
           final_traffic < 1000 ~
           "Medium",
-        detailed_segregation == "Level track" ~ "Low",
-        detailed_segregation == "Footway" ~ "Low",
         detailed_segregation == "Footway" &
           grepl("asphalt", surface, ignore.case = TRUE) ~
           "Medium",
-        detailed_segregation == "Level track" &
-          grepl("asphalt", surface, ignore.case = TRUE) ~
-          "Medium",
-        detailed_segregation == "Light segregation" & final_speed <= 50 ~ "Low",
+        detailed_segregation == "Light segregation" & final_speed >= 50 ~ "Low",
         detailed_segregation == "Light segregation" &
           final_speed == 60 &
           final_traffic < 1000 ~
           "Low",
-        detailed_segregation == "Painted Cycle Lane" & final_speed <= 50 ~
+        detailed_segregation == "Painted Cycle Lane" & final_speed >= 50 ~
           "Low",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 60 &
-          final_traffic < 1000 ~
+        detailed_segregation == "Mixed Traffic Street" & final_speed >= 30 ~
           "Low",
-        detailed_segregation == "Mixed Traffic Street" & final_speed <= 30 ~
-          "Low",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 40 &
-          final_traffic < 2000 ~
-          "Low",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 60 &
-          final_traffic < 1000 ~
-          "Low",
-        detailed_segregation == "Light segregation" ~ "Should not be used",
-        detailed_segregation == "Painted Cycle Lane" ~ "Should not be used",
-        detailed_segregation == "Mixed Traffic Street" ~ "Should not be used",
+        # detailed_segregation == "Mixed Traffic Street" &
+        #   final_speed == 40 &
+        #   final_traffic < 2000 ~
+        #   "Low",
+        # detailed_segregation == "Mixed Traffic Street" &
+        #   final_speed == 60 &
+        #   final_traffic < 1000 ~
+        #   "Low",
         TRUE ~ "Unknown"
       )
     ) |>
