@@ -817,6 +817,16 @@ estimate_traffic = function(osm) {
   osm
 }
 
+#' Classify Speeds
+#'
+#' This function classifies speeds in miles per hour (mph) into categories.
+#'
+#' @param speed_mph A numeric vector representing speeds in miles per hour.
+#' @return A character vector with the speed categories.
+#' @export 
+#' @examples
+#' classify_speeds(c(15, 25, 35, 45, 55, 65))
+#' # Returns: "<20 mph", "20 mph", "30 mph", "40 mph", "50 mph", "60+ mph"
 classify_speeds = function(speed_mph) {
   dplyr::case_when(
     speed_mph < 20 ~ "<20 mph",
@@ -828,6 +838,19 @@ classify_speeds = function(speed_mph) {
   )
 }
 
+
+
+#' Convert AADT categories to CBD AADT character ranges
+#'
+#' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
+#'
+#' @param AADT A character vector representing AADT categories. Valid categories include "0 to 1000", "0 to 2000", "1000+", "All", "1000 to 2000", "2000 to 4000", "2000+", and "4000+".
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @export
+#' @examples
+#' npt_to_cbd_aadt_character("0 to 1000") # returns "0 to 1999"
+#' npt_to_cbd_aadt_character("2000 to 4000") # returns "2000 to 3999"
+#' npt_to_cbd_aadt_character("4000+") # returns "4000+"
 npt_to_cbd_aadt_character = function(AADT) {
   dplyr::case_when(
       AADT %in% c("0 to 1000", "0 to 2000", "1000+", "All") ~ "0 to 1999",
@@ -835,6 +858,14 @@ npt_to_cbd_aadt_character = function(AADT) {
       AADT %in% c("4000+") ~ "4000+"
     )
 }
+
+#' Convert AADT categories to CBD AADT character ranges
+#'
+#' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
+#'
+#' @param AADT A numeric vector representing AADT
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @export
 npt_to_cbd_aadt_numeric = function(AADT) {
   dplyr::case_when(
     AADT < 2000 ~ "0 to 1999",
@@ -986,3 +1017,26 @@ utils::globalVariables(c(
   "cycle_segregation",
   "other_tags"
 ))
+
+#' @name los_table_long
+#' @title Long format Level of Service (LOS) table
+#' @description This dataset contains the level of service information in a long format, with columns for speed limit, AADT, infrastructure type, and level of service.
+#' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
+#' @source Generated from los_table_npt dataset
+#' @usage data(los_table_long)
+#' @examples
+#' data(los_table_long)
+#' head(los_table_long)
+NULL
+
+#' 
+#' @name los_table_complete
+#' @title Complete Level of Service (LOS) table
+#' @description This dataset contains the complete level of service information, including missing categories, in a long format.
+#' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
+#' @source Generated from los_table_long and los_table_long_missing datasets
+#' @usage data(los_table_complete)
+#' @examples
+#' data(los_table_complete)
+#' head(los_table_complete)
+NULL
