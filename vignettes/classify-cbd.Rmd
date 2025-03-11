@@ -97,7 +97,7 @@ The level of service associated with each link can be calculated based on the Le
 #            Shared Footway        Painted Cycle Lane 
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
-los_table = read_csv("../inst/extdata/level-of-service-table.csv")
+los_table = read_csv("inst/extdata/level-of-service-table.csv")
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"                    
@@ -146,6 +146,7 @@ los_table_long = los_table_npt |>
 # # Identify duplicates:
 # duplicated(los_table_long)
 los_table_long = los_table_long |>
+  arrange(`Speed Limit (mph)`, AADT, infrastructure) |>
   distinct()
 los_table_long
 write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
@@ -273,7 +274,8 @@ los_table_long_missing = tibble::tribble(
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
 los_table_complete = los_table_long_mini_updated |>
-  distinct()
+  distinct() |>
+  arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
 write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
 usethis::use_data(los_table_complete, overwrite = TRUE)
 ```
