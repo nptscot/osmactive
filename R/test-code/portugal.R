@@ -125,7 +125,7 @@ classify_cycle_infrastructure_portugal = function(osm) {
     )) |>
     
     dplyr::mutate(detailed_segregation4 = dplyr::case_when(
-      detailed_segregation3 %in% "Cycle track or lane" & highway == "cycleway" & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") ~ "Protected Active",
+      detailed_segregation3 %in% "Cycle track or lane" & highway == "cycleway" & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") & (is.na(sidewalk) | sidewalk=="no") & (is.na(segregated) | segregated=="no") ~ "Protected Active",
       detailed_segregation3 %in% "Cycle track or lane" & highway == "footway" & bicycle == "yes" ~ "Protected Active",
       detailed_segregation3 %in% "Cycle track or lane" & highway == "pedestrian" & bicycle == "designated" ~ "Protected Active",
       TRUE ~ detailed_segregation3
