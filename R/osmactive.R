@@ -817,7 +817,48 @@ estimate_traffic = function(osm) {
   osm
 }
 
+classify_speeds = function(speed_mph) {
+  dplyr::case_when(
+    speed_mph < 20 ~ "<20 mph",
+    speed_mph < 30 ~ "20 mph",
+    speed_mph < 40 ~ "30 mph",
+    speed_mph < 50 ~ "40 mph",
+    speed_mph < 60 ~ "50 mph",
+    speed_mph >= 60 ~ "60+ mph"
+  )
+}
 
+npt_to_cbd_aadt_character = function(AADT) {
+  dplyr::case_when(
+      AADT %in% c("0 to 1000", "0 to 2000", "1000+", "All") ~ "0 to 1999",
+      AADT %in% c("1000 to 2000", "2000 to 4000", "2000+") ~ "2000 to 3999",      
+      AADT %in% c("4000+") ~ "4000+"
+    )
+}
+npt_to_cbd_aadt_numeric = function(AADT) {
+  dplyr::case_when(
+    AADT < 2000 ~ "0 to 1999",
+    AADT < 4000 ~ "2000 to 3999",
+    AADT >= 4000 ~ "4000+"
+  )
+}
+
+#' Convert AADT to CBD AADT
+#'
+#' This function converts Annual Average Daily Traffic (AADT) to Central Business District (CBD) AADT.
+#' It handles both character and numeric inputs by delegating to appropriate helper functions.
+#'
+#' @param AADT A character or numeric value representing the Annual Average Daily Traffic.
+#' @return The converted CBD AADT value.
+#' @export
+npt_to_cbd_aadt = function(AADT) {
+  # If it's character:
+  if (is.character(AADT)) {
+    return(npt_to_cbd_aadt_character(AADT))
+  } else {
+    return(npt_to_cbd_aadt_numeric(AADT))
+  }
+}
 #' Generate Cycle by Design Level of Service
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
@@ -835,6 +876,7 @@ level_of_service = function(osm) {
     osm = osm |>
       dplyr::rename(final_traffic = assumed_volume)
   }
+  browser()
   # TODO: check these rules:
   osm = osm |>
     dplyr::mutate(

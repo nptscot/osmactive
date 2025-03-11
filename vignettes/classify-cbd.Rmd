@@ -105,7 +105,12 @@ los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/i
 #  [7] "Cycle Track at Carriageway Level"     
 #  [8] "Stepped or Footway Level Cycle Track" 
 #  [9] "Light Segregation"                    
-# [10] "Cycle Lane"   
+# [10] "Cycle Lane"
+table(los_table$`Two-way traffic flow (pcu per day)`)
+  #  0 to 1000    0 to 2000 1000 to 2000        1000+ 2000 to 4000        2000+ 
+  #          4            1            2            2            2            1 
+  #      4000+          All 
+  #          2            1 
 los_table_npt = los_table |>
   transmute(
     `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
@@ -115,7 +120,12 @@ los_table_npt = los_table |>
     `Off road cycleway` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
     `Segregated Track (narrow)` = `Light Segregation`
+  ) |>
+  # Convert the categories to "0 to 1999", "2000 to 3999", "4000+"
+  mutate(
+    AADT = npt_to_cbd_aadt(AADT)
   )
+
 los_table_npt |>
   knitr::kable()
 ```
@@ -129,7 +139,46 @@ los_table_long = los_table_npt |>
                values_to = "level_of_service")
 los_table_long
 # write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
+usethis::use_data(los_table_long, overwrite = TRUE)
 ```
+
+Next, we calculate the speed limits as follows:
+
+```{r}
+# table(los_table_long$`Speed Limit (mph)`)
+# <20 mph  20 mph  30 mph  40 mph  50 mph 60+ mph 
+#      12      16      12       8       8       4 
+cycle_net_speeds = clean_speeds(cycle_net)
+# table(cycle_net_speeds$maxspeed_clean)
+#  15  20  30  40  50  60 
+#   1 314 239  92   2  22
+classify_speeds = function(speed_mph) {
+  dplyr::case_when(
+    speed_mph < 20 ~ "<20 mph",
+    speed_mph < 30 ~ "20 mph",
+    speed_mph < 40 ~ "30 mph",
+    speed_mph < 50 ~ "40 mph",
+    speed_mph < 60 ~ "50 mph",
+    speed_mph >= 60 ~ "60+ mph"
+  )
+}
+classify_speeds(30)
+classify_speeds(10)
+classify_speeds(NA)
+```
+
+We can then create the `Speed Limit (mph)` and `AADT` columns in the `cycle_net` object:
+
+```{r}
+cycle_net_speeds = clean_speeds(cycle_net)
+cycle_net_volumes = estimate_traffic(cycle_net_speeds)
+cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
+cycle_net$AADT = npt_to_cbd_aadt(cycle_net_volumes$assumed_volume)
+class(cycle_net_volumes$assumed_volume)
+table(cycle_net$`Speed Limit (mph)`)
+table(cycle_net$AADT)
+```
+
 
 
 ```{r}
