@@ -274,7 +274,9 @@ los_table_long_missing = tibble::tribble(
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
 los_table_complete = los_table_long_mini_updated |>
-  distinct() |>
+  # Remove All traffic level:
+  filter(AADT != "All") |>
+  distinct(`Speed Limit (mph)`, `AADT`, cycle_segregation) |>
   arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
 write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
 usethis::use_data(los_table_complete, overwrite = TRUE)
