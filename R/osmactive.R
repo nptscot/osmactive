@@ -866,127 +866,50 @@ npt_to_cbd_aadt = function(AADT) {
 #' @export
 level_of_service = function(osm) {
   # Add final_speed column if not present:
-  if (!"final_speed" %in% names(osm)) {
+  if (!"Speed Limit (mph)" %in% names(osm)) {
     osm = clean_speeds(osm)
     osm = osm |>
       dplyr::rename(final_speed = maxspeed_clean)
+    osm$`Speed limit (mph)` = classify_speeds(osm$final_speed)
   }
-  if (!"final_traffic" %in% names(osm)) {
+  if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
     osm = osm |>
       dplyr::rename(final_traffic = assumed_volume)
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
   }
-  browser()
+  # browser()
   # TODO: check these rules:
-  osm = osm |>
+  osm_joined = left_join(osm, los_table_complete) |>
+    rename(`Level of Service` = level_of_service) |>
     dplyr::mutate(
-      `Level of Service` = dplyr::case_when(
-        detailed_segregation == "Off Road Cycleway" ~ "High",
-        detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
-        detailed_segregation == "Footway" & final_speed <= 20 ~ "High",
-        detailed_segregation == "Footway" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Light segregation" & final_speed <= 20 ~
-          "High",
-        detailed_segregation == "Light segregation" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed <= 20 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 30 &
-          final_traffic < 1000 ~
-          "High",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed <= 20 &
-          final_traffic < 2000 ~
-          "High",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 30 &
-          final_traffic < 1000 ~
-          "High",
-        detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
-        detailed_segregation == "Level track" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Footway" & final_speed <= 40 ~ "Medium",
-        detailed_segregation == "Footway" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Light segregation" & final_speed == 30 ~
-          "Medium",
-        detailed_segregation == "Light segregation" &
-          final_speed == 40 &
-          final_traffic < 2000 ~
-          "Medium",
-        detailed_segregation == "Light segregation" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" & final_speed <= 20 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 40 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed <= 20 &
-          final_traffic < 4000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 30 &
-          final_traffic < 2000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 40 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Footway" &
-          grepl("asphalt", surface, ignore.case = TRUE) ~
-          "Medium",
-        detailed_segregation == "Light segregation" & final_speed >= 50 ~ "Low",
-        detailed_segregation == "Light segregation" &
-          final_speed == 60 &
-          final_traffic < 1000 ~
-          "Low",
-        detailed_segregation == "Painted Cycle Lane" & final_speed >= 50 ~
-          "Low",
-        detailed_segregation == "Mixed Traffic Street" & final_speed >= 30 ~
-          "Low",
-        # detailed_segregation == "Mixed Traffic Street" &
-        #   final_speed == 40 &
-        #   final_traffic < 2000 ~
-        #   "Low",
-        # detailed_segregation == "Mixed Traffic Street" &
-        #   final_speed == 60 &
-        #   final_traffic < 1000 ~
-        #   "Low",
-        TRUE ~ "Unknown"
-      )
-    ) |>
-    dplyr::mutate(
+      `Level of Service` = factor(
+        `Level of Service`,
+        labels = rev(c("High", "Medium", "Low", "Should not be used")),
+        ordered = TRUE
+      ),
+      # Reverse the order:
       `Level of Service` = factor(
         `Level of Service`,
         levels = c("High", "Medium", "Low", "Should not be used"),
         ordered = TRUE
       )
     )
-  osm = sf::st_sf(
-    osm |> sf::st_drop_geometry(),
-    geometry = sf::st_geometry(osm)
+  osm_joined = osm_joined |>
+    mutate(
+      `Level of Service` = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & is.na(`Level of Service`) ~ "Medium",
+        cycle_segregation == "Off Road Cycleway" & is.na(`Level of Service`) ~ "High",
+        cycle_segregation == "Segregated Track (wide)" & is.na(`Level of Service`) ~ "High",
+        cycle_segregation == "Segregated Track (narrow)" & is.na(`Level of Service`) ~ "Medium",
+        TRUE ~ `Level of Service`
+      )
+    )
+  res = sf::st_sf(
+    osm_joined |> sf::st_drop_geometry(),
+    geometry = sf::st_geometry(osm_joined)
   )
-  osm
+  res
 }
 
 #' Function to get multilinestrings representing bus routes
