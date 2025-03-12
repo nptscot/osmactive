@@ -91,13 +91,16 @@ The level of service associated with each link can be calculated based on the Le
 ```{r}
 #| eval: false
 #| echo: false
+#| label: update-los-table
+# NOTE: run this locally
+devtools::load_all()
 # table(cycle_net$cycle_segregation)
 #   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
 #                       214                       973                       859 
 #            Shared Footway        Painted Cycle Lane 
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
-los_table = read_csv("inst/extdata/level-of-service-table.csv")
+# los_table = read_csv("inst/extdata/level-of-service-table.csv")
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"                    
@@ -296,5 +299,35 @@ cycle_net_los |>
   summarise(na = sum(is.na(`Level of Service`))) |>
   filter(na > 0) |>
   arrange(desc(na))
-# mapview::mapview(cycle_net_los, zcol = "Level of Service")
+cycle_net_los_plot = cycle_net_los |>
+  select(osm_id, `Speed Limit (mph)`, AADT, cycle_segregation, `Level of Service`)
+# mapview::mapview(cycle_net_los_plot, zcol = "Level of Service")
+```
+
+```{r}
+#| eval: false
+#| echo: false
+# Try for Leeds
+osm = get_travel_network("Leeds")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net, include_mixed_traffic = TRUE)
+# Add aadt and speed limit
+cycle_net_speeds = clean_speeds(cycle_net)
+cycle_net = estimate_traffic(cycle_net_speeds)
+# Classify volumes:
+cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net$assumed_volume)
+cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
+names(cycle_net_speeds)
+cycle_net_los = level_of_service(cycle_net)
+
+table(cycle_net_los$`Level of Service`)
+
+chapeltown_area = zonebuilder::zb_zone("Chapeltown, Leeds", n_circles = 3)
+cycle_net_los_ctown = cycle_net_los |>
+  sf::st_filter(chapeltown_area) |>
+  select(osm_id, `Speed Limit (mph)`, AADT, cycle_segregation, `Level of Service`)
+nrow(cycle_net_los_ctown)
+mapview::mapview(cycle_net_los_ctown, zcol = "Level of Service")
 ```
