@@ -757,8 +757,8 @@ clean_speeds = function(osm) {
 
   # Regex for different speeds:
   r20 = "living_street"
-  r30 = "residential"
-  r60 = "primary|secondary|tertiary|unclassified|service|trunk"
+  r30 = "residential|unclassified|service"
+  r60 = "primary|secondary|tertiary|trunk"
   r70 = "motorway"
 
   osm = osm |>
