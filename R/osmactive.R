@@ -914,8 +914,10 @@ level_of_service = function(osm) {
   }
   if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
-    osm = osm |>
-      dplyr::rename(final_traffic = assumed_volume)
+    if (!("final_traffic" %in% names(osm))) {
+      osm = osm |>
+        dplyr::rename(final_traffic = assumed_volume)
+    }
     osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
   }
   # browser()
