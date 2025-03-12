@@ -755,10 +755,13 @@ clean_speeds = function(osm) {
   osm$maxspeed_clean = gsub(" mph", "", osm$maxspeed_clean)
   osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
 
+  # TODO: add different rules for urban vs rural
   # Regex for different speeds:
   r20 = "living_street"
   r30 = "residential|unclassified|service"
-  r60 = "primary|secondary|tertiary|trunk"
+  # Compromise between urban being 60 default and rural 30/40:
+  r40 = "primary|secondary|tertiary"
+  r60 = "trunk"
   r70 = "motorway"
 
   osm = osm |>
@@ -769,6 +772,7 @@ clean_speeds = function(osm) {
         lit == "yes" ~ 30,
         stringr::str_detect(highway, r20) ~ 20,
         stringr::str_detect(highway, r30) ~ 30,
+        stringr::str_detect(highway, r40) ~ 40,
         stringr::str_detect(highway, r60) ~ 60,
         stringr::str_detect(highway, r70) ~ 70,
         TRUE ~ 30
