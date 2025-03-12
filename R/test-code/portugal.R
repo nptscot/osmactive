@@ -75,65 +75,60 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 
 
 classify_cycle_infrastructure_portugal = function(osm) {
+  
+  CYCLE_TRACK <- "Cycle track or lane" # PT: Ciclovia segregada
+  ADVISORY <- "Advisory lane" # PT: ??
+  PROTECTED_ACTIVE <- "Protected Active" # PT: Via partilhada com pedestres
+  MIXED_TRAFFIC <- "Mixed traffic" # PT: Via partilhada com veículos motorizados (ex. zonas 30)
+  
   osm |>
+    # 1. Preliminary classification
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(detailed_segregation = dplyr::case_when(
-      highway == "cycleway" ~ "Level track",
-      # highway == "cycleway" & foot != "no" ~ "Stepped or footway",
-      # highway == "footway" & bicycle == "yes" ~ "Stepped or footway",
-      # highway == "pedestrian" & bicycle == "designated" ~ "Stepped or footway",
-      highway == "path" & bicycle == "designated" ~ "Level track",
-      # these by default are not shared with traffic:
-      segregated == "yes" ~ "Stepped or footway",
-      segregated == "no" ~ "Stepped or footway",
-      TRUE ~ "Mixed traffic"
-    )) |>
-    # ...including by name
-    dplyr::mutate(detailed_segregation = dplyr::case_when(
-      # highways named towpaths or paths are assumed to be off-road
-      stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
-        detailed_segregation %in% c("Level track", "Stepped or footway") &
-        foot != "yes" ~ "Cycle track",
-      TRUE ~ detailed_segregation
-    )) |>
-    tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
-    # ...including by cycleway tag
-    dplyr::mutate(detailed_segregation2 = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway", 
-      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane", #not existing in Portugal
-      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ "Stepped or footway", #not existing in Portugal
-      TRUE ~ detailed_segregation
-    )) |>
-    dplyr::mutate(detailed_segregation2 = dplyr::case_when(
-      stringr::str_detect(cycleway_chars, "shared_lane") ~ "Advisory lane",
-      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ "Cycle lane",
-      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed traffic" ~ "Light segregation",
-      TRUE ~ detailed_segregation
-    )) |>
-    # CANT SOLVE THIS ONE
-    # dplyr::mutate(detailed_segregation2 = dplyr::case_when( # when we have a cycle lane in one direction and a advisory in the other direction, the street should be classified as cycle lane
-    #   stringr::str_detect(cycleway_chars, "lane|shared_lane") ~ "Cycle lane",
-    #   stringr::str_detect(cycleway_chars, "shared_lane|lane") ~ "Cycle lane",
-    #   TRUE ~ detailed_segregation
-    # )) |>
-    dplyr::mutate(detailed_segregation3 = dplyr::case_when(
-      detailed_segregation2 %in% c("Cycle track", "Level track", "Light segregation", "Cycle lane", "Stepped or footway") ~ "Cycle track or lane",
-      detailed_segregation2 %in% c("Advisory lane") ~ "Advisory lane",
-      detailed_segregation2 %in% c("Mixed traffic") ~ "Mixed traffic",
-      detailed_segregation2 %in% c("Stepped or footway") ~ "Protected Active",
-      TRUE ~ detailed_segregation2
+      
+      # Dedicated cycle lanes
+      highway == "cycleway" ~ CYCLE_TRACK,
+      highway == "path" & bicycle == "designated" ~ CYCLE_TRACK,
+      
+      # Sidewalks shared with bicycles
+      highway == "footway" & bicycle == "yes" ~ PROTECTED_ACTIVE,
+      highway == "pedestrian" & bicycle == "designated" ~ PROTECTED_ACTIVE,
+      
+      # When `segregated` tag set, it is not shared with traffic (https://wiki.openstreetmap.org/wiki/Key:segregated)
+      segregated == "yes" ~ CYCLE_TRACK,
+      segregated == "no" ~ CYCLE_TRACK,
+      
+      # If none verify, lets consider them lanes shared with cars 
+      TRUE ~ MIXED_TRAFFIC
     )) |>
     
+    # 2. Let's analyse the `cycleway` tags... (https://wiki.openstreetmap.org/wiki/Tag:highway%3Dcycleway)
+    tidyr::unite("cycleway_chars", dplyr::starts_with("cycleway"), sep = "|", remove = FALSE) |>
+    dplyr::mutate(detailed_segregation2 = dplyr::case_when(
+      stringr::str_detect(cycleway_chars, "separate") & detailed_segregation == "Mixed traffic" ~ CYCLE_TRACK, 
+      stringr::str_detect(cycleway_chars, "buffered_lane") & detailed_segregation == "Mixed traffic" ~ CYCLE_TRACK, 
+      stringr::str_detect(cycleway_chars, "segregated") & detailed_segregation == "Mixed traffic" ~ CYCLE_TRACK, 
+      TRUE ~ detailed_segregation
+    )) |>
+    
+    dplyr::mutate(detailed_segregation2 = dplyr::case_when(
+      stringr::str_detect(cycleway_chars, "shared_lane") ~ ADVISORY,
+      stringr::str_detect(cycleway_chars, "lane") & detailed_segregation == "Mixed traffic" ~ CYCLE_TRACK,
+      stringr::str_detect(cycleway_chars, "track") & detailed_segregation == "Mixed traffic" ~ CYCLE_TRACK,
+      TRUE ~ detailed_segregation
+    )) |>
+    
+    # 3. Let's clarify that previously classified cycle lanes are not shared with pedestrians
     dplyr::mutate(detailed_segregation4 = dplyr::case_when(
-      detailed_segregation3 %in% "Cycle track or lane" & highway == "cycleway" & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") & (is.na(sidewalk) | sidewalk=="no") & (is.na(segregated) | segregated=="no") ~ "Protected Active",
-      detailed_segregation3 %in% "Cycle track or lane" & highway == "footway" & bicycle == "yes" ~ "Protected Active",
-      detailed_segregation3 %in% "Cycle track or lane" & highway == "pedestrian" & bicycle == "designated" ~ "Protected Active",
-      TRUE ~ detailed_segregation3
+      detailed_segregation2 == CYCLE_TRACK & highway == "cycleway" & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") & (is.na(sidewalk) | sidewalk=="no") & (is.na(segregated) | segregated=="no") ~ PROTECTED_ACTIVE,
+      detailed_segregation2 == CYCLE_TRACK & highway == "footway" & bicycle == "yes" ~ PROTECTED_ACTIVE,
+      detailed_segregation2 == CYCLE_TRACK & highway == "pedestrian" & bicycle == "designated" ~ PROTECTED_ACTIVE,
+      TRUE ~ detailed_segregation2
     )) |>
     
     dplyr::mutate(cycle_segregation = factor(
       detailed_segregation4,
-      levels = c("Cycle track or lane", "Advisory lane", "Protected Active", "Mixed traffic"),
+      levels = c(CYCLE_TRACK, ADVISORY, PROTECTED_ACTIVE, MIXED_TRAFFIC),
       ordered = TRUE
     ))
 }
@@ -150,7 +145,6 @@ cycle_net_pt = classify_cycle_infrastructure_portugal(cycle_net)
 
 table(cycle_net_pt$detailed_segregation)
 table(cycle_net_pt$detailed_segregation2)
-table(cycle_net_pt$detailed_segregation3)
 table(cycle_net_pt$detailed_segregation4)
 table(cycle_net_pt$cycle_segregation)
 
