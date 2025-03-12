@@ -332,3 +332,45 @@ cycle_net_los_ctown = cycle_net_los |>
 nrow(cycle_net_los_ctown)
 mapview::mapview(cycle_net_los_ctown, zcol = "Level of Service")
 ```
+
+```{r}
+#| eval: false
+#| echo: false
+# check the clean_speeds function
+library(dplyr)
+library(sf)
+
+cycle_net_df = st_drop_geometry(cycle_net)
+
+# Summarize the original data (rows with missing maxspeed)
+original_na_summary = cycle_net_df |>
+  filter(is.na(maxspeed)) |>
+  group_by(highway) |>
+  summarise(count_before = n())
+
+# Filter rows with missing maxspeed and apply the cleaning function
+cycle_net_na = cycle_net_df |> filter(is.na(maxspeed))
+unique(cycle_net_speeds$highway)
+#  [1] "residential"    "tertiary"       "service"        "secondary"
+#  [5] "unclassified"   "footway"        "primary"        "trunk"
+#  [9] "cycleway"       "pedestrian"     "path"           "living_street"
+# [13] "trunk_link"     "secondary_link" "primary_link"   "tertiary_link"
+# [17] "busway"         "razed"
+cycle_net_speeds = clean_speeds(cycle_net_na)
+
+# Drop geometry from the cleaned data as well
+cycle_net_speeds_df = st_drop_geometry(cycle_net_speeds)
+
+# Summarize the cleaned data, using maxspeed_clean (the updated speed)
+cleaned_summary = cycle_net_speeds_df |>
+  group_by(highway) |>
+  summarise(
+    updated_speed = first(maxspeed_clean),
+    count_after = n()
+  )
+
+# Join the before and after summaries to compare
+comparison = left_join(original_na_summary, cleaned_summary, by = "highway")
+
+print(comparison)
+```

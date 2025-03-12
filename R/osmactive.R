@@ -757,6 +757,7 @@ clean_speeds = function(osm) {
 
   # TODO: add different rules for urban vs rural
   # Regex for different speeds:
+  r_na = "footway|cycleway|path|pedestrian|razed"
   r20 = "living_street"
   r30 = "residential|unclassified|service"
   # Compromise between urban being 60 default and rural 30/40:
@@ -770,6 +771,7 @@ clean_speeds = function(osm) {
         !is.na(maxspeed_clean) ~ maxspeed_clean,
         # Residential areas are 30 mph by default:
         lit == "yes" ~ 30,
+        stringr::str_detect(highway, r_na) ~ NA_real_,
         stringr::str_detect(highway, r20) ~ 20,
         stringr::str_detect(highway, r30) ~ 30,
         stringr::str_detect(highway, r40) ~ 40,
