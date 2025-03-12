@@ -740,6 +740,7 @@ most_common_value = function(x) {
 #' table(osm_cleaned$maxspeed_clean)
 #' plot(osm_cleaned[c("maxspeed", "maxspeed_clean")])
 clean_speeds = function(osm) {
+
   osm = osm |>
     dplyr::mutate(
       maxspeed_clean = dplyr::case_when(
@@ -754,21 +755,29 @@ clean_speeds = function(osm) {
   osm$maxspeed_clean = gsub(" mph", "", osm$maxspeed_clean)
   osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
 
+  # TODO: add different rules for urban vs rural
+  # Regex for different speeds:
+  r_na = "footway|cycleway|path|pedestrian|razed"
+  r20 = "living_street"
+  r30 = "residential|unclassified|service"
+  # Compromise between urban being 60 default and rural 30/40:
+  r40 = "primary|secondary|tertiary"
+  r60 = "trunk"
+  r70 = "motorway"
+
   osm = osm |>
     dplyr::mutate(
       maxspeed_clean = dplyr::case_when(
         !is.na(maxspeed_clean) ~ maxspeed_clean,
-        highway == "residential" ~ 20,
-        highway == "service" ~ 20,
-        highway == "unclassified" ~ 20,
-        highway == "tertiary" ~ 30,
-        highway == "tertiary_link" ~ 30,
-        highway == "secondary" ~ 30,
-        highway == "secondary_link" ~ 30,
-        highway == "primary" ~ 40,
-        highway == "primary_link" ~ 40,
-        highway == "trunk" ~ 60,
-        highway == "trunk_link" ~ 60,
+        # Residential areas are 30 mph by default:
+        lit == "yes" ~ 30,
+        stringr::str_detect(highway, r_na) ~ NA_real_,
+        stringr::str_detect(highway, r20) ~ 20,
+        stringr::str_detect(highway, r30) ~ 30,
+        stringr::str_detect(highway, r40) ~ 40,
+        stringr::str_detect(highway, r60) ~ 60,
+        stringr::str_detect(highway, r70) ~ 70,
+        TRUE ~ 30
       )
     )
   osm = sf::st_sf(
