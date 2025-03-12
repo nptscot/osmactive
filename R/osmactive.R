@@ -908,19 +908,11 @@ level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
     osm = clean_speeds(osm)
-    if (!"final_speed" %in% names(osm)) {
-          osm = osm |>
-          dplyr::rename(final_speed = maxspeed_clean)
-    }
-    osm$`Speed limit (mph)` = classify_speeds(osm$final_speed)
+    osm$`Speed limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
-    if (!"final_traffic" %in% names(osm)) {
-        osm = osm |>
-          dplyr::rename(final_traffic = assumed_volume)
-    }
-    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
   }
   # browser()
   # TODO: check these rules:
