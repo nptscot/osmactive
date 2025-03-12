@@ -308,7 +308,7 @@ cycle_net_los_plot = cycle_net_los |>
 #| eval: false
 #| echo: false
 # Try for Leeds
-devtools::load_all()
+# devtools::load_all()
 osm = get_travel_network("Leeds")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
