@@ -44,7 +44,7 @@ author:
 # bibliography: references.bib
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Typologies of cycle infrastructure}
+  %\VignetteIndexEntry{Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -224,7 +224,7 @@ relation["route"="bus"]({{bbox}});
 
 <!-- wget https://private-user-images.githubusercontent.com/1825120/403049322-97f3ce0e-7d0f-42ab-b2d5-e7557c4ebece.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Mzc5OTg1NDcsIm5iZiI6MTczNzk5ODI0NywicGF0aCI6Ii8xODI1MTIwLzQwMzA0OTMyMi05N2YzY2UwZS03ZDBmLTQyYWItYjJkNS1lNzU1N2M0ZWJlY2UucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDEyNyUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTAxMjdUMTcxNzI3WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9OGRlODM0ODhkYTkzNDUyMzcxYWZkMzFlY2M4Yjk3YmE3ODQzMTU0ZGM0MjVmMTU5ZGU5MzBlMzVhZDM3Y2MyNSZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.seGt2frqknDrrU5Y6pgptC24sgXGhn06pQ3t-diXmLA -O edinburgh_bus_lanes.png -->
 
-![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes}
+<!-- ![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes} -->
 
 <!-- {{< pagebreak >}} -->
 
@@ -239,7 +239,7 @@ The key components of the NPT are:
 -   The "Core network" layer, representing a cohesive network that could be a priority when planning new infrastructure, building on previous work [@szell2021].
 -   The [Network Planning Workspace (NPW)](https://nptscot.github.io/npw/) web application, which allows users to explore the data and create custom scenarios of infrastructure change.
 
-![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space}
+<!-- ![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space} -->
 
 <!-- {{< pagebreak >}} -->
 

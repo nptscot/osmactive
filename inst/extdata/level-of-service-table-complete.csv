@@ -1,0 +1,77 @@
+Speed Limit (mph),AADT,cycle_segregation,level_of_service
+20 mph,0 to 1999,Mixed Traffic Street,3
+20 mph,0 to 1999,Off road cycleway,3
+20 mph,0 to 1999,Painted Cycle Lane,3
+20 mph,0 to 1999,Segregated Track (narrow),2
+20 mph,0 to 1999,Segregated Track (wide),3
+20 mph,2000 to 3999,Mixed Traffic Street,2
+20 mph,2000 to 3999,Off road cycleway,3
+20 mph,2000 to 3999,Painted Cycle Lane,2
+20 mph,2000 to 3999,Segregated Track (narrow),3
+20 mph,2000 to 3999,Segregated Track (wide),3
+20 mph,4000+,Mixed Traffic Street,1
+20 mph,4000+,Off road cycleway,3
+20 mph,4000+,Painted Cycle Lane,1
+20 mph,4000+,Segregated Track (narrow),2
+20 mph,4000+,Segregated Track (wide),3
+30 mph,0 to 1999,Mixed Traffic Street,2
+30 mph,0 to 1999,Off road cycleway,3
+30 mph,0 to 1999,Painted Cycle Lane,2
+30 mph,0 to 1999,Segregated Track (narrow),2
+30 mph,0 to 1999,Segregated Track (wide),2
+30 mph,2000 to 3999,Mixed Traffic Street,1
+30 mph,2000 to 3999,Off road cycleway,3
+30 mph,2000 to 3999,Painted Cycle Lane,1
+30 mph,2000 to 3999,Segregated Track (narrow),2
+30 mph,2000 to 3999,Segregated Track (wide),2
+30 mph,4000+,Painted Cycle Lane,1
+30 mph,4000+,Segregated Track (narrow),1
+30 mph,4000+,Segregated Track (wide),2
+40 mph,0 to 1999,Mixed Traffic Street,1
+40 mph,0 to 1999,Off road cycleway,3
+40 mph,0 to 1999,Painted Cycle Lane,1
+40 mph,0 to 1999,Segregated Track (narrow),2
+40 mph,0 to 1999,Segregated Track (wide),2
+40 mph,2000 to 3999,Painted Cycle Lane,1
+40 mph,2000 to 3999,Segregated Track (narrow),1
+40 mph,2000 to 3999,Segregated Track (wide),1
+40 mph,4000+,Painted Cycle Lane,1
+40 mph,4000+,Segregated Track (narrow),1
+40 mph,4000+,Segregated Track (wide),1
+50 mph,0 to 1999,Mixed Traffic Street,1
+50 mph,0 to 1999,Off road cycleway,3
+50 mph,0 to 1999,Painted Cycle Lane,1
+50 mph,0 to 1999,Segregated Track (narrow),1
+50 mph,0 to 1999,Segregated Track (wide),1
+50 mph,2000 to 3999,Painted Cycle Lane,0
+50 mph,2000 to 3999,Segregated Track (narrow),0
+50 mph,2000 to 3999,Segregated Track (wide),1
+50 mph,4000+,Painted Cycle Lane,0
+50 mph,4000+,Segregated Track (narrow),0
+50 mph,4000+,Segregated Track (wide),1
+60+ mph,0 to 1999,Mixed Traffic Street,0
+60+ mph,0 to 1999,Off road cycleway,3
+60+ mph,0 to 1999,Painted Cycle Lane,0
+60+ mph,0 to 1999,Segregated Track (narrow),0
+60+ mph,0 to 1999,Segregated Track (wide),1
+60+ mph,2000 to 3999,Painted Cycle Lane,0
+60+ mph,2000 to 3999,Segregated Track (narrow),0
+60+ mph,2000 to 3999,Segregated Track (wide),1
+60+ mph,4000+,Painted Cycle Lane,0
+60+ mph,4000+,Segregated Track (narrow),0
+60+ mph,4000+,Segregated Track (wide),1
+<20 mph,0 to 1999,Mixed Traffic Street,3
+<20 mph,0 to 1999,Off road cycleway,3
+<20 mph,0 to 1999,Painted Cycle Lane,3
+<20 mph,0 to 1999,Segregated Track (narrow),3
+<20 mph,0 to 1999,Segregated Track (wide),3
+<20 mph,2000 to 3999,Mixed Traffic Street,2
+<20 mph,2000 to 3999,Off road cycleway,3
+<20 mph,2000 to 3999,Painted Cycle Lane,3
+<20 mph,2000 to 3999,Segregated Track (narrow),3
+<20 mph,2000 to 3999,Segregated Track (wide),3
+<20 mph,4000+,Mixed Traffic Street,1
+<20 mph,4000+,Off road cycleway,3
+<20 mph,4000+,Painted Cycle Lane,2
+<20 mph,4000+,Segregated Track (narrow),2
+<20 mph,4000+,Segregated Track (wide),3

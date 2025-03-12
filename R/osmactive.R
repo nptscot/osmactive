@@ -817,7 +817,79 @@ estimate_traffic = function(osm) {
   osm
 }
 
+#' Classify Speeds
+#'
+#' This function classifies speeds in miles per hour (mph) into categories.
+#'
+#' @param speed_mph A numeric vector representing speeds in miles per hour.
+#' @return A character vector with the speed categories.
+#' @export 
+#' @examples
+#' classify_speeds(c(15, 25, 35, 45, 55, 65))
+#' # Returns: "<20 mph", "20 mph", "30 mph", "40 mph", "50 mph", "60+ mph"
+classify_speeds = function(speed_mph) {
+  dplyr::case_when(
+    speed_mph < 20 ~ "<20 mph",
+    speed_mph < 30 ~ "20 mph",
+    speed_mph < 40 ~ "30 mph",
+    speed_mph < 50 ~ "40 mph",
+    speed_mph < 60 ~ "50 mph",
+    speed_mph >= 60 ~ "60+ mph"
+  )
+}
 
+
+
+#' Convert AADT categories to CBD AADT character ranges
+#'
+#' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
+#'
+#' @param AADT A character vector representing AADT categories. Valid categories include "0 to 1000", "0 to 2000", "1000+", "All", "1000 to 2000", "2000 to 4000", "2000+", and "4000+".
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @export
+#' @examples
+#' npt_to_cbd_aadt_character("0 to 1000") # returns "0 to 1999"
+#' npt_to_cbd_aadt_character("2000 to 4000") # returns "2000 to 3999"
+#' npt_to_cbd_aadt_character("4000+") # returns "4000+"
+npt_to_cbd_aadt_character = function(AADT) {
+  dplyr::case_when(
+      AADT %in% c("0 to 1000", "0 to 2000", "1000+", "All") ~ "0 to 1999",
+      AADT %in% c("1000 to 2000", "2000 to 4000", "2000+") ~ "2000 to 3999",      
+      AADT %in% c("4000+") ~ "4000+"
+    )
+}
+
+#' Convert AADT categories to CBD AADT character ranges
+#'
+#' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
+#'
+#' @param AADT A numeric vector representing AADT
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @export
+npt_to_cbd_aadt_numeric = function(AADT) {
+  dplyr::case_when(
+    AADT < 2000 ~ "0 to 1999",
+    AADT < 4000 ~ "2000 to 3999",
+    AADT >= 4000 ~ "4000+"
+  )
+}
+
+#' Convert AADT to CBD AADT
+#'
+#' This function converts Annual Average Daily Traffic (AADT) to Central Business District (CBD) AADT.
+#' It handles both character and numeric inputs by delegating to appropriate helper functions.
+#'
+#' @param AADT A character or numeric value representing the Annual Average Daily Traffic.
+#' @return The converted CBD AADT value.
+#' @export
+npt_to_cbd_aadt = function(AADT) {
+  # If it's character:
+  if (is.character(AADT)) {
+    return(npt_to_cbd_aadt_character(AADT))
+  } else {
+    return(npt_to_cbd_aadt_numeric(AADT))
+  }
+}
 #' Generate Cycle by Design Level of Service
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
@@ -825,126 +897,50 @@ estimate_traffic = function(osm) {
 #' @export
 level_of_service = function(osm) {
   # Add final_speed column if not present:
-  if (!"final_speed" %in% names(osm)) {
+  if (!"Speed Limit (mph)" %in% names(osm)) {
     osm = clean_speeds(osm)
     osm = osm |>
       dplyr::rename(final_speed = maxspeed_clean)
+    osm$`Speed limit (mph)` = classify_speeds(osm$final_speed)
   }
-  if (!"final_traffic" %in% names(osm)) {
+  if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
     osm = osm |>
       dplyr::rename(final_traffic = assumed_volume)
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
   }
+  # browser()
   # TODO: check these rules:
-  osm = osm |>
+  osm_joined = left_join(osm, los_table_complete) |>
+    rename(`Level of Service` = level_of_service) |>
     dplyr::mutate(
-      `Level of Service` = dplyr::case_when(
-        detailed_segregation == "Off Road Cycleway" ~ "High",
-        detailed_segregation == "Level track" & final_speed <= 30 ~ "High",
-        detailed_segregation == "Footway" & final_speed <= 20 ~ "High",
-        detailed_segregation == "Footway" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Light segregation" & final_speed <= 20 ~
-          "High",
-        detailed_segregation == "Light segregation" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed <= 20 &
-          final_traffic < 4000 ~
-          "High",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 30 &
-          final_traffic < 1000 ~
-          "High",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed <= 20 &
-          final_traffic < 2000 ~
-          "High",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 30 &
-          final_traffic < 1000 ~
-          "High",
-        detailed_segregation == "Level track" & final_speed == 40 ~ "Medium",
-        detailed_segregation == "Level track" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Footway" & final_speed <= 40 ~ "Medium",
-        detailed_segregation == "Footway" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Light segregation" & final_speed == 30 ~
-          "Medium",
-        detailed_segregation == "Light segregation" &
-          final_speed == 40 &
-          final_traffic < 2000 ~
-          "Medium",
-        detailed_segregation == "Light segregation" &
-          final_speed == 50 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" & final_speed <= 20 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 30 &
-          final_traffic < 4000 ~
-          "Medium",
-        detailed_segregation == "Painted Cycle Lane" &
-          final_speed == 40 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed <= 20 &
-          final_traffic < 4000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 30 &
-          final_traffic < 2000 ~
-          "Medium",
-        detailed_segregation == "Mixed Traffic Street" &
-          final_speed == 40 &
-          final_traffic < 1000 ~
-          "Medium",
-        detailed_segregation == "Footway" &
-          grepl("asphalt", surface, ignore.case = TRUE) ~
-          "Medium",
-        detailed_segregation == "Light segregation" & final_speed >= 50 ~ "Low",
-        detailed_segregation == "Light segregation" &
-          final_speed == 60 &
-          final_traffic < 1000 ~
-          "Low",
-        detailed_segregation == "Painted Cycle Lane" & final_speed >= 50 ~
-          "Low",
-        detailed_segregation == "Mixed Traffic Street" & final_speed >= 30 ~
-          "Low",
-        # detailed_segregation == "Mixed Traffic Street" &
-        #   final_speed == 40 &
-        #   final_traffic < 2000 ~
-        #   "Low",
-        # detailed_segregation == "Mixed Traffic Street" &
-        #   final_speed == 60 &
-        #   final_traffic < 1000 ~
-        #   "Low",
-        TRUE ~ "Unknown"
-      )
-    ) |>
-    dplyr::mutate(
+      `Level of Service` = factor(
+        `Level of Service`,
+        labels = rev(c("High", "Medium", "Low", "Should not be used")),
+        ordered = TRUE
+      ),
+      # Reverse the order:
       `Level of Service` = factor(
         `Level of Service`,
         levels = c("High", "Medium", "Low", "Should not be used"),
         ordered = TRUE
       )
     )
-  osm = sf::st_sf(
-    osm |> sf::st_drop_geometry(),
-    geometry = sf::st_geometry(osm)
+  osm_joined = osm_joined |>
+    mutate(
+      `Level of Service` = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & is.na(`Level of Service`) ~ "Medium",
+        cycle_segregation == "Off Road Cycleway" & is.na(`Level of Service`) ~ "High",
+        cycle_segregation == "Segregated Track (wide)" & is.na(`Level of Service`) ~ "High",
+        cycle_segregation == "Segregated Track (narrow)" & is.na(`Level of Service`) ~ "Medium",
+        TRUE ~ `Level of Service`
+      )
+    )
+  res = sf::st_sf(
+    osm_joined |> sf::st_drop_geometry(),
+    geometry = sf::st_geometry(osm_joined)
   )
-  osm
+  res
 }
 
 #' Function to get multilinestrings representing bus routes
@@ -1021,3 +1017,26 @@ utils::globalVariables(c(
   "cycle_segregation",
   "other_tags"
 ))
+
+#' @name los_table_long
+#' @title Long format Level of Service (LOS) table
+#' @description This dataset contains the level of service information in a long format, with columns for speed limit, AADT, infrastructure type, and level of service.
+#' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
+#' @source Generated from los_table_npt dataset
+#' @usage data(los_table_long)
+#' @examples
+#' data(los_table_long)
+#' head(los_table_long)
+NULL
+
+#' 
+#' @name los_table_complete
+#' @title Complete Level of Service (LOS) table
+#' @description This dataset contains the complete level of service information, including missing categories, in a long format.
+#' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
+#' @source Generated from los_table_long and los_table_long_missing datasets
+#' @usage data(los_table_complete)
+#' @examples
+#' data(los_table_complete)
+#' head(los_table_complete)
+NULL

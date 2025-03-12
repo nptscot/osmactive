@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-timeout(3000)
+options(timeout = 3000)
 library(osmactive)
 library(tidyverse)
 library(sf)
@@ -84,17 +84,20 @@ m
 
 The level of service associated with each link can be calculated based on the Level of Service table in the Cycling by Design guidance:
 
-![]()
+![](https://nptscot.github.io/images/clos_facilities.png)
 
-A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories:
+<!-- A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories: -->
 
 ```{r}
+#| eval: false
+#| echo: false
 # table(cycle_net$cycle_segregation)
 #   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
 #                       214                       973                       859 
 #            Shared Footway        Painted Cycle Lane 
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
+los_table = read_csv("inst/extdata/level-of-service-table.csv")
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"                    
@@ -105,7 +108,12 @@ los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/i
 #  [7] "Cycle Track at Carriageway Level"     
 #  [8] "Stepped or Footway Level Cycle Track" 
 #  [9] "Light Segregation"                    
-# [10] "Cycle Lane"   
+# [10] "Cycle Lane"
+table(los_table$`Two-way traffic flow (pcu per day)`)
+  #  0 to 1000    0 to 2000 1000 to 2000        1000+ 2000 to 4000        2000+ 
+  #          4            1            2            2            2            1 
+  #      4000+          All 
+  #          2            1 
 los_table_npt = los_table |>
   transmute(
     `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
@@ -114,32 +122,179 @@ los_table_npt = los_table |>
     `Mixed Traffic Street`,
     `Off road cycleway` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
-    `Segregated Track (narrow)` = `Light Segregation`
+    `Segregated Track (narrow)` = `Light Segregation`,
+    `Painted Cycle Lane` = `Cycle Lane`
+  ) |>
+  # Convert the categories to "0 to 1999", "2000 to 3999", "4000+"
+  mutate(
+    AADT = npt_to_cbd_aadt(AADT)
   )
+
 los_table_npt |>
   knitr::kable()
 ```
 
-We can convert this table into a 'long' format for use internally.
+<!-- We can convert this table into a 'long' format for use internally. -->
 
 ```{r}
+#| eval: false
+#| echo: false
 los_table_long = los_table_npt |>
   pivot_longer(cols = -c(`Speed (85th kph)`, `Speed Limit (mph)`, AADT),
                names_to = "infrastructure",
                values_to = "level_of_service")
+# # Identify duplicates:
+# duplicated(los_table_long)
+los_table_long = los_table_long |>
+  arrange(`Speed Limit (mph)`, AADT, infrastructure) |>
+  distinct()
 los_table_long
-# write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
+write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
+usethis::use_data(los_table_long, overwrite = TRUE)
 ```
 
+<!-- Next, we calculate the speed limits. -->
 
 ```{r}
 #| eval: false
-# Check for level track on York Place
+#| echo: false
+# table(los_table_long$`Speed Limit (mph)`)
+# <20 mph  20 mph  30 mph  40 mph  50 mph 60+ mph 
+#      12      16      12       8       8       4 
+cycle_net_speeds = clean_speeds(cycle_net)
+# table(cycle_net_speeds$maxspeed_clean)
+#  15  20  30  40  50  60 
+#   1 314 239  92   2  22
+classify_speeds = function(speed_mph) {
+  dplyr::case_when(
+    speed_mph < 20 ~ "<20 mph",
+    speed_mph < 30 ~ "20 mph",
+    speed_mph < 40 ~ "30 mph",
+    speed_mph < 50 ~ "40 mph",
+    speed_mph < 60 ~ "50 mph",
+    speed_mph >= 60 ~ "60+ mph"
+  )
+}
+classify_speeds(30)
+classify_speeds(10)
+classify_speeds(NA)
+```
+
+We can then create the `Speed Limit (mph)` and `AADT` columns in the `cycle_net` object:
+
+```{r}
+cycle_net_speeds = clean_speeds(cycle_net)
+cycle_net_volumes = estimate_traffic(cycle_net_speeds)
+cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
+cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net_volumes$assumed_volume)
+table(cycle_net$`Speed Limit (mph)`)
+table(cycle_net$AADT)
+```
+
+Finally, we can calculate the level of service for each link:
+
+```{r}
+#| eval: false
+#| echo: false
+los_table_long_mini = los_table_long |>
+  select(-`Speed (85th kph)`) |>
+  rename(cycle_segregation = infrastructure)
+cycle_net_los = left_join(cycle_net, los_table_long_mini)
+table(cycle_net_los$level_of_service)
+# Count the NAs by infrastructure type, speed limit and AADT:
+los_table_nas = cycle_net_los |>
+  sf::st_drop_geometry() |>
+  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
+  summarise(na = sum(is.na(level_of_service))) |>
+  filter(na > 0) |>
+  arrange(desc(na))
+# los_table_nas
+# # waldo::compare(names(los_table_nas), names(los_table_long_mini))
+#  1 NA                  NA           Shared Footway             3295
+#  2 NA                  NA           Off Road Cycleway           971
+#  3 NA                  NA           Segregated Track (narrow)   746
+#  4 NA                  NA           Segregated Track (wide)     211
+#  5 30 mph              4000+        Painted Cycle Lane          179
+#  6 40 mph              4000+        Painted Cycle Lane           84
+#  7 30 mph              4000+        Segregated Track (narrow)    33
+#  8 60+ mph             4000+        Painted Cycle Lane           22
+#  9 20 mph              0 to 1999    Shared Footway               20
+# 10 20 mph              NA           Segregated Track (narrow)     9
+# 11 20 mph              NA           Shared Footway                9
+# 12 40 mph              2000 to 3999 Painted Cycle Lane            6
+# 13 20 mph              NA           Off Road Cycleway             2
+# 14 40 mph              4000+        Segregated Track (narrow)     2
+# 15 50 mph              4000+        Painted Cycle Lane            2
+# 16 20 mph              NA           Segregated Track (wide)       1
+# 17 30 mph              2000 to 3999 Shared Footway                1
+# 18 <20 mph             NA           Segregated Track (narrow)     1
+```
+
+<!-- We can add the missing categories as follows: -->
+
+```{r}
+#| eval: false
+#| echo: false
+los_table_long_missing = tibble::tribble(
+  ~`Speed Limit (mph)`, ~AADT, ~cycle_segregation, ~level_of_service,
+  "30 mph", "4000+", "Painted Cycle Lane", 1,
+  "40 mph", "4000+", "Painted Cycle Lane", 1,
+  "40 mph", "4000+", "Painted Cycle Lane", 1,
+  "50 mph", "4000+", "Painted Cycle Lane", 0,
+  "60+ mph", "4000+", "Painted Cycle Lane", 0,
+  "40 mph", "2000 to 3999", "Painted Cycle Lane", 1,
+  "50 mph", "2000 to 3999", "Painted Cycle Lane", 0,
+  "60+ mph", "2000 to 3999", "Painted Cycle Lane", 0,
+  "40 mph", "0 to 1999", "Painted Cycle Lane", 1,
+  "50 mph", "0 to 1999", "Painted Cycle Lane", 0,
+  "60+ mph", "0 to 1999", "Painted Cycle Lane", 0,
+  "30 mph", "4000+", "Segregated Track (narrow)", 1,
+  "40 mph", "4000+", "Segregated Track (narrow)", 1,
+  "50 mph", "4000+", "Segregated Track (narrow)", 0,
+  "60+ mph", "4000+", "Segregated Track (narrow)", 0,
+  "40 mph", "2000 to 3999", "Segregated Track (narrow)", 1,
+  "50 mph", "2000 to 3999", "Segregated Track (narrow)", 0,
+  "60+ mph", "2000 to 3999", "Segregated Track (narrow)", 0,
+  "40 mph", "0 to 1999", "Segregated Track (narrow)", 1,
+  "50 mph", "0 to 1999", "Segregated Track (narrow)", 1,
+  "60+ mph", "0 to 1999", "Segregated Track (narrow)", 0,
+  "30 mph", "4000+", "Segregated Track (wide)", 2,
+  "30 mph", "2000 to 3999", "Segregated Track (wide)", 2,
+  "30 mph", "0 to 1999", "Segregated Track (wide)", 2,
+  "40 mph", "4000+", "Segregated Track (wide)", 1,
+  "40 mph", "2000 to 3999", "Segregated Track (wide)", 1,
+  "40 mph", "0 to 1999", "Segregated Track (wide)", 1,
+  "50 mph", "4000+", "Segregated Track (wide)", 1,
+  "50 mph", "2000 to 3999", "Segregated Track (wide)", 1,
+  "50 mph", "0 to 1999", "Segregated Track (wide)", 1,
+  "60+ mph", "4000+", "Segregated Track (wide)", 1,
+  "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1,
+  "60+ mph", "0 to 1999", "Segregated Track (wide)", 1
+)
+los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
+duplicated(los_table_long_mini_updated)
+los_table_complete = los_table_long_mini_updated |>
+  # Remove All traffic level:
+  filter(AADT != "All") |>
+  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
+  summarise(level_of_service = max(level_of_service)) |>
+  arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
+write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
+usethis::use_data(los_table_complete, overwrite = TRUE)
+```
+
+```{r}
 # devtools::load_all()
-osm_check = "1137759929"
-york_place = cycle_net |>
-  filter(osm_id == osm_check)
-cycle_net_los = level_of_service(york_place)
-library(tmap)
-mapview::mapview(cycle_net_los, zcol = "Level of Service")
+cycle_net_los = level_of_service(cycle_net) 
+# |>
+# select(osm_id, `Level of Service`, `Speed Limit (mph)`, AADT, cycle_segregation)
+table(cycle_net_los$`Level of Service`)
+# Count NA values:
+cycle_net_los |>
+  sf::st_drop_geometry() |>
+  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
+  summarise(na = sum(is.na(`Level of Service`))) |>
+  filter(na > 0) |>
+  arrange(desc(na))
+# mapview::mapview(cycle_net_los, zcol = "Level of Service")
 ```
