@@ -24,7 +24,7 @@ Speed Limit (mph),AADT,cycle_segregation,level_of_service
 30 mph,2000 to 3999,Painted Cycle Lane,1
 30 mph,2000 to 3999,Segregated Track (narrow),2
 30 mph,2000 to 3999,Segregated Track (wide),2
-30 mph,4000+,Mixed Traffic Street,0
+30 mph,4000+,Mixed Traffic Street,1
 30 mph,4000+,Painted Cycle Lane,1
 30 mph,4000+,Segregated Track (narrow),1
 30 mph,4000+,Segregated Track (wide),2
@@ -33,9 +33,11 @@ Speed Limit (mph),AADT,cycle_segregation,level_of_service
 40 mph,0 to 1999,Painted Cycle Lane,1
 40 mph,0 to 1999,Segregated Track (narrow),2
 40 mph,0 to 1999,Segregated Track (wide),2
+40 mph,2000 to 3999,Mixed Traffic Street,0
 40 mph,2000 to 3999,Painted Cycle Lane,1
 40 mph,2000 to 3999,Segregated Track (narrow),1
 40 mph,2000 to 3999,Segregated Track (wide),1
+40 mph,4000+,Mixed Traffic Street,0
 40 mph,4000+,Painted Cycle Lane,1
 40 mph,4000+,Segregated Track (narrow),1
 40 mph,4000+,Segregated Track (wide),1
@@ -44,9 +46,11 @@ Speed Limit (mph),AADT,cycle_segregation,level_of_service
 50 mph,0 to 1999,Painted Cycle Lane,1
 50 mph,0 to 1999,Segregated Track (narrow),1
 50 mph,0 to 1999,Segregated Track (wide),1
+50 mph,2000 to 3999,Mixed Traffic Street,0
 50 mph,2000 to 3999,Painted Cycle Lane,0
 50 mph,2000 to 3999,Segregated Track (narrow),0
 50 mph,2000 to 3999,Segregated Track (wide),1
+50 mph,4000+,Mixed Traffic Street,0
 50 mph,4000+,Painted Cycle Lane,0
 50 mph,4000+,Segregated Track (narrow),0
 50 mph,4000+,Segregated Track (wide),1
@@ -55,9 +59,11 @@ Speed Limit (mph),AADT,cycle_segregation,level_of_service
 60+ mph,0 to 1999,Painted Cycle Lane,0
 60+ mph,0 to 1999,Segregated Track (narrow),0
 60+ mph,0 to 1999,Segregated Track (wide),1
+60+ mph,2000 to 3999,Mixed Traffic Street,0
 60+ mph,2000 to 3999,Painted Cycle Lane,0
 60+ mph,2000 to 3999,Segregated Track (narrow),0
 60+ mph,2000 to 3999,Segregated Track (wide),1
+60+ mph,4000+,Mixed Traffic Street,0
 60+ mph,4000+,Painted Cycle Lane,0
 60+ mph,4000+,Segregated Track (narrow),0
 60+ mph,4000+,Segregated Track (wide),1

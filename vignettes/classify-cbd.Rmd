@@ -273,7 +273,21 @@ los_table_long_missing = tibble::tribble(
   "60+ mph", "4000+", "Segregated Track (wide)", 1,
   "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1,
   "60+ mph", "0 to 1999", "Segregated Track (wide)", 1,
-  "30 mph", "4000+", "Mixed Traffic Street", 0
+  "20 mph",  "0 to 1999", "Mixed Traffic Street", 3,
+  "20 mph",  "2000 to 3999", "Mixed Traffic Street", 2,
+  "20 mph",  "4000+", "Mixed Traffic Street", 1,
+  "30 mph", "0 to 1999", "Mixed Traffic Street", 2,
+  "30 mph", "2000 to 3999", "Mixed Traffic Street", 1,
+  "30 mph", "4000+", "Mixed Traffic Street", 1,
+  "40 mph", "0 to 1999", "Mixed Traffic Street", 1,
+  "40 mph", "2000 to 3999", "Mixed Traffic Street", 0,
+  "40 mph", "4000+", "Mixed Traffic Street", 0,
+  "50 mph", "0 to 1999", "Mixed Traffic Street", 1,
+  "50 mph", "2000 to 3999", "Mixed Traffic Street", 0,
+  "50 mph", "4000+", "Mixed Traffic Street", 0,
+  "60+ mph", "0 to 1999", "Mixed Traffic Street", 0,
+  "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0,
+  "60+ mph", "4000+", "Mixed Traffic Street", 0
 )
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
