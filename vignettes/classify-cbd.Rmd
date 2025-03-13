@@ -323,7 +323,7 @@ cycle_net_los_plot = cycle_net_los |>
 #| eval: false
 #| echo: false
 # Try for Leeds
-# devtools::load_all()
+devtools::load_all()
 osm = get_travel_network("Leeds")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
@@ -346,6 +346,10 @@ cycle_net_los_ctown = cycle_net_los |>
   select(osm_id, highway, `Speed Limit (mph)`, AADT, cycle_segregation, `Level of Service`)
 nrow(cycle_net_los_ctown)
 mapview::mapview(cycle_net_los_ctown, zcol = "Level of Service")
+# Check non-compliant ones
+cycle_net_los_ctown |>
+  filter(`Level of Service` == "Should not be used (non-compliant intervention)") |>
+  mapview::mapview(zcol = "Level of Service")
 ```
 
 ```{r}
