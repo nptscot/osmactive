@@ -24,6 +24,7 @@ Speed Limit (mph),AADT,cycle_segregation,level_of_service
 30 mph,2000 to 3999,Painted Cycle Lane,1
 30 mph,2000 to 3999,Segregated Track (narrow),2
 30 mph,2000 to 3999,Segregated Track (wide),2
+30 mph,4000+,Mixed Traffic Street,0
 30 mph,4000+,Painted Cycle Lane,1
 30 mph,4000+,Segregated Track (narrow),1
 30 mph,4000+,Segregated Track (wide),2

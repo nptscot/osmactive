@@ -272,7 +272,8 @@ los_table_long_missing = tibble::tribble(
   "50 mph", "0 to 1999", "Segregated Track (wide)", 1,
   "60+ mph", "4000+", "Segregated Track (wide)", 1,
   "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1,
-  "60+ mph", "0 to 1999", "Segregated Track (wide)", 1
+  "60+ mph", "0 to 1999", "Segregated Track (wide)", 1,
+  "30 mph", "4000+", "Mixed Traffic Street", 0
 )
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
@@ -309,7 +310,7 @@ cycle_net_los_plot = cycle_net_los |>
 #| echo: false
 # Try for Leeds
 # devtools::load_all()
-osm = get_travel_network("Leeds")
+osm = get_travel_network("Edinburgh")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
@@ -322,7 +323,7 @@ cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net$assumed_volume)
 cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
 names(cycle_net_speeds)
 cycle_net_los = level_of_service(cycle_net)
-
+mapview::mapview(cycle_net_los, zcol = "Level of Service")
 table(cycle_net_los$`Level of Service`)
 
 chapeltown_area = zonebuilder::zb_zone("Chapeltown, Leeds", n_circles = 3)
