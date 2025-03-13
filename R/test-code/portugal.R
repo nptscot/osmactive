@@ -77,9 +77,9 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 classify_cycle_infrastructure_portugal = function(osm) {
   
   CYCLE_TRACK <- "Cycle track or lane" # PT: Ciclovia segregada
-  ADVISORY <- "Advisory lane" # PT: ??
-  PROTECTED_ACTIVE <- "Protected Active" # PT: Via partilhada com pedestres
-  MIXED_TRAFFIC <- "Mixed traffic" # PT: Via partilhada com veículos motorizados (ex. zonas 30)
+  ADVISORY <- "Advisory lane" # PT: Via partilhada com veículos motorizados (ex. zonas 30)
+  PROTECTED_ACTIVE <- "Protected Active" # PT: Via partilhada com peões
+  MIXED_TRAFFIC <- "Mixed traffic" # PT: Via banalizada
   
   osm |>
     # 1. Preliminary classification
@@ -120,9 +120,9 @@ classify_cycle_infrastructure_portugal = function(osm) {
     
     # 3. Let's clarify that previously classified cycle lanes are not shared with pedestrians
     dplyr::mutate(detailed_segregation4 = dplyr::case_when(
-      detailed_segregation2 == CYCLE_TRACK & highway == "cycleway" & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") & (is.na(sidewalk) | sidewalk=="no") & (is.na(segregated) | segregated=="no") ~ PROTECTED_ACTIVE,
-      detailed_segregation2 == CYCLE_TRACK & highway == "footway" & bicycle == "yes" ~ PROTECTED_ACTIVE,
-      detailed_segregation2 == CYCLE_TRACK & highway == "pedestrian" & bicycle == "designated" ~ PROTECTED_ACTIVE,
+      detailed_segregation2 == CYCLE_TRACK & highway %in% c("cycleway", "path") & foot %in% c("designated", "permissive", "private", "use_sidepath", "yes") & (is.na(sidewalk) | sidewalk=="no") & (is.na(segregated) | segregated=="no") ~ PROTECTED_ACTIVE,
+      detailed_segregation2 == CYCLE_TRACK & highway == "footway" & bicycle %in% c("yes" , "designated") ~ PROTECTED_ACTIVE,
+      detailed_segregation2 == CYCLE_TRACK & highway == "pedestrian" & bicycle %in% c("yes" , "designated") ~ PROTECTED_ACTIVE,
       TRUE ~ detailed_segregation2
     )) |>
     
