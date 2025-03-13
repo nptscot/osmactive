@@ -908,7 +908,7 @@ level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
     osm = clean_speeds(osm)
-    osm$`Speed limit (mph)` = classify_speeds(osm$maxspeed_clean)
+    osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
