@@ -136,13 +136,14 @@ plot(cycle_net_los["Level of Service"])
 osm = get_travel_network("Leeds")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+cycle_net_d = distance_to_road(cycle_net, drive_net)
+cycle_net_c = classify_cycle_infrastructure(cycle_net_d)
+m = plot_osm_tmap(cycle_net_c)
 m
 ```
 
 ```{r}
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
 
@@ -150,6 +151,21 @@ system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobbe
 
 # Available:
 # https://github.com/nptscot/osmactive/releases/download/v0.1/classify_cycle_infrastructure_leeds.html
+# cycle_net_c = classify_cycle_infrastructure(cycle_net_d, include_mixed_traffic = TRUE)
+cycle_net_c_all = classify_cycle_infrastructure(cycle_net_d)
+cycle_net_los = level_of_service(cycle_net_c_all)
+names(cycle_net_los)
+cycle_net_los = cycle_net_los |>
+  select(name, cycle_segregation, detailed_segregation, `Level of Service`, AADT, surface, `Speed Limit (mph)`)
+cycle_net_wetherby_road = cycle_net_los |>
+  filter(stringr::str_detect(name, "Wetherby Road"))
+summary(cycle_net_los$`Level of Service`)
+table(cycle_net_los$`Level of Service`)
+plot(cycle_net_los["Level of Service"])
+m = tm_shape(cycle_net_los) +
+  tm_lines(col = "Level of Service")
+tmap::tmap_save(m, "classify_cycle_infrastructure_leeds_los.html")
+# browseURL("classify_cycle_infrastructure_leeds_los.html")
 ```
 
 ## Edinburgh example
