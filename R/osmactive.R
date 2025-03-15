@@ -904,6 +904,9 @@ npt_to_cbd_aadt = function(AADT) {
 #' @param osm An sf object with the road network including speed limits and traffic volumes
 #' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
 #' @export
+#' @examples 
+#' osm = osm_edinburgh
+#' osm_los = level_of_service(osm)
 level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
@@ -912,24 +915,19 @@ level_of_service = function(osm) {
   }
   if (!"AADT" %in% names(osm)) {
     osm = estimate_traffic(osm)
-    osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
   }
-  # browser()
   # TODO: check these rules:
   osm_joined = left_join(osm, los_table_complete) |>
-    rename(`Level of Service` = level_of_service) |>
+    dplyr::rename(`Level of Service` = level_of_service) |>
     dplyr::mutate(
       `Level of Service` = factor(
         `Level of Service`,
+        levels = 0:3,
         labels = rev(c("High", "Medium", "Low", "Should not be used")),
         ordered = TRUE
-      ),
-      # Reverse the order:
-      `Level of Service` = factor(
-        `Level of Service`,
-        levels = c("High", "Medium", "Low", "Should not be used"),
-        ordered = TRUE
-      )
+       ),
+       `Level of Service` = forcats::fct_rev(`Level of Service`)
     )
   osm_joined = osm_joined |>
     mutate(
