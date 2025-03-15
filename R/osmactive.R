@@ -914,11 +914,14 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    osm = estimate_traffic(osm)
-    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+    if ("final_traffic" %in% names(osm)) {
+      osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
+    } else {
+      osm = estimate_traffic(osm)
+      osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+    }
   }
-  # TODO: check these rules:
-  osm_joined = left_join(osm, los_table_complete) |>
+  osm_joined = dplyr::left_join(osm, los_table_complete) |>
     dplyr::rename(`Level of Service` = level_of_service) |>
     dplyr::mutate(
       `Level of Service` = factor(
@@ -931,7 +934,7 @@ level_of_service = function(osm) {
     )
 
   osm_joined = osm_joined |>
-    mutate(
+    dplyr::mutate(
       `Level of Service` = dplyr::case_when(
         cycle_segregation == "Shared Footway" & is.na(`Level of Service`) ~ "Medium",
         cycle_segregation == "Off Road Cycleway" & is.na(`Level of Service`) ~ "High",
@@ -942,8 +945,8 @@ level_of_service = function(osm) {
     ) |>
       # Differentiate between Do not use (non-compliant intervention)
       # and Do not use (mixed traffic)
-      mutate(
-        `Level of Service` = case_when(
+      dplyr::mutate(
+        `Level of Service` = dplyr::case_when(
           cycle_segregation != "Mixed Traffic Street" & `Level of Service` == "Should not be used" ~ 
             "Should not be used (non-compliant intervention)",
           `Level of Service` == "Should not be used" ~ "Should not be used (mixed traffic)",
