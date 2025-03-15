@@ -14,6 +14,7 @@ URL: https://nptscot.github.io/osmactive/
 BugReports: https://github.com/nptscot/osmactive/issues
 Imports: 
     dplyr,
+    forcats,
     geos,
     osmextract,
     sf,

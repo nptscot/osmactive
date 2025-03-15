@@ -15,3 +15,7 @@ An sf object with the Cycle by Design Level of Service in the column \verb{Level
 \description{
 Generate Cycle by Design Level of Service
 }
+\examples{
+osm = osm_edinburgh
+osm_los = level_of_service(osm)
+}
