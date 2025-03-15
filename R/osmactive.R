@@ -929,6 +929,7 @@ level_of_service = function(osm) {
        ),
        `Level of Service` = forcats::fct_rev(`Level of Service`)
     )
+
   osm_joined = osm_joined |>
     mutate(
       `Level of Service` = dplyr::case_when(
@@ -937,8 +938,18 @@ level_of_service = function(osm) {
         cycle_segregation == "Segregated Track (wide)" & is.na(`Level of Service`) ~ "High",
         cycle_segregation == "Segregated Track (narrow)" & is.na(`Level of Service`) ~ "Medium",
         TRUE ~ `Level of Service`
+      ) 
+    ) |>
+      # Differentiate between Do not use (non-compliant intervention)
+      # and Do not use (mixed traffic)
+      mutate(
+        `Level of Service` = case_when(
+          cycle_segregation != "Mixed Traffic Street" & `Level of Service` == "Should not be used" ~ 
+            "Should not be used (non-compliant intervention)",
+          `Level of Service` == "Should not be used" ~ "Should not be used (mixed traffic)",
+          TRUE ~ `Level of Service`
+        )
       )
-    )
   res = sf::st_sf(
     osm_joined |> sf::st_drop_geometry(),
     geometry = sf::st_geometry(osm_joined)
