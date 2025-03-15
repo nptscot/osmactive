@@ -922,37 +922,37 @@ level_of_service = function(osm) {
     }
   }
   osm_joined = dplyr::left_join(osm, los_table_complete) |>
-    dplyr::rename(`Level of Service` = level_of_service) |>
-    dplyr::mutate(
-      `Level of Service` = factor(
-        `Level of Service`,
-        levels = 0:3,
-        labels = rev(c("High", "Medium", "Low", "Should not be used")),
-        ordered = TRUE
-       ),
-       `Level of Service` = forcats::fct_rev(`Level of Service`)
-    )
+    dplyr::rename(los = level_of_service)
 
   osm_joined = osm_joined |>
     dplyr::mutate(
-      `Level of Service` = dplyr::case_when(
-        cycle_segregation == "Shared Footway" & is.na(`Level of Service`) ~ "Medium",
-        cycle_segregation == "Off Road Cycleway" & is.na(`Level of Service`) ~ "High",
-        cycle_segregation == "Segregated Track (wide)" & is.na(`Level of Service`) ~ "High",
-        cycle_segregation == "Segregated Track (narrow)" & is.na(`Level of Service`) ~ "Medium",
-        TRUE ~ `Level of Service`
+      los = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & is.na(los) ~ 2,
+        cycle_segregation == "Off Road Cycleway" & is.na(los) ~ 3,
+        cycle_segregation == "Segregated Track (wide)" & is.na(los) ~ 3,
+        cycle_segregation == "Segregated Track (narrow)" & is.na(los) ~ 2,
+        TRUE ~ los
       ) 
     ) |>
       # Differentiate between Do not use (non-compliant intervention)
       # and Do not use (mixed traffic)
       dplyr::mutate(
-        `Level of Service` = dplyr::case_when(
-          cycle_segregation != "Mixed Traffic Street" & `Level of Service` == "Should not be used" ~ 
-            "Should not be used (non-compliant intervention)",
-          `Level of Service` == "Should not be used" ~ "Should not be used (mixed traffic)",
-          TRUE ~ `Level of Service`
+        los = dplyr::case_when(
+          # Non-compliant infrastructure:
+          cycle_segregation != "Mixed Traffic Street" & los == 0 ~ -1,
+          TRUE ~ los
         )
-      )
+      ) |>
+    dplyr::mutate(
+      los = factor(
+        los,
+        levels = -1:3,
+        labels = rev(c("High", "Medium", "Low", "Should not be used (mixed traffic)", "Should not be used (non-compliant intervention)")),
+        ordered = TRUE
+       ),
+       los = forcats::fct_rev(los)
+    ) |>
+    dplyr::rename(`Level of Service` = los)
   res = sf::st_sf(
     osm_joined |> sf::st_drop_geometry(),
     geometry = sf::st_geometry(osm_joined)
