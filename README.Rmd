@@ -84,7 +84,7 @@ library(sf) # for spatial data
 
 Alternatively, you can load the package with the following for local development:
 
-```{r, include=FALSE}
+```{r, eval=FALSE}
 devtools::load_all()
 ```
 
@@ -125,6 +125,7 @@ m
 Estimate the 'level of service' of cycle infrastructure:
 
 ```{r}
+#| label: level_of_service
 cycle_net_los = level_of_service(cycle_net)
 table(cycle_net_los$`Level of Service`)
 plot(cycle_net_los["Level of Service"])
