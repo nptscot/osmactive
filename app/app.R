@@ -1,9 +1,15 @@
+message("Hello")
+
+#remotes::install_github('nptscot/osmactive', dependencies = 'Suggests', ask = FALSE, Ncpus = parallel::detectCores())
+
 library(shiny)
 library(tmap)
 library(osmextract)
 library(sf)
 library(dplyr)
 library(osmactive)
+
+message("Packages loaded")
 
 ui = fluidPage(
   titlePanel("OSM Active Travel Map"),
@@ -12,29 +18,14 @@ ui = fluidPage(
   tmapOutput("map", height = "600px")
 )
 
-
+# TODO: make interactive?
+tmap_mode("view")
 server = function(input, output, session) {
   
-  # Reactive value to store the current tmap mode
-  tmapMode = reactiveVal("plot")
-  
-  # Observe the button click and toggle the tmap mode
-  observeEvent(input$toggleMode, {
-    currentMode = tmapMode()
-    if (currentMode == "plot") {
-      tmapMode("view")
-      tmap_mode("view")
-    } else {
-      tmapMode("plot")
-      tmap_mode("plot")
-    }
-  })
-  
   output$map = renderTmap({
-    city_name = input$city
-    currentMode = tmapMode()
-    
+    city_name = input$city    
     # Fetch OSM data for the city
+    message("Getting OSM data")
     osm = tryCatch({
       get_travel_network(city_name)
     }, error = function(e) {
@@ -42,6 +33,7 @@ server = function(input, output, session) {
     })
     
     if (is.null(osm)) {
+      message("Loading osm data")
       return(tm_shape(sf::st_sf(sf::st_sfc(crs = 4326))) +
                tm_text("City not found"))
     }
@@ -52,7 +44,9 @@ server = function(input, output, session) {
     cycle_net = get_cycling_network(osm)
     cycle_net = distance_to_road(cycle_net, drive_net)
     cycle_net = classify_cycle_infrastructure(cycle_net)
-    plot_osm_tmap(cycle_net)
+
+    output$map = renderTmap(plot_osm_tmap(cycle_net))
+
   })
 }
 
