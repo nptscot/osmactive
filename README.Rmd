@@ -104,17 +104,6 @@ table(cycle_net$detailed_segregation)
 table(cycle_net$cycle_segregation)
 ```
 
-```{r minimal_plot_osm_tmap, eval=FALSE, echo=FALSE}
-tm_shape(osm) +
-  tm_lines(col = "grey") +
-  tm_shape(cycle_net) +
-  tm_lines(col = "green") +
-  tm_shape(drive_net) +
-  tm_lines(col = "darkgrey") +
-  tm_shape(drive_net_major) +
-  tm_lines(col = "black")
-```
-
 You can also create plots with the packaged `plot_osm_tmap()` function:
 
 ```{r minimal_plot_osm}
@@ -130,6 +119,27 @@ cycle_net_los = level_of_service(cycle_net)
 table(cycle_net_los$`Level of Service`)
 plot(cycle_net_los["Level of Service"])
 ```
+
+Use any plotting code you like:
+
+```{r minimal_plot_osm_tmap, eval=FALSE, echo=FALSE}
+tm_shape(osm) +
+  tm_lines(col = "grey") +
+  tm_shape(cycle_net) +
+  tm_lines(col = "green") +
+  tm_shape(drive_net) +
+  tm_lines(col = "darkgrey") +
+  tm_shape(drive_net_major) +
+  tm_lines(col = "black")
+```
+
+# Running as a shiny app
+
+```{r}
+#| eval: false
+shiny::runApp("code/app.R")
+```
+
 
 ## Leeds example
 
