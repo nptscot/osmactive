@@ -26,7 +26,8 @@ Suggests:
     rmarkdown,
     tmap (>= 3.9),
     tidyverse,
-    quarto
+    quarto,
+    shiny
 Remotes: 
     r-tmap/tmap
 Encoding: UTF-8
