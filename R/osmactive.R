@@ -689,7 +689,10 @@ plot_osm_tmap = function(
     ) +
     # Add scale bar
     tmap::tm_scalebar(position = c("left", "bottom")) +
-    tmap::tm_layout(basemap.server = basemaps())
+    tmap::tm_layout(basemap.server = basemaps()) +
+    # TODO: remove this when the following issue is fixed:
+    # https://github.com/r-tmap/tmap/issues/1064
+    tmap::tm_view(use_WebGL = FALSE)
 }
 
 basemaps = function() {
