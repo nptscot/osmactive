@@ -321,13 +321,25 @@ m = plot_osm_tmap(cycle_net)
 m
 ```
 
+## Jamaica example
+
+```{r leeds}
+osm = get_travel_network("Jamaica")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net_d = distance_to_road(cycle_net, drive_net)
+cycle_net_c = classify_cycle_infrastructure(cycle_net_d)
+m = plot_osm_tmap(cycle_net_c)
+m
+```
+
 <!-- Save an interactive version of the map to check the resu lts as follows: -->
 
 ```{r}
 #| include: false
-tmap_save(m, "cycle_net_bristol.html")
-browseURL("cycle_net_bristol.html")
-system("gh release upload v0.1 cycle_net_bristol.html --clobber")
+tmap_save(m, "cycle_net_jamaica.html")
+browseURL("cycle_net_jamaica.html")
+system("gh release upload v0.1 cycle_net_jamaica.html --clobber")
 # Available:
 # https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
 ```
