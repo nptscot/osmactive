@@ -706,6 +706,48 @@ basemaps = function() {
   )
 }
 
+#' Plot OSM data using mapgl
+#'
+#' This function visualizes OSM data using the mapgl package.
+#'
+#' @param osm An sf object with the road network or cycling network
+#' @param color_column The column to use for coloring the lines (default: "highway")
+#' @param line_width The width of the lines (default: 2)
+#' @param opacity The opacity of the lines (default: 0.8)
+#' @return A mapgl object visualizing the OSM data
+#' @export
+#' @examples
+#' osm = osm_edinburgh
+#' plot_mapgl_osm(osm, color_column = "cycle_segregation")
+plot_osm_mapgl = function(
+  osm,
+  color_column = "cycle_segregation",
+  line_width = 2,
+  opacity = 0.8,
+  palette = get_palette_npt()
+) {
+  # browser()
+  if (!requireNamespace("mapgl", quietly = TRUE)) {
+    stop("mapgl is not installed. Please install mapgl to use this function.")
+  }
+  if (!color_column %in% names(osm)) {
+    stop("The specified color_column does not exist in the provided sf object.")
+  }
+  mapgl::mapboxgl(bounds = osm) |>
+    mapgl::add_line_layer(
+      id = "osm-layer",
+      source = osm,
+      line_color = mapgl::match_expr(
+        column = color_column,
+        values = unique(osm[[color_column]]),
+        stops = palette[seq(length(unique(osm[[color_column]])))]
+      ),
+      line_width = line_width,
+      line_opacity = opacity,
+      tooltip = color_column
+    )
+}
+
 # Function: most_common_value
 # Description: This function takes a vector as input and returns the most common value in the vector.
 # Parameters:

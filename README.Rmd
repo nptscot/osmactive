@@ -26,41 +26,41 @@ The goal of osmactive is to provide functions, example datasets and documentatio
 
 ```{r, eval=FALSE, echo=FALSE}
 # Setup instructions
-# Create the README.Rmd with usethis:
-usethis::use_readme_rmd()
-# Add description:
-usethis::use_description()
-# Add package dependencies
-usethis::use_package("osmextract")
-# Create the R directory
-usethis::use_r("osmactive")
-usethis::use_package("geos")
-usethis::use_package("sf")
-usethis::use_package("dplyr")
-usethis::use_package("stringr")
-# Ignore README.Rmd in build ignore
-usethis::use_build_ignore("README.Rmd")
-usethis::use_mit_license("Robin Lovelace")
+# # Create the README.Rmd with usethis:
+# usethis::use_readme_rmd()
+# # Add description:
+# usethis::use_description()
+# # Add package dependencies
+# usethis::use_package("osmextract")
+# # Create the R directory
+# usethis::use_r("osmactive")
+# usethis::use_package("geos")
+# usethis::use_package("sf")
+# usethis::use_package("dplyr")
+# usethis::use_package("stringr")
+# # Ignore README.Rmd in build ignore
+# usethis::use_build_ignore("README.Rmd")
+# usethis::use_mit_license("Robin Lovelace")
 
-# Add pkgdown site
-usethis::use_pkgdown()
-# pkgdown pages
-usethis::use_pkgdown_github_pages()
-# Add actions
-usethis::use_github_action("pkgdown")
-usethis::use_github_action("check-standard")
-# Add vignette with paper on cycle infrastructure classification
-usethis::use_vignette("classifying-cycle-infrastructure")
-# Add example datasets
-usethis::use_data_raw("osm_edinburgh")
-usethis::use_vignette("classify-cbd", "Scottish Cycling by Design classification")
-# Style the package
-remotes::install_github("Robinlovelace/styler.equals")
-styler.equals::style_pkg()
-# And the README:
-styler.equals::style_file("README.Rmd")
-# build readme:
-devtools::build_readme()
+# # Add pkgdown site
+# usethis::use_pkgdown()
+# # pkgdown pages
+# usethis::use_pkgdown_github_pages()
+# # Add actions
+# usethis::use_github_action("pkgdown")
+# usethis::use_github_action("check-standard")
+# # Add vignette with paper on cycle infrastructure classification
+# usethis::use_vignette("classifying-cycle-infrastructure")
+# # Add example datasets
+# usethis::use_data_raw("osm_edinburgh")
+# usethis::use_vignette("classify-cbd", "Scottish Cycling by Design classification")
+# # Style the package
+# remotes::install_github("Robinlovelace/styler.equals")
+# styler.equals::style_pkg()
+# # And the README:
+# styler.equals::style_file("README.Rmd")
+# # build readme:
+# devtools::build_readme()
 ```
 
 ```{r, eval=FALSE, echo=FALSE}
@@ -138,6 +138,14 @@ tm_shape(osm) +
 ```{r}
 #| eval: false
 shiny::runApp("code/app.R")
+```
+
+# Mapgl
+
+```{r}
+# pak::pak("mapgl")
+devtools::load_all()
+plot_osm_mapgl(cycle_net)
 ```
 
 
