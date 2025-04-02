@@ -984,8 +984,8 @@ level_of_service = function(osm) {
 #' @export
 #' @examples
 #' # r = get_bus_routes("Edinburgh")
-#' r = get_bus_routes("Isle of Wight")
-#' plot(r["osm_id"])
+#' # r = get_bus_routes("Isle of Wight")
+#' # plot(r["osm_id"])
 get_bus_routes = function(
   place,
   query = "SELECT * FROM multilinestrings WHERE route == 'bus'",

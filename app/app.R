@@ -1,6 +1,7 @@
 message("Hello")
 
-#remotes::install_github('nptscot/osmactive', dependencies = 'Suggests', ask = FALSE, Ncpus = parallel::detectCores())
+# remotes::install_github('nptscot/osmactive', dependencies = 'Suggests', ask = FALSE, Ncpus = parallel::detectCores())
+# remotes::install_github('r-tmap/tmap')
 
 library(shiny)
 library(tmap)
@@ -44,10 +45,9 @@ server = function(input, output, session) {
     cycle_net = get_cycling_network(osm)
     cycle_net = distance_to_road(cycle_net, drive_net)
     cycle_net = classify_cycle_infrastructure(cycle_net)
-
-    output$map = renderTmap(plot_osm_tmap(cycle_net))
-
+    plot_osm_tmap(cycle_net)
   })
 }
 
 shinyApp(ui = ui, server = server)
+
