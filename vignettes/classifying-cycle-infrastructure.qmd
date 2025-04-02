@@ -36,13 +36,12 @@ library(osmactive)
 Transport networks are diverse and complex.
 This applies to all modes of transport, but especially to 'cycle network' which, uniquely, includes infrastructure segments that can be used both motorised and non-motorised modes.
 Even in places with relatively good provision of dedicated for cycling a substantial proportion of the cyclable network is also drivable, with 'fietstrase' in The Netherlands providing a classic example.
-In this paper we present a typology of cycle infrastructure classification systems, based on a review of official documents and academic literature *and their implementation in open source software*.
-We find substantial differences in the way that cycle infrastructure is classified between countries.
-Countries with more established pro-cycling policies tend to have TBC classification systems, while countries with less established pro-cycling policies tend to have TBC classification systems.
-Recent efforts to provide international guidance on how to talk and classify cycling infrastructure has impacts on policies: measuring level of separation from motor traffic, for example, enables planners to focus on infrastructure that is safe for all.
-We conclude with tentative recommendations of classification systems for different use cases, with reference to open source implementations for reproducible cycle infrastructure classification.
-The `osmactive` package that accompanies this paper, which classifies cycle infrastructure based on OSM tags represents one such implementation.
-The work presented in this paper and our experience developing the package can provide a basis for open and community-driven classification systems that co-evolve with changing policy, community and data-availability landscapes.
+In this paper we present a typology of cycle infrastructure classification systems and guidance on *what to build where*, based on official documents from TBC countries *and their implementation in open source software*.
+We find substantial differences between each classification system.
+Recent efforts to provide international guidance on how to talk about and classify cycling infrastructure has impacts on policies: measuring level of separation from motor traffic, for example, enables planners to focus on infrastructure that is safe for all.
+We conclude with tentative recommendations of classification systems for different use cases, with reference to our implementation in the `osmactive` package accompanies this paper.
+The work presented in this paper and our experience developing the package can provide a basis for open and community-driven classification systems that are modular, reproducible and extendable for different needs.
+The work provides a basis for more data-driven cycle traffic design guidance, that can co-evolve with changing policy, community and data-availability landscapes.
 
 # Introduction
 
