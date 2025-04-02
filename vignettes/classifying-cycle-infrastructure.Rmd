@@ -1,11 +1,17 @@
 ---
 title: "Cycle infrastructure classification systems"
 subtitle: "Comparing international 'best practice' guides and implementing them in open source software for reproducible research and data-driven active travel planning"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Typologies of cycle infrastructure}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+
+# For .Rmd version:
+# output: rmarkdown::html_vignette
+# vignette: >
+#   %\VignetteIndexEntry{Typologies of cycle infrastructure}
+#   %\VignetteEngine{knitr::rmarkdown}
+#   %\VignetteEncoding{UTF-8}
+
+# For .qmd version:
+format: html
+number-sections: true
 ---
 
 ```{r, include = FALSE}
