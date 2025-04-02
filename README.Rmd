@@ -11,7 +11,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   message = FALSE,
   warning = FALSE,
-  cache = TRUE
+  cache = FALSE
 )
 ```
 
@@ -53,6 +53,19 @@ usethis::use_github_action("check-standard")
 usethis::use_vignette("classifying-cycle-infrastructure")
 # Add example datasets
 usethis::use_data_raw("osm_edinburgh")
+usethis::use_vignette("classify-cbd", "Scottish Cycling by Design classification")
+# Style the package
+remotes::install_github("Robinlovelace/styler.equals")
+styler.equals::style_pkg()
+# And the README:
+styler.equals::style_file("README.Rmd")
+# build readme:
+devtools::build_readme()
+```
+
+```{r, eval=FALSE, echo=FALSE}
+# For testing:
+devtools::document()
 devtools::check()
 ```
 
@@ -60,96 +73,145 @@ Install the package with:
 
 ```{r, eval=FALSE}
 remotes::install_github("nptscot/osmactive")
-library(osmactive)
 ```
 
-```{r, include=FALSE}
+```{r}
+library(osmactive)
+library(tmap) # for mapping
+library(dplyr) # for data manipulation
+library(sf) # for spatial data
+```
+
+Alternatively, you can load the package with the following for local development:
+
+```{r, eval=FALSE}
 devtools::load_all()
 ```
+
+## Minimal example
+
+The package comes with example data for testing functions.
+You can test the functions as follows:
+
+```{r minimal}
+osm = osm_edinburgh
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+drive_net_major = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+table(cycle_net$detailed_segregation)
+table(cycle_net$cycle_segregation)
+```
+
+You can also create plots with the packaged `plot_osm_tmap()` function:
+
+```{r minimal_plot_osm}
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+Estimate the 'level of service' of cycle infrastructure:
+
+```{r}
+#| label: level_of_service
+cycle_net_los = level_of_service(cycle_net)
+table(cycle_net_los$`Level of Service`)
+plot(cycle_net_los["Level of Service"])
+```
+
+Use any plotting code you like:
+
+```{r minimal_plot_osm_tmap, eval=FALSE, echo=FALSE}
+tm_shape(osm) +
+  tm_lines(col = "grey") +
+  tm_shape(cycle_net) +
+  tm_lines(col = "green") +
+  tm_shape(drive_net) +
+  tm_lines(col = "darkgrey") +
+  tm_shape(drive_net_major) +
+  tm_lines(col = "black")
+```
+
+# Running as a shiny app
+
+```{r}
+#| eval: false
+shiny::runApp("code/app.R")
+```
+
 
 ## Leeds example
 
 ```{r leeds}
-library(dplyr)
-library(tmap)
-leeds_zb = zonebuilder::zb_zone("Leeds")
-leeds = leeds_zb |>
-  filter(circle_id == 1)
-osm = get_travel_network("Leeds", boundary = leeds, boundary_type = "clipsrc")
+osm = get_travel_network("Leeds")
 cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+drive_net = get_driving_network(osm)
+cycle_net_d = distance_to_road(cycle_net, drive_net)
+cycle_net_c = classify_cycle_infrastructure(cycle_net_d)
+m = plot_osm_tmap(cycle_net_c)
 m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
-leeds_6km = leeds_zb |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Leeds", boundary = leeds_6km, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_leeds.html")
 browseURL("classify_cycle_infrastructure_leeds.html")
 
 system("gh release upload v0.1 classify_cycle_infrastructure_leeds.html --clobber")
+
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/classify_cycle_infrastructure_leeds.html
+# cycle_net_c = classify_cycle_infrastructure(cycle_net_d, include_mixed_traffic = TRUE)
+cycle_net_c_all = classify_cycle_infrastructure(cycle_net_d)
+cycle_net_los = level_of_service(cycle_net_c_all)
+names(cycle_net_los)
+cycle_net_los = cycle_net_los |>
+  select(name, cycle_segregation, detailed_segregation, `Level of Service`, AADT, surface, `Speed Limit (mph)`)
+cycle_net_wetherby_road = cycle_net_los |>
+  filter(stringr::str_detect(name, "Wetherby Road"))
+summary(cycle_net_los$`Level of Service`)
+table(cycle_net_los$`Level of Service`)
+plot(cycle_net_los["Level of Service"])
+m = tm_shape(cycle_net_los) +
+  tm_lines(col = "Level of Service")
+tmap::tmap_save(m, "classify_cycle_infrastructure_leeds_los.html")
+# browseURL("classify_cycle_infrastructure_leeds_los.html")
 ```
 
 ## Edinburgh example
 
-
 ```{r edinburgh}
-edinburgh = zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km = edinburgh |>
-  # Change number in next line to change zone size:
-  filter(circle_id <= 2) |>
-  sf::st_union()
-osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+osm = get_travel_network("Edinburgh")
 cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
+drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
 m
-
 ```
 
-<!-- Save an interactive version of the map to check the results as follows: -->
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
 
 ```{r}
-#| eval: false
-#| echo: false
-edinburgh_6km = edinburgh |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Scotland", boundary = edinburgh_6km, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+#| include: false
 tmap_save(m, "cycle_net_edinburgh.html")
 browseURL("cycle_net_edinburgh.html")
-system("gh release create v0.1", intern = TRUE)
 system("gh release upload v0.1 cycle_net_edinburgh.html --clobber")
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_edinburgh.html
 ```
 
 ## Dublin example
 
 ```{r dublin}
 dublin_zones = zonebuilder::zb_zone("Dublin")
-dublin = dublin_zones |>
-  filter(circle_id == 1)
-osm = get_travel_network("Republic of Ireland", boundary = dublin, boundary_type = "clipsrc")
+dublin_6km = dublin_zones |>
+  filter(circle_id <= 3) |>
+  sf::st_union()
+osm = get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
 cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
+drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
@@ -157,17 +219,7 @@ m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
-dublin_6km = dublin_zones |>
-  filter(circle_id <= 3) |>
-  sf::st_union()
-osm = get_travel_network("Republic of Ireland", boundary = dublin_6km, boundary_type = "clipsrc")
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-m = plot_osm_tmap(cycle_net)
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_dublin.html")
 browseURL("classify_cycle_infrastructure_dublin.html")
 # upload:
@@ -185,7 +237,7 @@ lisbon = lisbon |>
   sf::st_cast("POLYGON")
 osm = get_travel_network("Portugal", boundary = lisbon, boundary_type = "clipsrc", force_vectortranslate = TRUE)
 cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network_major(osm)
+drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 m = plot_osm_tmap(cycle_net)
@@ -193,10 +245,81 @@ m
 ```
 
 ```{r}
-#| eval: false
-#| echo: false
+#| include: false
 tmap_save(m, "classify_cycle_infrastructure_lisbon.html")
 browseURL("classify_cycle_infrastructure_lisbon.html")
 # upload:
 system("gh release upload v0.1 classify_cycle_infrastructure_lisbon.html --clobber")
+
+# Test for surfaces:
+table(cycle_net$surface)
+```
+
+## London
+
+```{r london}
+london = zonebuilder::zb_zone("Southwark Station", n_circles = 1)
+london = sf::st_union(london) |>
+  sf::st_make_valid()
+osm = get_travel_network(london, boundary = london, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+#| include: false
+tmap_save(m, "classify_cycle_infrastructure_london.html")
+browseURL("classify_cycle_infrastructure_london.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_london.html --clobber")
+```
+
+## Cambridge
+
+```{r cambridge}
+cambridge = zonebuilder::zb_zone("Cambridge")
+cambridge = sf::st_union(cambridge) |>
+  sf::st_make_valid()
+osm = get_travel_network("Cambridge", boundary = cambridge, boundary_type = "clipsrc")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+#| include: false
+tmap_save(m, "classify_cycle_infrastructure_cambridge.html")
+browseURL("classify_cycle_infrastructure_cambridge.html")
+# upload:
+system("gh release upload v0.1 classify_cycle_infrastructure_cambridge.html --clobber")
+```
+
+## Bristol example
+
+```{r bristol}
+osm = get_travel_network("Edinburgh")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
+
+```{r}
+#| include: false
+tmap_save(m, "cycle_net_bristol.html")
+browseURL("cycle_net_bristol.html")
+system("gh release upload v0.1 cycle_net_bristol.html --clobber")
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
 ```

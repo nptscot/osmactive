@@ -14,6 +14,7 @@ URL: https://nptscot.github.io/osmactive/
 BugReports: https://github.com/nptscot/osmactive/issues
 Imports: 
     dplyr,
+    forcats,
     geos,
     osmextract,
     sf,
@@ -21,14 +22,16 @@ Imports:
     tidyr
 Suggests: 
     knitr,
+    jsonlite,
     rmarkdown,
-    tmap (>= 3.9)
-Remotes: 
-    r-tmap/tmap
+    tmap (>= 3.9),
+    tidyverse,
+    quarto,
+    shiny
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 LazyData: true
 VignetteBuilder: knitr

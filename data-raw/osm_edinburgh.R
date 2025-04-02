@@ -3,7 +3,7 @@
 remotes::install_github("nptscot/osmactive")
 library(osmactive)
 # Or
-devtools::load_all()
+# devtools::load_all()
 library(dplyr)
 library(tmap)
 library(sf)
@@ -16,9 +16,13 @@ edinburgh_sf = sf::st_sf(
   crs = 4326
 )
 edinburgh_3km = edinburgh_sf |>
-  sf::st_buffer(3000) 
+  sf::st_buffer(3000)
 
-osm = get_travel_network("Scotland", boundary = edinburgh_3km, boundary_type = "clipsrc")
+osm = get_travel_network(
+  "Scotland",
+  boundary = edinburgh_3km,
+  boundary_type = "clipsrc"
+)
 names(osm)
 
 osm_york_way = osm |>
@@ -33,19 +37,41 @@ osm_york_way_buffer = osm_york_way |>
 
 plot(osm_york_way_buffer)
 
-
 osm = osm[osm_york_way_buffer, ]
 plot(osm)
 
 # # Keep only most relevant columns
-osm = osm %>%
-  select(osm_id, name, highway, cycleway, bicycle, lanes, sidewalk, segregated, other_tags)
+osm = osm |>
+  select(
+    osm_id,
+    name,
+    highway,
+    matches("cycleway"),
+    bicycle,
+    lanes,
+    foot,
+    path,
+    sidewalk,
+    segregated,
+    maxspeed,
+    width,
+    lit,
+    oneway,
+    cycleway_surface,
+    surface,
+    smoothness,
+    other_tags
+  )
+names(osm)
+
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
 driving_network = get_driving_network(osm)
 edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
-cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+cycleways_classified = classify_cycle_infrastructure(
+  edinburgh_cycle_with_distance
+)
 # # cycleways_classified_old = cycleways_classified
 # waldo::compare(cycleways_classified, cycleways_classified_old)
 

@@ -53,3 +53,7 @@ docs
 *.gpkg
 inst/doc
 *.geojson
+*.Rds
+*.pdf
+
+/.quarto/

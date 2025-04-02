@@ -1,0 +1,176 @@
+---
+title: "Tests of known OSM ways"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tests of known OSM ways}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(osmactive)
+library(dplyr)
+# devtools::load_all() # for development
+```
+
+The following test checks to see if a known OSM way in Leeds, a footpath in Leeds in a path on which cycling is allowed and is common, is correctly identified, as Shared Use.
+
+```{r}
+osm = get_travel_network("Leeds")
+potternewton_path = osm |>
+  filter(osm_id == 306849934)
+cycle_net = get_cycling_network(potternewton_path)
+nrow(cycle_net)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net_classified = classify_cycle_infrastructure(cycle_net)
+cycle_net_classified |>
+  pull(cycle_segregation)
+```
+
+Let's check out 'highway=path' tagged segments in the network in Leeds:
+
+```{r}
+cycle_net = get_cycling_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+tmap::tmap_mode("view")
+cycle_net_path = cycle_net |>
+  filter(highway == "path")
+m = plot_osm_tmap(cycle_net_path)
+m
+# tmap::tmap_save(m, "path.html")
+# browseURL("path.html")
+```
+
+Leith Walk, should be Segregated Track (narrow).
+It is on part of it, with the following tags for way [22587411](https://www.openstreetmap.org/way/22587411).
+
+```{r}
+osm = get_travel_network("Edinburgh", force_download = TRUE)
+nrow(osm)
+sum(osm$cycleway_left == "separate", na.rm = TRUE)
+# Full cycle network:
+cycle_net = get_cycling_network(osm)
+nrow(cycle_net)
+table(cycle_net$cycleway_right)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
+tmap::tmap_save(m, "leith_walk_full.html")
+browseURL("leith_walk_full.html")
+```
+
+```{r}
+leith_walk_narrow = cycle_net |>
+  filter(osm_id == 1209807764)
+get_cycling_network(leith_walk_narrow)
+leith_walk_narrow_minimal = leith_walk_narrow |>
+  select_if(~ !all(is.na(.))) |>
+  sf::st_drop_geometry()
+leith_walk_narrow_minimal
+```
+
+```{r, echo=FALSE}
+#       osm_id  highway oneway                            cycleway_chars lit
+# 1 1209807764 cycleway    yes NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA|NA yes
+#   width surface smoothness z_order distance_to_road detailed_segregation
+# 1     1 asphalt       good       0              9.1          Level track
+#   cycle_pedestrian_separation width_clean         cycle_segregation
+# 1                     Unknown           1 Segregated Track (narrow)
+```
+
+Another part of the same corridor, way 1214008544, is classified as Shared Footway: 
+
+```{r}
+leith_walk_footway = cycle_net |>
+  filter(osm_id == 1214008544)
+leith_walk_footway_minimal = leith_walk_footway |>
+  select_if(~ !all(is.na(.))) |>
+  sf::st_drop_geometry()
+leith_walk_footway_minimal
+```
+
+```{r, echo=FALSE}
+#      osm_id       name highway maxspeed oneway cycleway_left cycleway_right lit
+# 1 578114866 Leith Walk primary   20 mph    yes      separate             no yes
+#   surface z_order
+# 1 asphalt       7
+#                                                                                       other_tags
+# 1 "name:left"=>"Crighton Place","ref"=>"A900","sidewalk:left"=>"separate","sidewalk:right"=>"no"
+```
+
+Let's compare them:
+
+```{r}
+waldo::compare(leith_walk_narrow, leith_walk_footway)
+```
+
+Highway=path should be
+
+```{r}
+leith_walk = osm |>
+  filter(name == "Leith Walk")
+cycle_net = get_cycling_network(leith_walk)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+cycle_net |>
+  pull(cycle_segregation)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+tmap::tmap_save(m, "leith_walk.html")
+browseURL("leith_walk.html")
+```
+
+# 757849580
+
+```{r}
+cloch_lighthouse = zonebuilder::zb_zone("Cloch Lighthouse", n_circles = 3)
+cloch_lighthouse_union = sf::st_union(cloch_lighthouse)
+osm = get_travel_network("Scotland", boundary = cloch_lighthouse_union, boundary_type = "clipsrc")
+osm_cloch_road = osm |>
+  filter(osm_id == 757849580)
+osm_cloch_road_1km = osm_cloch_road |>
+  sf::st_buffer(1000)
+osm_cloch_road_1km = osm |>
+  sf::st_intersection(osm_cloch_road_1km)
+plot(osm_cloch_road_1km$geometry)
+mapview::mapview(osm_cloch_road_1km)
+cycle_net = get_cycling_network(osm_cloch_road_1km)
+drive_net = get_driving_network(osm_cloch_road_1km)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+# # # Make changes to osmactive code then reload with
+devtools::load_all()
+# osm_classified_coch = osm_classified |>
+#   filter(osm_id == 757849580)
+# # osm_classified_coch$cycle_pedestrian_separation
+# # # [1] Shared Footway (not segregated)
+# # # 3 Levels: Shared Footway (segregated) < ... < Unknown
+# # osm_classified_coch$cycle_segregation
+# osm_classified = osm_classified_coch
+cycle_net_cloch_road = cycle_net |>
+  filter(osm_id == 757849580)
+cycle_net_cloch_road$cycle_segregation # Should be shared footway
+m = plot_osm_tmap(cycle_net)
+tmap::tmap_mode("view")
+m
+tmap::tmap_save(m, "cloch_road.html")
+# Save the cycle_net
+sf::write_sf(cycle_net, "cycle_net_cloch_road.geojson")
+system("gh release list")
+system("gh release upload v0.1 cycle_net_cloch_road.geojson cloch_road.html --clobber")
+# See result online at https://github.com/nptscot/osmactive/releases/tag/v0.1/cycle_net_cloch_road.geojson
+```

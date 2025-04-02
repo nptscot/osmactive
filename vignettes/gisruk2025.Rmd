@@ -1,0 +1,303 @@
+---
+# conference: GISRUK 2025
+title: "Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning"
+author: 
+  - name: Robin Lovelace
+    affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
+    orcid: 0000-0001-5679-6536
+  - name: Zhao Wang
+    affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
+    orcid: 0000-0002-4054-0533
+  - name: Hussein Mahfouz
+    affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
+    orcid: 0000-0002-6043-8616
+  - name: Juan Pablo Fonseca Zamora
+    affiliation: Leeds Institute for Transport Studies, University of Leeds, UK
+    orcid: 0009-0006-7042-3828
+  - name: Angus Calder
+    affiliation: Sustrans Scotland
+  - name: Martin Lucas-Smith
+    affiliation: CycleStreets Ltd, Cambridge, UK
+  - name: Dustin Carlino
+    affiliation: Alan Turing Institute, London, UK
+    orcid: 0000-0002-5565-0989
+  - name: Josiah Parry
+    affiliation: Environmental Systems Research Institute (Esri), Redlands, CA, USA 
+    orcid: 0000-0001-9910-865X
+  - name: Rosa Félix
+    affiliation: University of Lisbon
+    orcid: 0000-0002-5642-6006
+# abstract: |
+#   Evidence on street networks and their potential changes under future scenarios is crucial for active travel planning. However, most active travel models rely on oversimplified street representations, using single variables like 'quietness', neglecting key factors such as footway widths. This paper introduces new methods for classifying street networks for active travel, integrating diverse datasets from OpenStreetMap and official sources. Implemented in open source software packages `osmactive` and `anime`, these methods are scalable and reproducible. The results are showcased in a web application hosted at www.npt.scot, demonstrating how geographic data science can drive high-impact research.
+# # implemented in open source software packages including `osmactive` R package and the `anime` Rust crate
+# keywords: [network analysis, transport planning, OpenStreetMap, active travel, reproducible research]
+# execute: 
+#   echo: false
+#   message: false
+#   warning: false
+#   eval: false
+# # format: gfm
+# # quarto add sdesabbata/quarto-gisruk
+# format:
+#   gisruk-pdf:
+#     keep-tex: true
+# bibliography: references.bib
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<!-- New methods and open source tools for active travel planning are presented, integrating diverse street network datasets. Implemented in the `osmactive` R package and `anime` Rust crate, and showcased in the Network Planning Tool for Scotland. -->
+
+<!-- See https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf for rendered version of this paper. -->
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+```{r}
+#| include: false
+# install pak if not installed:
+if (!requireNamespace("pak", quietly = TRUE)) {
+  install.packages("pak")
+}
+pak::pkg_install("tidyverse", ask = FALSE)
+
+github_pkgs = c(
+  "nptscot/osmactive",
+  "josiahparry/anime/r"
+)
+pak::pkg_install(github_pkgs, ask = FALSE)
+library(tidyverse)
+library(osmactive)
+library(tmap)
+```
+
+<!-- Workaround for bug in gfm rendering of titles by quarto: -->
+
+<!-- # Mapping, classifying, and integrating diverse street network datasets: new methods and open source tools for active travel planning -->
+
+```{r}
+#| eval: false
+#| echo: false
+quarto::quarto_render("os_blog_post.qmd", output_format = "docx")
+d = list.dirs("~/..")
+d_onedrive = d[grep("OneDrive", d)]
+list.files("~/OneDrive/projects-all/atumscotland/phase3")
+# file.copy("os_blog_post.docx", "~/OneDrive/projects-all/atumscotland/phase3", overwrite = TRUE)
+list.files( "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-all\\atumscotland\\phase3")
+file.copy("os_blog_post.docx", "C:\\Users\\georl_admin\\OneDrive - University of Leeds\\projects-all\\atumscotland\\phase3", overwrite = TRUE)
+# Upload to gh
+quarto::quarto_render("gisruk2025.qmd")
+system("gh release upload v0.1 gisruk2025.pdf --clobber")
+```
+
+# Introduction
+
+Active travel is an accessible and cost-effective way to replace short car trips and make transport systems more sustainable.
+The Network Planning Tool (NPT) for Scotland is a new web-based strategic network planning tool that estimates cycling potential down to the street level.
+The NPT builds on the functionality of the Propensity to Cycle Tool (PCT) and related tools [@lovelace2017; @goodman2019; @lovelace2024; @félix2025], offering a detailed nationwide cycling potential analysis for Scotland.
+The NPT is funded by Transport Scotland and developed by the University of Leeds in collaboration with Sustrans Scotland.
+The tool is open-source and hosted at [github.come/nptscot](https://github.com/nptscot), enabling others to learn from and contribute to the underlying methods to help make transport planning more open and participatory [@lovelace2020a].
+
+A unique feature of the NPT is its integration of multiple layers into a single tool, overcoming limitations of previous strategic network planning tools, which generally focus either on behaviour data (such as the PCT) or physical infrastructure [@vybornova2024; @vierø2024].
+The NPT brings together more than a dozen datasets, including Ordnance Survey Mastermap and OpenStreetmap data products to provide comprehensive data on the potential for mode shift, infrastructure, modelled motor traffic levels, and street space at the network level.
+This paper presents new geographic methods we developed to support this work, with reference to reproducible code that use the new `osmactive` R package for classifying national-scale OpenStreetMap (OSM) datasets based on attributes and geographic relationships, and the `anime` Rust crate for astonishingly fast and accurate route network data integration.
+
+# Datasets and methods
+
+The NPT uses datasets from diverse sources including from the DfT's network of traffic sensors, motor traffic counts based a survey evaluating Edinburgh's roll-out of 20 mph speed limits, the National Travel Survey, and the Scottish Household Travel Survey.
+We used four key datasets representing the road network for this project:
+
+-   Ordnance Survey OpenRoads, an open access and simplified representation of the road network that is ideal for visualisation
+-   OS MasterMap Highways, a more detailed dataset that includes information on road widths and other features
+-   OS Mastermap Topography, the most detailed vector dataset that includes detailed information on the geometry of many features of the man-made environment, including curb lines. In the OS Topo layer roads and other pieces of transport infrastructure such as footways (pavements) are represented not as corridor or lane centerlines, but as polygons.
+-   OpenStreetMap, a crowdsourced dataset that is continuously updated by community volunteers. The dataset is rich, with tags for width and smoothness of infrastructure, but is not as consistent as the OS datasets.
+
+Ordnance Survey's MasterMap Highways and Topography datasets provide unparalleled accuracy and detail, but are a struggle to import using consumer-grade hardware and standard tools such as QGIS.
+To overcome this issue we developed [the `mastermapr` package](https://github.com/acteng/mastermapr) in collaboration with the government agency Active Travel England (ATE), to efficiently and flexibly imports MasterMap datasets (50 GB compressed).
+After importing the four route network datasets outlined above, we integrated them using the following steps:
+
+-   Pavement widths were calculated from the OS MasterMap Topography dataset using the function `get_pavement_widths()` from the `osmactive` package. This function calculates the width of manmade roadside features associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment.
+-   The `get_bus_routes()` function from the `osmactive` package was used to determine the number of bus lanes on each road segment.
+-   We used the `anime` Rust crate to efficiently join the networks, based on alignment and proximity. The use of spatial indexes makes the implementation highly efficient compared with the [`rnet_join()`](https://docs.ropensci.org/stplanr/reference/rnet_join.html) function in the R package `stplanr` that we were using previously. See the [josiahparry/ANIME codebase on GitHub](https://github.com/JosiahParry/anime) for details of the new algorithm and its implementation as an R (and planned Python) interface to the new [`anime` Rust crate](https://crates.io/crates/anime).
+
+## Classifying OpenStreetNetwork ways
+
+Functions including `get_travel_network()` and `classify_cycle_infrastructure()` from the `osmactive` package were used to classify cycle infrastructure types based on the presence of cycle lanes, tracks, and other features (see the code snippet which generates @fig-bristol below).
+
+```{r}
+#| label: bristol
+#| eval: false
+#| echo: true
+osm = get_travel_network("bristol")
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+plot_osm_tmap(cycle_net)
+```
+
+<!-- Save an interactive version of the map to check the resu lts as follows: -->
+
+```{r}
+#| include: false
+#| eval: false
+m = plot_osm_tmap(cycle_net)
+m +
+  tm_layout(legend.position = c("right", "top"))
+m
+tmap_save(m, "cycle_net_bristol.html")
+browseURL("cycle_net_bristol.html")
+system("gh release upload v0.1 cycle_net_bristol.html --clobber")
+# Available:
+# https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
+```
+
+![Cycle infrastructre and painted cycle lanes in Bristol, generated with 5 lines of code using the osmactive package. See interactive version online at [github.com/nptscot/osmactive/releases](https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html).](images/paste-1.png){#fig-bristol}
+
+## Road width measurements
+
+Two key measurements are needed to assess whether existing roads can accommodate cycle infrastructure: carriageway width and corridor width, as defined below.
+
+Accurate and available carriageway width measurements are important because they determine if proposed infrastructure can fit solely within the carriageway, without the need for moving curbs or other roadside features.
+The Scottish Cycling by Design (CbD) guidance document outlines three types of cycle infrastructure that run along the carriageway, building on Department for Transport guidance [@departmentfortransport2020]:
+
+-   Cycle track at carriageway level
+-   Stepped cycle track
+-   Cycle track at footway level
+
+The first option, cycle track that is at carriage level, has additional advantages over stepped cycleway, being often cheaper to construct [with no new tarmac required in many cases](https://www.transport.gov.scot/media/50323/cycling-by-design-update-2019-final-document-15-september-2021-1.pdf#page=76) but requires sufficient width on the existing carriageway to accommodate the cycle infrastructure.
+
+Corridor width captures the carriageway plus any built roadside features, such as footways.
+The following [`dplyr` query](https://dplyr.tidyverse.org/) was used to extract the width of manmade roadside features: `filter(descriptive_group == "Roadside", make == "Manmade")`.
+From that point, we calculated the width of pavements associated with each road segment by dividing the area of matching polygons associated with each road segment by the length of the road segment, as implemented in the `get_pavement_widths()` function in the `osmactive` package.
+
+## Minimum cycle track and buffer widths
+
+The corridor width is important because it determines whether, in cases where there is insufficient space on the carriageway, part of the footway or other manmade roadside features may be reallocated for cycle infrastructure, while still maintaining recommended minimum widths for pedestrians.
+CbD guidance on widths is summarised in table @tbl-cbd.
+
+| Cycle infrastructure type  | Absolute minimum width | Desirable minimum width |
+|--------------------------|-----------------------|------------------------|
+| Unidirectional cycle track | 1.5 m                  | 2.0 m                   |
+| Bidirectional cycle track  | 2.0 m                  | 3.0 m                   |
+
+: Table illustrating the minimum width requirements for cycle infrastructure according to the Cycling by Design (CbD) guidance. {#tbl-cbd}
+
+CbD also specifies buffers that must be accounted for when calculating the effective available width for cycle infrastructure (@tbl-buffers).
+
+| Road type / Speed limit | Buffer width |
+|-------------------------|--------------|
+| 30 mph                  | 0.5 m        |
+| 40 mph                  | 1.0 m        |
+| 50 mph                  | 2.0 m        |
+| 60 mph                  | 2.5 m        |
+| 70 mph                  | 3.5 m        |
+
+: Table illustrating the buffer widths for cycle infrastructure based on road type and speed limit according to the Cycling by Design (CbD) guidance. {#tbl-buffers}
+
+Speed limit data taken from OSM was used to determine the buffer width for each road segment.
+
+## Bus routes and road traffic assumptions
+
+The minimum space requirements for motor traffic depend on the uses of the road, including whether it is a bus route and whether there are dedicated bus lanes.
+Based on the Active Travel England cross section check tool, part of [Active Travel England's open access Excel-based design tools](https://www.gov.uk/government/publications/active-travel-england-design-assistance-tools) (see [acteng.github.io/inspectorate_tools/](https://acteng.github.io/inspectorate_tools/) for web-based versions), we assumed the following widths for motor traffic:
+
+-   Non-bus routes: 2 × 2.75 m
+-   Bus routes without dedicated bus lanes: 2 × 3.2 m
+-   Bus routes with dedicated bus lanes: 2 × 3.2 m plus an additional space of `n_bus_lanes` × 3.2 m for the dedicated bus lanes.
+
+<!-- https://overpass-turbo.eu/s/1Xaf -->
+
+The number of bus lanes was determined from the OSM data with the function [`get_bus_routes()`](https://nptscot.github.io/osmactive/reference/get_bus_routes.html) in the R package `osmactive` that we developed for this project.
+The results are illustrated in @fig-edinburgh-bus-lanes, which can also be reproduced with the following [Overpass Turbo query](https://overpass-turbo.eu/s/1Xaf):
+
+```         
+relation["route"="bus"]({{bbox}});
+```
+
+<!-- ![](https://private-user-images.githubusercontent.com/1825120/403049322-97f3ce0e-7d0f-42ab-b2d5-e7557c4ebece.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Mzc5OTg1NDcsIm5iZiI6MTczNzk5ODI0NywicGF0aCI6Ii8xODI1MTIwLzQwMzA0OTMyMi05N2YzY2UwZS03ZDBmLTQyYWItYjJkNS1lNzU1N2M0ZWJlY2UucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDEyNyUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTAxMjdUMTcxNzI3WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9OGRlODM0ODhkYTkzNDUyMzcxYWZkMzFlY2M4Yjk3YmE3ODQzMTU0ZGM0MjVmMTU5ZGU5MzBlMzVhZDM3Y2MyNSZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.seGt2frqknDrrU5Y6pgptC24sgXGhn06pQ3t-diXmLA) -->
+
+<!-- wget https://private-user-images.githubusercontent.com/1825120/403049322-97f3ce0e-7d0f-42ab-b2d5-e7557c4ebece.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Mzc5OTg1NDcsIm5iZiI6MTczNzk5ODI0NywicGF0aCI6Ii8xODI1MTIwLzQwMzA0OTMyMi05N2YzY2UwZS03ZDBmLTQyYWItYjJkNS1lNzU1N2M0ZWJlY2UucG5nP1gtQW16LUFsZ29yaXRobT1BV1M0LUhNQUMtU0hBMjU2JlgtQW16LUNyZWRlbnRpYWw9QUtJQVZDT0RZTFNBNTNQUUs0WkElMkYyMDI1MDEyNyUyRnVzLWVhc3QtMSUyRnMzJTJGYXdzNF9yZXF1ZXN0JlgtQW16LURhdGU9MjAyNTAxMjdUMTcxNzI3WiZYLUFtei1FeHBpcmVzPTMwMCZYLUFtei1TaWduYXR1cmU9OGRlODM0ODhkYTkzNDUyMzcxYWZkMzFlY2M4Yjk3YmE3ODQzMTU0ZGM0MjVmMTU5ZGU5MzBlMzVhZDM3Y2MyNSZYLUFtei1TaWduZWRIZWFkZXJzPWhvc3QifQ.seGt2frqknDrrU5Y6pgptC24sgXGhn06pQ3t-diXmLA -O edinburgh_bus_lanes.png -->
+
+<!-- ![Bus routes in Edinburgh, extracted from OpenStreetMap](edinburgh_bus_lanes.png){#fig-edinburgh-bus-lanes} -->
+
+<!-- {{< pagebreak >}} -->
+
+# Results
+
+The result of the data engineering, data integration, modelling and visualisation steps described above is datasets that are visualised interactively in the NPT web application, using `pmtiles` for efficient rendering of large datasets [@gonçalves2023].
+The key components of the NPT are:
+
+-   The "Route network" layer, presenting data on cycling potential on OSM-based and simplified [@lovelace_reproducible_2024] network layers.
+-   The "Infrastructure and traffic" layer, which includes data on motor traffic levels and cycle infrastructure.
+-   The "Street space" layer, which categorises roads in accordance with the Cycling by Design guidance, specifying the methodology for classifying road spaces and cycle infrastructure, presented in @fig-street-space.
+-   The "Core network" layer, representing a cohesive network that could be a priority when planning new infrastructure, building on previous work [@szell2021].
+-   The [Network Planning Workspace (NPW)](https://nptscot.github.io/npw/) web application, which allows users to explore the data and create custom scenarios of infrastructure change.
+
+<!-- ![Street Space layer in Network Planning Tool for Scotland.](street_space.png){#fig-street-space} -->
+
+<!-- {{< pagebreak >}} -->
+
+# Conclusion
+
+The Network Planning Tool for Scotland is a cutting-edge web application designed for strategic cycle network planning.
+A unique feature of the NPT is its integration of multiple layers into a single tool, overcoming limitations of previous strategic network planning tools, which generally focus either on behaviour data or physical infrastructure.
+The new street space layer represents a step change in access to combined carriageway and corridor widths, the first time this data has been made available at a national level, to the best of our knowledge.
+
+In future work we plan to improve the NPT by incorporating new datasets from a variety of sources, including [Scotland's Spatial Hub](https://data.spatialhub.scot).
+We would like to develop context-specific classifications in the `osmactive` package to better address the diverse needs of different urban environments and support the roll-out the methods in new places.
+
+# References
+
+::: {#refs}
+:::
+
+# Acknowledgements {.appendix .unnumbered}
+
+<!-- Acknowledgement should be made of any funding bodies who have supported the work reported in the paper, of those who have given permission for their work to be reproduced or of individuals whose particular assistance is due recognition. Acknowledge data providers here where appropriate. -->
+
+Thanks to Transport Scotland for funding the development of the Network Planning Tool for Scotland, and to the many users who have provided feedback on the tool.
+Thanks to Sustrans Scotland, and Matt Davis and Angus Calder in particular, for collaborating on the project.
+
+Thanks to the OpenStreetMap community for creating and maintaining the data that underpins the NPT.
+<!-- Contains OS data © Crown copyright and database rights 2025 OS licence number 100046668. --> Thanks to Ordnance Survey for providing the MasterMap data that underpins the NPT (contains OS data © Crown copyright and database rights 2025 OS licence number 100046668).
+
+# Biographies {.appendix .unnumbered}
+
+<!-- All contributing authors should include a biography of no more than 50 words each outlining their career stage and research interests. -->
+
+Robin Lovelace is Professor of Transport Data Science at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation, with a focus on modeling transport systems, active travel, and decarbonisation.
+
+Zhao Wang is a researcher at the Leeds Institute for Transport Studies (ITS).
+Zhao specializes in machine learning, data science and geocomputation for transport planning and engineering.
+
+Hussein Mahfouz is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in data science and geocomputation for transport planning and engineering, with a focus on Demand Responsive Transport (DRT).
+
+Juan Pablo Fonseca Zamora is a PhD student at the Leeds Institute for Transport Studies (ITS) and specialises in new methods for traffic modelling.
+
+Angus Calder is a Senior Mobility Planner at Sustrans Scotland and specialises in active travel planning and infrastructure design.
+
+Martin Lucas-Smith is a Director at CycleStreets Ltd and specialises in open data and open source software for cycling.
+
+Dustin Carlino is an independent researcher and software developer, specialising in open source software development and geographic data science.
+
+Josiah Parry is a Senior Product Engineer at Environmental Systems Research Institute, Inc (Esri) and an open source software developer.
+
+Rosa Félix is a researcher at the University of Lisbon and specialises geographic methods for transport planning, with a focus on active travel and decarbonisation.
+
+```{=html}
+<!-- I confirm that this submission has been approved by all authors
+Would you like to be considered for the GoFundGeo Grant?
+
+The GISRUK & OSGeo:UK GoFundGeo grant is an annual £500 award for GISRUK presenters (oral or poster) who present a tool or technique that has potential for wide uptake in the open source geospatial (OSGeo) community. The purpose of the grant is to help the recipient to make their approach easily adoptable through the provision of open source code repository and/or tool (e.g. a QGIS plugin). This grant is open to all, but with a focus on ECRs.
+
+
+If you would like your submission to be considered for this award, please specify how the £500 grant would enable you to do to develop your code or method into a reusable tool.
+
+It would allow the osmactive R package to be developed to match the guidance for minimum standards in other countries, including Portugal (led by Rosa Félix) and Norway (led by Ray Pritchard), for the benefit of transport planners worldwide. We will do a call for community input to crowd source input from the OSM and active travel advocacy groups internationally as part of the grant process, which will fund a hackathon (travel and sustenance) on the package. See https://github.com/nptscot/osmactive for details. -->
+```
