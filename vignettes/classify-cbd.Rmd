@@ -288,7 +288,7 @@ los_table_long_missing <- tibble::tribble(
   "50 mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
   "50 mph", "4000+", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
   # --- 60+ mph ---
-  "60+ mph", "0 to 999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
+  "60+ mph", "0 to 999", "Mixed Traffic Street", 1, # CbD: 80kph+, All flows, Mixed = X (0)
   "60+ mph", "1000 to 1999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
   "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
   "60+ mph", "4000+", "Mixed Traffic Street", 0 # CbD: 80kph+, All flows, Mixed = X (0)
