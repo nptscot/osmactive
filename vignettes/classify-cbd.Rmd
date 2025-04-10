@@ -45,34 +45,31 @@ devtools::load_all()
 #            Shared Footway        Painted Cycle Lane 
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
+
+
 los_table = read_csv("inst/extdata/level-of-service-table.csv")
-# los_table = read_csv("inst/extdata/level-of-service-table.csv")
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
-#  [2] "Speed Limit (mph)"                    
-#  [3] "Two-way traffic flow (pcu per day)"   
-#  [4] "Two-way traffic flow (pcu per hour)"  
-#  [5] "Mixed Traffic Street"                 
-#  [6] "Detached or Remote Cycle Track"       
-#  [7] "Cycle Track at Carriageway Level"     
-#  [8] "Stepped or Footway Level Cycle Track" 
-#  [9] "Light Segregation"                    
-# [10] "Cycle Lane"
-table(los_table$`Two-way traffic flow (pcu per day)`)
-    # 0 to 999 1000 to 1999        1000+ 2000 to 4000        2000+        4000+
-  #          4            1            2            2            2            1
-    #        5            3            2            2            1            2
-  #      4000+          All 
-    #      All
-  #          2            1 
-    #        1
+#  [2] "Speed Limit (mph)"
+#  [3] "Speed Limit (kph)"
+#  [4] "Two-way traffic flow (pcu per day)"
+#  [5] "Two-way traffic flow (pcu per hour)"
+#  [6] "Mixed Traffic Street"
+#  [7] "Detached or Remote Cycle Track"
+#  [8] "Cycle Track at Carriageway Level"
+#  [9] "Stepped or Footway Level Cycle Track"
+# [10] "Light Segregation"
+# [11] "Cycle Lane"
+
+
 los_table_npt = los_table |>
   transmute(
     `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
     `Speed Limit (mph)` = `Speed Limit (mph)`,
+    `Speed Limit (kph)` = `Speed Limit (kph)`,
     AADT = `Two-way traffic flow (pcu per day)`,
     `Mixed Traffic Street`,
-    `Off road cycleway` = `Detached or Remote Cycle Track`,
+    `Off Road Cycleway` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
     `Segregated Track (narrow)` = `Light Segregation`,
     `Painted Cycle Lane` = `Cycle Lane`
@@ -84,28 +81,74 @@ los_table_npt = los_table |>
 
 los_table_npt |>
   knitr::kable()
+
+
+los_table_npt_long <- los_table_npt %>%
+  pivot_longer(
+    cols = c("Mixed Traffic Street",
+             "Off Road Cycleway",
+             "Segregated Track (wide)",
+             "Segregated Track (narrow)",
+             "Painted Cycle Lane"),
+    names_to = "infrastructure",
+    values_to = "level_of_service"
+  )
+
+output_lines <- los_table_npt_long %>%
+  mutate(
+    line_text = paste0(
+      '"', `Speed (85th kph)`, '", ',
+      '"', `Speed Limit (mph)`, '", ',
+      '"', `Speed Limit (kph)`, '", ',
+      '"', AADT, '", ',
+      '"', infrastructure, '", ',
+      level_of_service, ','
+    )
+  ) %>%
+  pull(line_text)
+
+# 5. Print or write each line
+cat(output_lines, sep = "\n")
+
+header_line <- paste0(
+  '"Speed (85th kph)",',
+  ' "Speed Limit (mph)",',
+  ' "Speed Limit (kph)",',
+  ' "AADT",',
+  ' "infrastructure",',
+  ' "level_of_service"'
+)
+all_lines <- c(header_line, output_lines)
+# Save the formatted lines directly to a file
+writeLines(all_lines, "inst/extdata/level-of-service-all.csv")
+usethis::use_data(all_lines, overwrite = TRUE)
 ```
 
-<!-- We can convert this table into a 'long' format for use internally. -->
+# Testing the classification
 
 ```{r}
-#| eval: false
-#| echo: false
-los_table_long = los_table_npt |>
-  pivot_longer(cols = -c(`Speed (85th kph)`, `Speed Limit (mph)`, AADT),
-               names_to = "infrastructure",
-               values_to = "level_of_service")
-# # Identify duplicates:
-# duplicated(los_table_long)
-los_table_long = los_table_long |>
-  arrange(`Speed Limit (mph)`, AADT, infrastructure) |>
-  distinct()
-los_table_long
-write_csv(los_table_long, "inst/extdata/level-of-service-table-long.csv")
-usethis::use_data(los_table_long, overwrite = TRUE)
+osm = osm_edinburgh
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+drive_net_major = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+table(cycle_net$detailed_segregation)
+table(cycle_net$cycle_segregation)
 ```
 
-<!-- Next, we calculate the speed limits. -->
+
+We can then create the `Speed Limit (mph)` and `AADT` columns in the `cycle_net` object:
+
+```{r}
+cycle_net_speeds = clean_speeds(cycle_net)
+cycle_net_volumes = estimate_traffic(cycle_net_speeds)
+cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
+cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net_volumes$assumed_volume)
+table(cycle_net$`Speed Limit (mph)`)
+table(cycle_net$AADT)
+```
+
 
 ```{r}
 #| eval: false
@@ -130,164 +173,6 @@ classify_speeds = function(speed_mph) {
 classify_speeds(30)
 classify_speeds(10)
 classify_speeds(NA)
-```
-
-We can then create the `Speed Limit (mph)` and `AADT` columns in the `cycle_net` object:
-
-```{r}
-cycle_net_speeds = clean_speeds(cycle_net)
-cycle_net_volumes = estimate_traffic(cycle_net_speeds)
-cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
-cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net_volumes$assumed_volume)
-table(cycle_net$`Speed Limit (mph)`)
-table(cycle_net$AADT)
-```
-
-Finally, we can calculate the level of service for each link:
-
-```{r}
-#| eval: false
-#| echo: false
-los_table_long_mini = los_table_long |>
-  rename(cycle_segregation = infrastructure)
-cycle_net_los = left_join(cycle_net, los_table_long_mini)
-table(cycle_net_los$level_of_service)
-# Count the NAs by infrastructure type, speed limit and AADT:
-los_table_nas = cycle_net_los |>
-  sf::st_drop_geometry() |>
-  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
-  summarise(na = sum(is.na(level_of_service))) |>
-  filter(na > 0) |>
-  arrange(desc(na))
-# los_table_nas
-# # waldo::compare(names(los_table_nas), names(los_table_long_mini))
-#  1 NA                  NA           Shared Footway             3295
-#  2 NA                  NA           Off Road Cycleway           971
-#  3 NA                  NA           Segregated Track (narrow)   746
-#  4 NA                  NA           Segregated Track (wide)     211
-#  5 30 mph              4000+        Painted Cycle Lane          179
-#  6 40 mph              4000+        Painted Cycle Lane           84
-#  7 30 mph              4000+        Segregated Track (narrow)    33
-#  8 60+ mph             4000+        Painted Cycle Lane           22
-#  9 20 mph              0 to 1999    Shared Footway               20
-# 10 20 mph              NA           Segregated Track (narrow)     9
-# 11 20 mph              NA           Shared Footway                9
-# 12 40 mph              2000 to 3999 Painted Cycle Lane            6
-# 13 20 mph              NA           Off Road Cycleway             2
-# 14 40 mph              4000+        Segregated Track (narrow)     2
-# 15 50 mph              4000+        Painted Cycle Lane            2
-# 16 20 mph              NA           Segregated Track (wide)       1
-# 17 30 mph              2000 to 3999 Shared Footway                1
-# 18 <20 mph             NA           Segregated Track (narrow)     1
-```
-
-<!-- We can add the missing categories as follows: -->
-
-```{r}
-#| eval: false
-#| echo: false
-los_table_long_missing = tibble::tribble(
-  # Added `Speed (85th kph)` column with specific kph ranges
-  ~`Speed (85th kph)`, ~`Speed Limit (mph)`, ~AADT, ~cycle_segregation, ~level_of_service,
-  "50 kph to 65 kph", "30 mph", "4000+", "Painted Cycle Lane", 1,
-  "65 kph to 80 kph", "40 mph", "4000+", "Painted Cycle Lane", 1,
-  "80 kph to 95 kph", "50 mph", "4000+", "Painted Cycle Lane", 0,
-  "95 kph to 110 kph", "60+ mph", "4000+", "Painted Cycle Lane", 0,
-  "65 kph to 80 kph", "40 mph", "2000 to 3999", "Painted Cycle Lane", 1,
-  "80 kph to 95 kph", "50 mph", "2000 to 3999", "Painted Cycle Lane", 0,
-  "95 kph to 110 kph", "60+ mph", "2000 to 3999", "Painted Cycle Lane", 0,
-  "65 kph to 80 kph", "40 mph", "1000 to 1999", "Painted Cycle Lane", 1,
-  "65 kph to 80 kph", "40 mph", "0 to 999", "Painted Cycle Lane", 1,
-  "80 kph to 95 kph", "50 mph", "1000 to 1999", "Painted Cycle Lane", 0,
-  "80 kph to 95 kph", "50 mph", "0 to 999", "Painted Cycle Lane", 1,
-  "95 kph to 110 kph", "60+ mph", "1000 to 1999", "Painted Cycle Lane", 0,
-  "95 kph to 110 kph", "60+ mph", "0 to 999", "Painted Cycle Lane", 0,
-  "50 kph to 65 kph", "30 mph", "4000+", "Segregated Track (narrow)", 1,
-  "65 kph to 80 kph", "40 mph", "4000+", "Segregated Track (narrow)", 1,
-  "80 kph to 95 kph", "50 mph", "4000+", "Segregated Track (narrow)", 0,
-  "95 kph to 110 kph", "60+ mph", "4000+", "Segregated Track (narrow)", 0,
-  "65 kph to 80 kph", "40 mph", "2000 to 3999", "Segregated Track (narrow)", 1,
-  "80 kph to 95 kph", "50 mph", "2000 to 3999", "Segregated Track (narrow)", 0,
-  "95 kph to 110 kph", "60+ mph", "2000 to 3999", "Segregated Track (narrow)", 0,
-  "65 kph to 80 kph", "40 mph", "1000 to 1999", "Segregated Track (narrow)", 1,
-  "65 kph to 80 kph", "40 mph", "0 to 999", "Segregated Track (narrow)", 2,
-  "80 kph to 95 kph", "50 mph", "1000 to 1999", "Segregated Track (narrow)", 0,
-  "80 kph to 95 kph", "50 mph", "0 to 999", "Segregated Track (narrow)", 1,
-  "95 kph to 110 kph", "60+ mph", "1000 to 1999", "Segregated Track (narrow)", 0,
-  "95 kph to 110 kph", "60+ mph", "0 to 999", "Segregated Track (narrow)", 0,
-  "50 kph to 65 kph", "30 mph", "4000+", "Segregated Track (wide)", 2,
-  "50 kph to 65 kph", "30 mph", "2000 to 3999", "Segregated Track (wide)", 2,
-  "50 kph to 65 kph", "30 mph", "1000 to 1999", "Segregated Track (wide)", 2,
-  "50 kph to 65 kph", "30 mph", "0 to 999", "Segregated Track (wide)", 2,
-  "65 kph to 80 kph", "40 mph", "4000+", "Segregated Track (wide)", 1,
-  "65 kph to 80 kph", "40 mph", "2000 to 3999", "Segregated Track (wide)", 1,
-  "65 kph to 80 kph", "40 mph", "1000 to 1999", "Segregated Track (wide)", 1,
-  "65 kph to 80 kph", "40 mph", "0 to 999", "Segregated Track (wide)", 2,
-  "80 kph to 95 kph", "50 mph", "4000+", "Segregated Track (wide)", 1,
-  "80 kph to 95 kph", "50 mph", "2000 to 3999", "Segregated Track (wide)", 1,
-  "80 kph to 95 kph", "50 mph", "1000 to 1999", "Segregated Track (wide)", 1,
-  "80 kph to 95 kph", "50 mph", "0 to 999", "Segregated Track (wide)", 1,
-  "95 kph to 110 kph", "60+ mph", "4000+", "Segregated Track (wide)", 1,
-  "95 kph to 110 kph", "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1,
-  "95 kph to 110 kph", "60+ mph", "1000 to 1999", "Segregated Track (wide)", 1,
-  "95 kph to 110 kph", "60+ mph", "0 to 999", "Segregated Track (wide)", 1,
-  "30 kph to 50 kph", "20 mph",  "1000 to 1999", "Mixed Traffic Street", 2,
-  "30 kph to 50 kph", "20 mph",  "0 to 999", "Mixed Traffic Street", 3,
-  "30 kph to 50 kph", "20 mph",  "2000 to 3999", "Mixed Traffic Street", 2,
-  "30 kph to 50 kph", "20 mph",  "4000+", "Mixed Traffic Street", 1,
-  "50 kph to 65 kph", "30 mph", "1000 to 1999", "Mixed Traffic Street", 1,
-  "50 kph to 65 kph", "30 mph", "0 to 999", "Mixed Traffic Street", 2,
-  "50 kph to 65 kph", "30 mph", "2000 to 3999", "Mixed Traffic Street", 0,
-  "50 kph to 65 kph", "30 mph", "4000+", "Mixed Traffic Street", 0,
-  "65 kph to 80 kph", "40 mph", "1000 to 1999", "Mixed Traffic Street", 0,
-  "65 kph to 80 kph", "40 mph", "0 to 999", "Mixed Traffic Street", 1,
-  "65 kph to 80 kph", "40 mph", "2000 to 3999", "Mixed Traffic Street", 0,
-  "65 kph to 80 kph", "40 mph", "4000+", "Mixed Traffic Street", 0,
-  "80 kph to 95 kph", "50 mph", "1000 to 1999", "Mixed Traffic Street", 0,
-  "80 kph to 95 kph", "50 mph", "0 to 999", "Mixed Traffic Street", 1,
-  "80 kph to 95 kph", "50 mph", "2000 to 3999", "Mixed Traffic Street", 0,
-  "80 kph to 95 kph", "50 mph", "4000+", "Mixed Traffic Street", 0,
-  "95 kph to 110 kph", "60+ mph", "1000 to 1999", "Mixed Traffic Street", 0,
-  "95 kph to 110 kph", "60+ mph", "0 to 999", "Mixed Traffic Street", 0,
-  "95 kph to 110 kph", "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0,
-  "95 kph to 110 kph", "60+ mph", "4000+", "Mixed Traffic Street", 0,
-  "30 kph to 50 kph", "20 mph",  "0 to 999", "Painted Cycle Lane", 3,
-  "30 kph to 50 kph", "20 mph",  "1000 to 1999", "Painted Cycle Lane", 2,
-  "30 kph to 50 kph", "20 mph",  "2000 to 3999", "Painted Cycle Lane", 2,
-  "30 kph to 50 kph", "20 mph",  "4000+", "Painted Cycle Lane", 1,
-  "30 kph to 50 kph", "20 mph",  "1000 to 1999", "Mixed Traffic Street", 2,
-  "30 kph to 50 kph", "20 mph",  "0 to 999", "Mixed Traffic Street", 3,
-  "30 kph to 50 kph", "20 mph",  "2000 to 3999", "Mixed Traffic Street", 2,
-  "30 kph to 50 kph", "20 mph",  "4000+", "Mixed Traffic Street", 1,
-  # Add missing combinations for 20 mph Painted Cycle Lane
-  "30 kph to 50 kph", "20 mph",  "0 to 999", "Painted Cycle Lane", 3,
-  "30 kph to 50 kph", "20 mph",  "1000 to 1999", "Painted Cycle Lane", 2,
-  "30 kph to 50 kph", "20 mph",  "2000 to 3999", "Painted Cycle Lane", 2,
-  "30 kph to 50 kph", "20 mph",  "4000+", "Painted Cycle Lane", 1,
-)
-los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
-duplicated(los_table_long_mini_updated)
-los_table_complete = los_table_long_mini_updated |>
-  # Remove All traffic level:
-  filter(AADT != "All") |>
-  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
-  summarise(level_of_service = max(level_of_service)) |>
-  arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
-write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
-usethis::use_data(los_table_complete, overwrite = TRUE)
-```
-
-# Testing the classification
-
-```{r}
-osm = osm_edinburgh
-cycle_net = get_cycling_network(osm)
-drive_net = get_driving_network(osm)
-drive_net_major = get_driving_network(osm)
-cycle_net = distance_to_road(cycle_net, drive_net)
-cycle_net = classify_cycle_infrastructure(cycle_net)
-table(cycle_net$detailed_segregation)
-table(cycle_net$cycle_segregation)
 ```
 
 ```{r minimal_plot_osm}
