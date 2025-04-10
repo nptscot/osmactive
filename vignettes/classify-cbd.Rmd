@@ -29,7 +29,7 @@ The default classification is the Cycling by Design guidance from the Scottish G
 
 The level of service associated with each link can be calculated based on the Level of Service table in the Cycling by Design guidance:
 
-![](https://nptscot.github.io/CbDs/clos_facilities.png)
+![](https://nptscot.github.io/images/clos_facilities.png)
 
 <!-- A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories: -->
 
