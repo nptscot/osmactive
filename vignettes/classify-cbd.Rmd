@@ -268,8 +268,10 @@ los_table_long_missing = tibble::tribble(
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
 los_table_complete = los_table_long_mini_updated |>
-  group_by(`Speed (85th kph)`, `Speed Limit (mph)`, AADT, cycle_segregation) |>
-  summarise(level_of_service = max(level_of_service), .groups = 'drop') |>
+  # Remove All traffic level:
+  filter(AADT != "All") |>
+  group_by(`Speed Limit (mph)`, AADT, cycle_segregation) |>
+  summarise(level_of_service = max(level_of_service)) |>
   arrange(`Speed Limit (mph)`, AADT, cycle_segregation)
 write_csv(los_table_complete, "inst/extdata/level-of-service-table-complete.csv")
 usethis::use_data(los_table_complete, overwrite = TRUE)
@@ -307,7 +309,7 @@ cycle_net <- cycle_net |>
       (\(nearest_id) drive_net$maxspeed[nearest_id])(),
     maxspeed
   ))
-  
+
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 central_edinburgh = osm_edinburgh |>
