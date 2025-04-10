@@ -73,10 +73,33 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="fu">tmap</span><span class="fu">::</span><span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tmap_mode.html" class="external-link">tmap_mode</a></span><span class="op">(</span><span class="st">"view"</span><span class="op">)</span></span></code></pre></div>
 <p>The default classification is the Cycling by Design guidance from the
-Scottish Government. This is a detailed classification system that
-includes the following categories, based on a minimal example
-dataset:</p>
+Scottish Government. The following code shows how we implemented it.</p>
+<div class="section level2">
+<h2 id="transport-scotlands-cycling-by-design-classification">Transport Scotland’s Cycling by Design classification<a class="anchor" aria-label="anchor" href="#transport-scotlands-cycling-by-design-classification"></a>
+</h2>
+<p>The level of service associated with each link can be calculated
+based on the Level of Service table in the Cycling by Design
+guidance:</p>
+<p><img src="https://nptscot.github.io/images/clos_facilities.png"></p>
+<!-- A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories: -->
+<!-- We can convert this table into a 'long' format for use internally. -->
+<!-- Next, we calculate the speed limits. -->
+<p>We can then create the <code>Speed Limit (mph)</code> and
+<code>AADT</code> columns in the <code>cycle_net</code> object:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cycle_net_speeds</span> <span class="op">=</span> <span class="fu"><a href="../reference/clean_speeds.html">clean_speeds</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
+<span><span class="va">cycle_net_volumes</span> <span class="op">=</span> <span class="fu"><a href="../reference/estimate_traffic.html">estimate_traffic</a></span><span class="op">(</span><span class="va">cycle_net_speeds</span><span class="op">)</span></span>
+<span><span class="va">cycle_net</span><span class="op">$</span><span class="va">`Speed Limit (mph)`</span> <span class="op">=</span> <span class="fu"><a href="../reference/classify_speeds.html">classify_speeds</a></span><span class="op">(</span><span class="va">cycle_net_speeds</span><span class="op">$</span><span class="va">maxspeed_clean</span><span class="op">)</span></span>
+<span><span class="va">cycle_net</span><span class="op">$</span><span class="va">AADT</span> <span class="op">=</span> <span class="fu"><a href="../reference/npt_to_cbd_aadt_numeric.html">npt_to_cbd_aadt_numeric</a></span><span class="op">(</span><span class="va">cycle_net_volumes</span><span class="op">$</span><span class="va">assumed_volume</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">`Speed Limit (mph)`</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">AADT</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, we can calculate the level of service for each link:</p>
+<!-- We can add the missing categories as follows: -->
+</div>
+<div class="section level2">
+<h2 id="testing-the-classification">Testing the classification<a class="anchor" aria-label="anchor" href="#testing-the-classification"></a>
+</h2>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">osm</span> <span class="op">=</span> <span class="va">osm_edinburgh</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
@@ -85,12 +108,12 @@ dataset:</p>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">detailed_segregation</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">cycle_segregation</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osm_tmap.html">plot_osm_tmap</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <p>Let’s try running the code on a larger example, covering
 Edinburgh:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Edinburgh"</span><span class="op">)</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
@@ -115,7 +138,7 @@ case that doesn’t seem like off-road.</p>
 with no parallel road nearby.</p>
 </blockquote>
 <p>Let’s pull out those bits of infrastructure:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cycle_net_included</span> <span class="op">=</span> <span class="va">cycle_net</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">osm_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1137759929</span>, <span class="fl">1209807768</span>, <span class="fl">7973833</span>, <span class="fl">265320503</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cycle_net_included</span><span class="op">)</span></span>
@@ -123,31 +146,19 @@ with no parallel road nearby.</p>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>We can also plot these as follows:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osm_tmap.html">plot_osm_tmap</a></span><span class="op">(</span><span class="va">cycle_net_included</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="level-of-service">Level of service<a class="anchor" aria-label="anchor" href="#level-of-service"></a>
-</h2>
-<p>The level of service associated with each link can be calculated
-based on the Level of Service table in the Cycling by Design
-guidance:</p>
-<p><img src="https://nptscot.github.io/images/clos_facilities.png"></p>
-<!-- A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories: -->
-<!-- We can convert this table into a 'long' format for use internally. -->
-<!-- Next, we calculate the speed limits. -->
-<p>We can then create the <code>Speed Limit (mph)</code> and
-<code>AADT</code> columns in the <code>cycle_net</code> object:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cycle_net_speeds</span> <span class="op">=</span> <span class="fu"><a href="../reference/clean_speeds.html">clean_speeds</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
-<span><span class="va">cycle_net_volumes</span> <span class="op">=</span> <span class="fu"><a href="../reference/estimate_traffic.html">estimate_traffic</a></span><span class="op">(</span><span class="va">cycle_net_speeds</span><span class="op">)</span></span>
-<span><span class="va">cycle_net</span><span class="op">$</span><span class="va">`Speed Limit (mph)`</span> <span class="op">=</span> <span class="fu"><a href="../reference/classify_speeds.html">classify_speeds</a></span><span class="op">(</span><span class="va">cycle_net_speeds</span><span class="op">$</span><span class="va">maxspeed_clean</span><span class="op">)</span></span>
-<span><span class="va">cycle_net</span><span class="op">$</span><span class="va">AADT</span> <span class="op">=</span> <span class="fu"><a href="../reference/npt_to_cbd_aadt_numeric.html">npt_to_cbd_aadt_numeric</a></span><span class="op">(</span><span class="va">cycle_net_volumes</span><span class="op">$</span><span class="va">assumed_volume</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">`Speed Limit (mph)`</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">$</span><span class="va">AADT</span><span class="op">)</span></span></code></pre></div>
-<p>Finally, we can calculate the level of service for each link:</p>
-<!-- We can add the missing categories as follows: -->
+<div class="section level3">
+<h3 id="tests-for-leith-walk">Tests for Leith Walk<a class="anchor" aria-label="anchor" href="#tests-for-leith-walk"></a>
+</h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drive_net_speeds</span> <span class="op">=</span> <span class="fu"><a href="../reference/clean_speeds.html">clean_speeds</a></span><span class="op">(</span><span class="va">drive_net</span><span class="op">)</span></span>
+<span><span class="co"># Check for Leith Walk</span></span>
+<span><span class="va">drive_net_speeds</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">name</span> <span class="op">==</span> <span class="st">"Leith Walk"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"speed"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># devtools::load_all()</span></span>
 <span><span class="va">cycle_net_los</span> <span class="op">=</span> <span class="fu"><a href="../reference/level_of_service.html">level_of_service</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span> </span>
 <span><span class="co"># |&gt;</span></span>
@@ -162,9 +173,11 @@ guidance:</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">na</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">cycle_net_los_plot</span> <span class="op">=</span> <span class="va">cycle_net_los</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">osm_id</span>, <span class="va">`Speed Limit (mph)`</span>, <span class="va">AADT</span>, <span class="va">cycle_segregation</span>, <span class="va">`Level of Service`</span><span class="op">)</span></span>
-<span><span class="co"># mapview::mapview(cycle_net_los_plot, zcol = "Level of Service")</span></span></code></pre></div>
+<span><span class="fu">mapview</span><span class="fu">::</span><span class="fu">mapview</span><span class="op">(</span><span class="va">cycle_net_los</span>, zcol <span class="op">=</span> <span class="st">"Level of Service"</span><span class="op">)</span></span></code></pre></div>
 </div>
-  </main>
+</div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
