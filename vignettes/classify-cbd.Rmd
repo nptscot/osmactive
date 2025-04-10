@@ -29,7 +29,7 @@ The default classification is the Cycling by Design guidance from the Scottish G
 
 The level of service associated with each link can be calculated based on the Level of Service table in the Cycling by Design guidance:
 
-![](https://nptscot.github.io/images/clos_facilities.png)
+![](https://nptscot.github.io/CbDs/clos_facilities.png)
 
 <!-- A tabular representation of this data is as follows, after translating CbD infrastructure categories into NPT categories: -->
 
@@ -186,76 +186,76 @@ los_table_nas = cycle_net_los |>
 los_table_long_missing <- tibble::tribble(
   ~`Speed Limit (mph)`, ~AADT, ~cycle_segregation, ~level_of_service,
   # Painted Cycle Lane -> Cycle Lane
-  "30 mph", "4000+", "Painted Cycle Lane", 1, # Image: 30-50kph, 4000+, Cycle Lane = ● (1)
-  "40 mph", "4000+", "Painted Cycle Lane", 1, # Image: 50-65kph, 2000+, Cycle Lane = ● (1)
+  "30 mph", "4000+", "Painted Cycle Lane", 1, # CbD: 30-50kph, 4000+, Cycle Lane = ● (1)
+  "40 mph", "4000+", "Painted Cycle Lane", 1, # CbD: 50-65kph, 2000+, Cycle Lane = ● (1)
   # Removed duplicate row here
-  "40 mph", "2000 to 3999", "Painted Cycle Lane", 1, # Image: 50-65kph, 2000+, Cycle Lane = ● (1)
-  "40 mph", "0 to 999", "Painted Cycle Lane", 2, # Image: 50-65kph, 0-1000, Cycle Lane = ●● (2) - Updated from 1
-  "40 mph", "1000 to 1999", "Painted Cycle Lane", 1, # Image: 50-65kph, 1000-2000, Cycle Lane = ● (1)
-  "50 mph", "4000+", "Painted Cycle Lane", 1, # Image: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
-  "50 mph", "2000 to 3999", "Painted Cycle Lane", 1, # Image: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
-  "50 mph", "0 to 999", "Painted Cycle Lane", 2, # Image: 65-80kph, 0-1000, Cycle Lane = ●● (2) - Updated from 0
-  "50 mph", "1000 to 1999", "Painted Cycle Lane", 1, # Image: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
-  "60+ mph", "4000+", "Painted Cycle Lane", 0, # Image: 80kph+, All flows, Cycle Lane = X (0)
-  "60+ mph", "2000 to 3999", "Painted Cycle Lane", 0, # Image: 80kph+, All flows, Cycle Lane = X (0)
-  "60+ mph", "0 to 999", "Painted Cycle Lane", 0, # Image: 80kph+, All flows, Cycle Lane = X (0)
-  "60+ mph", "1000 to 1999", "Painted Cycle Lane", 0, # Image: 80kph+, All flows, Cycle Lane = X (0)
+  "40 mph", "2000 to 3999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 2000+, Cycle Lane = ● (1)
+  "40 mph", "0 to 999", "Painted Cycle Lane", 2, # CbD: 50-65kph, 0-1000, Cycle Lane = ●● (2) - Updated from 1
+  "40 mph", "1000 to 1999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 1000-2000, Cycle Lane = ● (1)
+  "50 mph", "4000+", "Painted Cycle Lane", 1, # CbD: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
+  "50 mph", "2000 to 3999", "Painted Cycle Lane", 1, # CbD: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
+  "50 mph", "0 to 999", "Painted Cycle Lane", 2, # CbD: 65-80kph, 0-1000, Cycle Lane = ●● (2) - Updated from 0
+  "50 mph", "1000 to 1999", "Painted Cycle Lane", 1, # CbD: 65-80kph, 1000+, Cycle Lane = ● (1) - Updated from 0
+  "60+ mph", "4000+", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
+  "60+ mph", "2000 to 3999", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
+  "60+ mph", "0 to 999", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
+  "60+ mph", "1000 to 1999", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
 
   # Segregated Track (narrow) -> Light Segregation
-  "30 mph", "4000+", "Segregated Track (narrow)", 2, # Image: 30-50kph, 4000+, Light Seg = ●● (2) - Updated from 1
-  "40 mph", "4000+", "Segregated Track (narrow)", 1, # Image: 50-65kph, 2000+, Light Seg = ● (1)
-  "40 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # Image: 50-65kph, 2000+, Light Seg = ● (1)
-  "40 mph", "0 to 999", "Segregated Track (narrow)", 2, # Image: 50-65kph, 0-1000, Light Seg = ●● (2)
-  "40 mph", "1000 to 1999", "Segregated Track (narrow)", 1, # Image: 50-65kph, 1000-2000, Light Seg = ● (1)
-  "50 mph", "4000+", "Segregated Track (narrow)", 1, # Image: 65-80kph, 1000+, Light Seg = ● (1) - Updated from 0
-  "50 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # Image: 65-80kph, 1000+, Light Seg = ● (1) - Updated from 0
-  "50 mph", "0 to 999", "Segregated Track (narrow)", 2, # Image: 65-80kph, 0-1000, Light Seg = ●● (2)
-  "50 mph", "1000 to 1999", "Segregated Track (narrow)", 1, # Image: 65-80kph, 1000+, Light Seg = ● (1)
-  "60+ mph", "4000+", "Segregated Track (narrow)", 0, # Image: 80kph+, All flows, Light Seg = X (0)
-  "60+ mph", "2000 to 3999", "Segregated Track (narrow)", 0, # Image: 80kph+, All flows, Light Seg = X (0)
-  "60+ mph", "0 to 999", "Segregated Track (narrow)", 0, # Image: 80kph+, All flows, Light Seg = X (0)
-  "60+ mph", "1000 to 1999", "Segregated Track (narrow)", 0, # Image: 80kph+, All flows, Light Seg = X (0)
+  "30 mph", "4000+", "Segregated Track (narrow)", 2, # CbD: 30-50kph, 4000+, Light Seg = ●● (2) - Updated from 1
+  "40 mph", "4000+", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 2000+, Light Seg = ● (1)
+  "40 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 2000+, Light Seg = ● (1)
+  "40 mph", "0 to 999", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 0-1000, Light Seg = ●● (2)
+  "40 mph", "1000 to 1999", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 1000-2000, Light Seg = ● (1)
+  "50 mph", "4000+", "Segregated Track (narrow)", 1, # CbD: 65-80kph, 1000+, Light Seg = ● (1) - Updated from 0
+  "50 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # CbD: 65-80kph, 1000+, Light Seg = ● (1) - Updated from 0
+  "50 mph", "0 to 999", "Segregated Track (narrow)", 2, # CbD: 65-80kph, 0-1000, Light Seg = ●● (2)
+  "50 mph", "1000 to 1999", "Segregated Track (narrow)", 1, # CbD: 65-80kph, 1000+, Light Seg = ● (1)
+  "60+ mph", "4000+", "Segregated Track (narrow)", 0, # CbD: 80kph+, All flows, Light Seg = X (0)
+  "60+ mph", "2000 to 3999", "Segregated Track (narrow)", 0, # CbD: 80kph+, All flows, Light Seg = X (0)
+  "60+ mph", "0 to 999", "Segregated Track (narrow)", 0, # CbD: 80kph+, All flows, Light Seg = X (0)
+  "60+ mph", "1000 to 1999", "Segregated Track (narrow)", 0, # CbD: 80kph+, All flows, Light Seg = X (0)
 
   # Segregated Track (wide) -> Cycle Track at Carriageway Level
-  "30 mph", "4000+", "Segregated Track (wide)", 3, # Image: 30-50kph, 4000+, C'way Track = ●●● (3) - Updated from 2
-  "30 mph", "2000 to 3999", "Segregated Track (wide)", 3, # Image: 30-50kph, 2000-4000, C'way Track = ●●● (3) - Updated from 2
-  "30 mph", "0 to 999", "Segregated Track (wide)", 3, # Image: 30-50kph, 0-1000, C'way Track = ●●● (3)
-  "30 mph", "1000 to 1999", "Segregated Track (wide)", 3, # Image: 30-50kph, 1000-2000, C'way Track = ●●● (3) - Updated from 2
-  "40 mph", "4000+", "Segregated Track (wide)", 3, # Image: 50-65kph, 2000+, C'way Track = ●●● (3) - Updated from 1
-  "40 mph", "2000 to 3999", "Segregated Track (wide)", 3, # Image: 50-65kph, 2000+, C'way Track = ●●● (3) - Updated from 1
-  "40 mph", "0 to 999", "Segregated Track (wide)", 3, # Image: 50-65kph, 0-1000, C'way Track = ●●● (3) - Updated from 1
-  "40 mph", "1000 to 1999", "Segregated Track (wide)", 3, # Image: 50-65kph, 1000-2000, C'way Track = ●●● (3) - Updated from 1
-  "50 mph", "4000+", "Segregated Track (wide)", 3, # Image: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
-  "50 mph", "2000 to 3999", "Segregated Track (wide)", 3, # Image: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
-  "50 mph", "0 to 999", "Segregated Track (wide)", 3, # Image: 65-80kph, 0-1000, C'way Track = ●●● (3) - Updated from 1
-  "50 mph", "1000 to 1999", "Segregated Track (wide)", 3, # Image: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
-  # For 60+ mph, the image shows different LoS for 80-95kph vs 95-110kph. Using the lower LoS (from 95-110kph) for a conservative "60+" value.
-  "60+ mph", "4000+", "Segregated Track (wide)", 1, # Image: 95-110kph, All flows, C'way Track = ● (1)
-  "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1, # Image: 95-110kph, All flows, C'way Track = ● (1)
-  "60+ mph", "0 to 999", "Segregated Track (wide)", 1, # Image: 95-110kph, All flows, C'way Track = ● (1)
-  "60+ mph", "1000 to 1999", "Segregated Track (wide)", 1, # Image: 95-110kph, All flows, C'way Track = ● (1)
+  "30 mph", "4000+", "Segregated Track (wide)", 3, # CbD: 30-50kph, 4000+, C'way Track = ●●● (3) - Updated from 2
+  "30 mph", "2000 to 3999", "Segregated Track (wide)", 3, # CbD: 30-50kph, 2000-4000, C'way Track = ●●● (3) - Updated from 2
+  "30 mph", "0 to 999", "Segregated Track (wide)", 3, # CbD: 30-50kph, 0-1000, C'way Track = ●●● (3)
+  "30 mph", "1000 to 1999", "Segregated Track (wide)", 3, # CbD: 30-50kph, 1000-2000, C'way Track = ●●● (3) - Updated from 2
+  "40 mph", "4000+", "Segregated Track (wide)", 3, # CbD: 50-65kph, 2000+, C'way Track = ●●● (3) - Updated from 1
+  "40 mph", "2000 to 3999", "Segregated Track (wide)", 3, # CbD: 50-65kph, 2000+, C'way Track = ●●● (3) - Updated from 1
+  "40 mph", "0 to 999", "Segregated Track (wide)", 3, # CbD: 50-65kph, 0-1000, C'way Track = ●●● (3) - Updated from 1
+  "40 mph", "1000 to 1999", "Segregated Track (wide)", 3, # CbD: 50-65kph, 1000-2000, C'way Track = ●●● (3) - Updated from 1
+  "50 mph", "4000+", "Segregated Track (wide)", 3, # CbD: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
+  "50 mph", "2000 to 3999", "Segregated Track (wide)", 3, # CbD: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
+  "50 mph", "0 to 999", "Segregated Track (wide)", 3, # CbD: 65-80kph, 0-1000, C'way Track = ●●● (3) - Updated from 1
+  "50 mph", "1000 to 1999", "Segregated Track (wide)", 3, # CbD: 65-80kph, 1000+, C'way Track = ●●● (3) - Updated from 1
+  # For 60+ mph, the CbD shows different LoS for 80-95kph vs 95-110kph. Using the lower LoS (from 95-110kph) for a conservative "60+" value.
+  "60+ mph", "4000+", "Segregated Track (wide)", 1, # CbD: 95-110kph, All flows, C'way Track = ● (1)
+  "60+ mph", "2000 to 3999", "Segregated Track (wide)", 1, # CbD: 95-110kph, All flows, C'way Track = ● (1)
+  "60+ mph", "0 to 999", "Segregated Track (wide)", 1, # CbD: 95-110kph, All flows, C'way Track = ● (1)
+  "60+ mph", "1000 to 1999", "Segregated Track (wide)", 1, # CbD: 95-110kph, All flows, C'way Track = ● (1)
 
   # Mixed Traffic Street -> Mixed Traffic Street
-  "20 mph", "0 to 999", "Mixed Traffic Street", 3, # Image: 0-30kph, 0-2000, Mixed = ●●● (3)
-  "20 mph", "1000 to 1999", "Mixed Traffic Street", 3, # Image: 0-30kph, 0-2000, Mixed = ●●● (3)
-  "20 mph", "2000 to 3999", "Mixed Traffic Street", 2, # Image: 0-30kph, 2000-4000, Mixed = ●● (2)
-  "20 mph", "4000+", "Mixed Traffic Street", 1, # Image: 0-30kph, 4000+, Mixed = ● (1)
-  "30 mph", "0 to 999", "Mixed Traffic Street", 2, # Image: 30-50kph, 0-1000, Mixed = ●● (2)
-  "30 mph", "1000 to 1999", "Mixed Traffic Street", 2, # Image: 30-50kph, 1000-2000, Mixed = ●● (2)
-  "30 mph", "2000 to 3999", "Mixed Traffic Street", 1, # Image: 30-50kph, 2000-4000, Mixed = ● (1)
-  "30 mph", "4000+", "Mixed Traffic Street", 1, # Image: 30-50kph, 4000+, Mixed = ● (1)
-  "40 mph", "0 to 999", "Mixed Traffic Street", 2, # Image: 50-65kph, 0-1000, Mixed = ●● (2) - Updated from 1
-  "40 mph", "1000 to 1999", "Mixed Traffic Street", 1, # Image: 50-65kph, 1000-2000, Mixed = ● (1)
-  "40 mph", "2000 to 3999", "Mixed Traffic Street", 0, # Image: 50-65kph, 2000+, Mixed = X (0)
-  "40 mph", "4000+", "Mixed Traffic Street", 0, # Image: 50-65kph, 2000+, Mixed = X (0)
-  "50 mph", "0 to 999", "Mixed Traffic Street", 1, # Image: 65-80kph, 0-1000, Mixed = ● (1)
-  "50 mph", "1000 to 1999", "Mixed Traffic Street", 0, # Image: 65-80kph, 1000+, Mixed = X (0) - Updated from 1
-  "50 mph", "2000 to 3999", "Mixed Traffic Street", 0, # Image: 65-80kph, 1000+, Mixed = X (0)
-  "50 mph", "4000+", "Mixed Traffic Street", 0, # Image: 65-80kph, 1000+, Mixed = X (0)
-  "60+ mph", "0 to 999", "Mixed Traffic Street", 0, # Image: 80kph+, All flows, Mixed = X (0)
-  "60+ mph", "1000 to 1999", "Mixed Traffic Street", 0, # Image: 80kph+, All flows, Mixed = X (0)
-  "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0, # Image: 80kph+, All flows, Mixed = X (0)
-  "60+ mph", "4000+", "Mixed Traffic Street", 0 # Image: 80kph+, All flows, Mixed = X (0)
+  "20 mph", "0 to 999", "Mixed Traffic Street", 3, # CbD: 0-30kph, 0-2000, Mixed = ●●● (3)
+  "20 mph", "1000 to 1999", "Mixed Traffic Street", 3, # CbD: 0-30kph, 0-2000, Mixed = ●●● (3)
+  "20 mph", "2000 to 3999", "Mixed Traffic Street", 2, # CbD: 0-30kph, 2000-4000, Mixed = ●● (2)
+  "20 mph", "4000+", "Mixed Traffic Street", 1, # CbD: 0-30kph, 4000+, Mixed = ● (1)
+  "30 mph", "0 to 999", "Mixed Traffic Street", 2, # CbD: 30-50kph, 0-1000, Mixed = ●● (2)
+  "30 mph", "1000 to 1999", "Mixed Traffic Street", 2, # CbD: 30-50kph, 1000-2000, Mixed = ●● (2)
+  "30 mph", "2000 to 3999", "Mixed Traffic Street", 1, # CbD: 30-50kph, 2000-4000, Mixed = ● (1)
+  "30 mph", "4000+", "Mixed Traffic Street", 1, # CbD: 30-50kph, 4000+, Mixed = ● (1)
+  "40 mph", "0 to 999", "Mixed Traffic Street", 2, # CbD: 50-65kph, 0-1000, Mixed = ●● (2) - Updated from 1
+  "40 mph", "1000 to 1999", "Mixed Traffic Street", 1, # CbD: 50-65kph, 1000-2000, Mixed = ● (1)
+  "40 mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 50-65kph, 2000+, Mixed = X (0)
+  "40 mph", "4000+", "Mixed Traffic Street", 0, # CbD: 50-65kph, 2000+, Mixed = X (0)
+  "50 mph", "0 to 999", "Mixed Traffic Street", 1, # CbD: 65-80kph, 0-1000, Mixed = ● (1)
+  "50 mph", "1000 to 1999", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0) - Updated from 1
+  "50 mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
+  "50 mph", "4000+", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
+  "60+ mph", "0 to 999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
+  "60+ mph", "1000 to 1999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
+  "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
+  "60+ mph", "4000+", "Mixed Traffic Street", 0 # CbD: 80kph+, All flows, Mixed = X (0)
 )
 
 # You can print or view the updated table
