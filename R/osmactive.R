@@ -757,90 +757,33 @@ clean_speeds = function(osm) {
     )
 
   osm$maxspeed_clean = gsub(" mph", "", osm$maxspeed_clean)
-  suppressWarnings({
-    # Suppress warnings for NAs introduced by coercion
-    osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
-  })
+  osm$maxspeed_clean = as.numeric(osm$maxspeed_clean)
 
-  # --- Nearest Neighbor Speed Imputation (Optional) ---
-  idx_na = which(is.na(osm$maxspeed_clean))
+  # TODO: add different rules for urban vs rural
+  # Regex for different speeds:
+  r_na = "footway|cycleway|path|pedestrian|razed"
+  r20 = "living_street"
+  r30 = "residential|unclassified|service"
+  # Compromise between urban being 60 default and rural 30/40:
+  r40 = "primary|secondary|tertiary"
+  r60 = "trunk"
+  r70 = "motorway"
 
-  if (!is.null(osm_full) && length(idx_na) > 0) {
-    message("Attempting to impute ", length(idx_na), " missing speeds from nearest features in osm_full.")
-    # Ensure osm_full has comparable speed info (apply initial cleaning)
-    osm_full = osm_full |>
-      dplyr::mutate(
-        maxspeed_clean_temp = dplyr::case_when(
-          maxspeed == "national" & highway %in% c("motorway", "motorway_link") ~
-            "70 mph",
-          maxspeed == "national" & !highway %in% c("motorway", "motorway_link") ~
-            "60 mph",
-          TRUE ~ maxspeed
-        )
+  osm = osm |>
+    dplyr::mutate(
+      maxspeed_clean = dplyr::case_when(
+        !is.na(maxspeed_clean) ~ maxspeed_clean,
+        # Residential areas are 30 mph by default:
+        lit == "yes" ~ 30,
+        stringr::str_detect(highway, r_na) ~ NA_real_,
+        stringr::str_detect(highway, r20) ~ 20,
+        stringr::str_detect(highway, r30) ~ 30,
+        stringr::str_detect(highway, r40) ~ 40,
+        stringr::str_detect(highway, r60) ~ 60,
+        stringr::str_detect(highway, r70) ~ 70,
+        TRUE ~ 30
       )
-    osm_full$maxspeed_clean_temp = gsub(" mph", "", osm_full$maxspeed_clean_temp)
-    suppressWarnings({
-      osm_full$maxspeed_clean_temp = as.numeric(osm_full$maxspeed_clean_temp)
-    })
-
-    # Ensure CRS match for distance calculation (use projected CRS like 27700)
-    target_crs = sf::st_crs(27700)
-    osm_na_proj = sf::st_transform(osm[idx_na, ], target_crs)
-    osm_full_proj = sf::st_transform(osm_full, target_crs)
-
-    # Find nearest features
-    nearest_indices = sf::st_nearest_feature(osm_na_proj, osm_full_proj)
-    nearest_speeds = osm_full_proj$maxspeed_clean_temp[nearest_indices]
-
-    # Update only where nearest neighbor provided a valid speed
-    idx_update = idx_na[!is.na(nearest_speeds)]
-    speeds_to_update = nearest_speeds[!is.na(nearest_speeds)]
-
-    if(length(idx_update) > 0) {
-       message("Successfully imputed ", length(idx_update), " speeds using nearest neighbor.")
-       osm$maxspeed_clean[idx_update] = speeds_to_update
-    } else {
-       message("Nearest neighbor imputation did not find any valid speeds.")
-    }
-    # Clean up temporary column
-    osm_full = dplyr::select(osm_full, -maxspeed_clean_temp)
-  }
-
-  # --- Highway-based Imputation (Fallback) ---
-  # Update idx_na after potential imputation
-  idx_na_remaining = which(is.na(osm$maxspeed_clean))
-  if (length(idx_na_remaining) > 0) {
-      message("Applying highway-based imputation for ", length(idx_na_remaining), " remaining NAs.")
-      # Regex for different speeds:
-      r_na = "footway|cycleway|path|pedestrian|razed"
-      r20 = "living_street"
-      r30 = "residential|unclassified|service"
-      r40 = "primary|secondary|tertiary"
-      r60 = "trunk"
-      r70 = "motorway"
-
-      osm = osm |>
-        dplyr::mutate(
-          maxspeed_clean = dplyr::case_when(
-            # Only apply to remaining NAs
-            !row_number() %in% idx_na_remaining ~ maxspeed_clean,
-            # Original logic applied only where speed is still NA
-            lit == "yes" ~ 30,
-            stringr::str_detect(highway, r_na) ~ NA_real_,
-            stringr::str_detect(highway, r20) ~ 20,
-            stringr::str_detect(highway, r30) ~ 30,
-            stringr::str_detect(highway, r40) ~ 40,
-            stringr::str_detect(highway, r60) ~ 60,
-            stringr::str_detect(highway, r70) ~ 70,
-            TRUE ~ 30 # Default fallback
-          )
-        )
-   } else {
-      message("No remaining NAs for highway-based imputation.")
-   }
-
-
-  # Ensure sf object structure is maintained
+    )
   osm = sf::st_sf(
     osm |> sf::st_drop_geometry(),
     geometry = sf::st_geometry(osm)
