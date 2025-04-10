@@ -186,22 +186,27 @@ los_table_nas = cycle_net_los |>
 los_table_long_missing <- tibble::tribble(
   ~`Speed Limit (mph)`, ~AADT, ~cycle_segregation, ~level_of_service,
   # Painted Cycle Lane -> Cycle Lane
+  # --- 20 mph ---
   "20 mph", "0 to 999", "Painted Cycle Lane", 3, # CbD: 30-50kph, 0-2000, Cycle Lane = ●●● (3) 
   "20 mph", "1000 to 1999", "Painted Cycle Lane", 2, # CbD: 30-50kph, 0-2000, Cycle Lane = ●● (2)
   "20 mph", "2000 to 3999", "Painted Cycle Lane", 2, # CbD: 30-50kph, 2000-4000, Cycle Lane = ●● (2)
   "20 mph", "4000+", "Painted Cycle Lane", 1, # CbD: 30-50kph, 4000+, Cycle Lane = ● (1)
+  # --- 30 mph ---
   "30 mph", "0 to 999", "Painted Cycle Lane", 2, # CbD: 50-65kph, 0-1000, Cycle Lane = ●● (2)
   "30 mph", "1000 to 1999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 1000-2000, Cycle Lane = ● (1)
   "30 mph", "2000 to 3999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 2000-4000, Cycle Lane = ● (1)
   "30 mph", "4000+", "Painted Cycle Lane", 0, # CbD: 30-50kph, 4000+, Cycle Lane = X (0)
+  # --- 40 mph ---
   "40 mph", "0 to 999", "Painted Cycle Lane", 2, # CbD: 50-65kph, 0-1000, Cycle Lane = ●● (2)
   "40 mph", "1000 to 1999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 1000-2000, Cycle Lane = ● (1)
   "40 mph", "2000 to 3999", "Painted Cycle Lane", 1, # CbD: 50-65kph, 2000+, Cycle Lane = ● (1)
   "40 mph", "4000+", "Painted Cycle Lane", 0, # CbD: 50-65kph, 2000+, Cycle Lane = X (0)
+  # --- 50 mph ---
   "50 mph", "0 to 999", "Painted Cycle Lane", 1, # CbD: 65-80kph, 0-1000, Cycle Lane = ● (1)
   "50 mph", "1000 to 1999", "Painted Cycle Lane", 1, # CbD: 65-80kph, 1000+, Cycle Lane = ● (1)
   "50 mph", "2000 to 3999", "Painted Cycle Lane", 0, # CbD: 65-80kph, 1000+, Cycle Lane = X (0) 
   "50 mph", "4000+", "Painted Cycle Lane", 0, # CbD: 65-80kph, 1000+, Cycle Lane = = X (0)  
+  # --- 60+ mph ---
   "60+ mph", "0 to 999", "Painted Cycle Lane", 1, # CbD: 80kph+, All flows, Cycle Lane = ● (1)
   "60+ mph", "1000 to 1999", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
   "60+ mph", "2000 to 3999", "Painted Cycle Lane", 0, # CbD: 80kph+, All flows, Cycle Lane = X (0)
@@ -214,16 +219,15 @@ los_table_long_missing <- tibble::tribble(
   "20 mph", "2000 to 3999", "Segregated Track (narrow)", 3, # CbD: 30-50kph, 2000-4000, Light Seg = ●●● (3)
   "20 mph", "4000+", "Segregated Track (narrow)", 2, # CbD: 30-50kph, 4000+, Light Seg = ●● (2)
   # --- 30 mph ---
-  "30 mph", "0 to 999", "Segregated Track (narrow)", 3, # CbD: 50-65kph, 0-1000, Light Seg = ●●● (3)
-  "30 mph", "1000 to 1999", "Segregated Track (narrow)", 3, # CbD: 50-65kph, 1000-2000, Light Seg = ●●● (3)
-  "30 mph", "2000 to 3999", "Segregated Track (narrow)", 3, # CbD: 50-65kph, 2000-4000, Light Seg = ●●● (3)
-  "30 mph", "4000+", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 4000+, Light Seg = ●● (2)
+  "30 mph", "0 to 999", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 0-1000, Light Seg = ●● (2)
+  "30 mph", "1000 to 1999", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 1000-2000, Light Seg = ●● (2)
+  "30 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 2000-4000, Light Seg = ● (1)
   "30 mph", "4000+", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 4000+, Light Seg = ● (1) 
   # --- 40 mph ---
   "40 mph", "0 to 999", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 0-1000, Light Seg = ●● (2)
   "40 mph", "1000 to 1999", "Segregated Track (narrow)", 2, # CbD: 50-65kph, 1000-2000, Light Seg = ●● (2)
   "40 mph", "2000 to 3999", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 2000+, Light Seg = ● (1)
-  "40 mph", "4000+", "Segregated Track (narrow)", 0, # CbD: 50-65kph, 2000+, Light Seg = X (0)
+  "40 mph", "4000+", "Segregated Track (narrow)", 1, # CbD: 50-65kph, 2000+, Light Seg = X (0)
   # --- 50 mph ---
   "50 mph", "0 to 999", "Segregated Track (narrow)", 2, # CbD: 65-80kph, 0-1000, Light Seg = ●● (2)
   "50 mph", "1000 to 1999", "Segregated Track (narrow)", 1, # CbD: 65-80kph, 1000+, Light Seg = ● (1)
@@ -265,8 +269,8 @@ los_table_long_missing <- tibble::tribble(
   # Mixed Traffic Street -> Mixed Traffic Street
   # --- 20 mph ---
   "20 mph", "0 to 999", "Mixed Traffic Street", 3, # CbD: 0-30kph, 0-2000, Mixed = ●●● (3)
-  "20 mph", "1000 to 1999", "Mixed Traffic Street", 3, # CbD: 0-30kph, 0-2000, Mixed = ●●● (3)
-  "20 mph", "2000 to 3999", "Mixed Traffic Street",2, # CbD: 0-30kph, 2000-4000, Mixed = ●● (2)
+  "20 mph", "1000 to 1999", "Mixed Traffic Street", 2, # CbD: 0-30kph, 0-2000, Mixed = ●●● (3)
+  "20 mph", "2000 to 3999", "Mixed Traffic Street",1, # CbD: 0-30kph, 2000-4000, Mixed = ● (1)
   "20 mph", "4000+", "Mixed Traffic Street", 1, # CbD: 0-30kph, 4000+, Mixed = ● (1)
   # --- 30 mph ---
   "30 mph", "0 to 999", "Mixed Traffic Street", 2, # CbD: 50-65kph, 0-1000, Mixed = ●● (2)
@@ -283,6 +287,7 @@ los_table_long_missing <- tibble::tribble(
   "50 mph", "1000 to 1999", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0) - Updated from 1
   "50 mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
   "50 mph", "4000+", "Mixed Traffic Street", 0, # CbD: 65-80kph, 1000+, Mixed = X (0)
+  # --- 60+ mph ---
   "60+ mph", "0 to 999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
   "60+ mph", "1000 to 1999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
   "60+ mph", "2000 to 3999", "Mixed Traffic Street", 0, # CbD: 80kph+, All flows, Mixed = X (0)
