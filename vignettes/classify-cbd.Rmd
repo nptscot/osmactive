@@ -258,8 +258,6 @@ los_table_long_missing <- tibble::tribble(
   "60+ mph", "4000+", "Mixed Traffic Street", 0 # CbD: 80kph+, All flows, Mixed = X (0)
 )
 
-# You can print or view the updated table
-# print(los_table_updated)
 los_table_long_mini_updated = bind_rows(los_table_long_mini, los_table_long_missing)
 duplicated(los_table_long_mini_updated)
 los_table_complete = los_table_long_mini_updated |>
