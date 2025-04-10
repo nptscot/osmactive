@@ -743,9 +743,8 @@ most_common_value = function(x) {
 #' table(osm_cleaned$maxspeed)
 #' table(osm_cleaned$maxspeed_clean)
 #' plot(osm_cleaned[c("maxspeed", "maxspeed_clean")])
-clean_speeds = function(osm, osm_full = NULL) {
+clean_speeds = function(osm) {
 
-  # --- Initial Speed Cleaning ---
   osm = osm |>
     dplyr::mutate(
       maxspeed_clean = dplyr::case_when(
