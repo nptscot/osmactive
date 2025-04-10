@@ -218,7 +218,7 @@ los_table_long_missing <- tibble::tribble(
 
   # Segregated Track (wide) -> Cycle Track at Carriageway Level
   "30 mph", "4000+", "Segregated Track (wide)", 2, # CbD: 50-65kph, 4000+, C'way Track = ●● (2) 
-  "30 mph", "2000 to 3999", "Segregated Track (wide)", 32, # CbD: 50-65kph, 2000-4000, C'way Track =  ●● (2) 
+  "30 mph", "2000 to 3999", "Segregated Track (wide)", 2, # CbD: 50-65kph, 2000-4000, C'way Track =  ●● (2) 
   "30 mph", "0 to 999", "Segregated Track (wide)", 2, # CbD: 50-65kph, 0-1000, C'way Track =  ●● (2) 
   "30 mph", "1000 to 1999", "Segregated Track (wide)", 2, # CbD: 50-65kph, 1000-2000, C'way Track =  ●● (2) 
   "40 mph", "4000+", "Segregated Track (wide)", 2, # CbD: 50-65kph, 2000+, C'way Track = ●● (2) 
