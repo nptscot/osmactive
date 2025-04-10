@@ -730,7 +730,6 @@ most_common_value = function(x) {
 #' Clean speeds
 #'
 #' @param osm An sf object with the road network
-#' @param osm_full An sf object with the full road network
 #' @return An sf object with the cleaned speed values in the column `maxspeed_clean`
 #' @export
 #' @examples
