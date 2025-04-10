@@ -867,7 +867,7 @@ classify_speeds = function(speed_mph) {
 npt_to_cbd_aadt_character = function(AADT) {
   dplyr::case_when(
       AADT %in% c("0 to 1000", "All", "0 to 999") ~ "0 to 999",
-      AADT %in% c("1000 to 2000", "0 to 2000", "1000+", "1000 to 1999") ~ "1000 to 1999",
+      AADT %in% c("1000 to 2000", "1000+", "1000 to 1999") ~ "1000 to 1999",
       AADT %in% c("2000 to 4000", "2000+") ~ "2000 to 3999",      
       AADT %in% c("4000+") ~ "4000+"
     )
