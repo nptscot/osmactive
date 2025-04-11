@@ -20,6 +20,8 @@ options(timeout = 3000)
 library(osmactive)
 library(tidyverse)
 library(sf)
+library(dplyr)
+library(mapview)
 tmap::tmap_mode("view")
 ```
 
@@ -85,7 +87,7 @@ los_table_npt |>
   knitr::kable()
 
 
-los_table_npt_long <- los_table_npt %>%
+los_table_npt_long <- los_table_npt |>
   pivot_longer(
     cols = c("Mixed Traffic Street",
              "Off Road Cycleway",
@@ -96,7 +98,7 @@ los_table_npt_long <- los_table_npt %>%
     values_to = "level_of_service"
   )
 
-output_lines <- los_table_npt_long %>%
+output_lines <- los_table_npt_long |>
   mutate(
     line_text = paste0(
       '"', `Speed (85th kph)`, '", ',
@@ -106,7 +108,7 @@ output_lines <- los_table_npt_long %>%
       '"', infrastructure, '", ',
       level_of_service, ','
     )
-  ) %>%
+  ) |>
   pull(line_text)
 
 # 5. Print or write each line
@@ -183,6 +185,86 @@ m
 ```
 
 Let's try running the code on a larger example, covering Edinburgh:
+
+but let's solve speed NA problem in cycle_net first:
+
+```{r}
+devtools::load_all() # load minimal exmaple cycle_net_f and drive_net_f
+mapview::mapview(cycle_net_f, color = "blue") + 
+  mapview::mapview(drive_net_f, color = "red") 
+
+get_azimuth <- function(line) {
+  coords <- sf::st_coordinates(line)
+  if (nrow(coords) < 2) return(NA)
+  x1 <- coords[1, "X"]
+  y1 <- coords[1, "Y"]
+  x2 <- coords[nrow(coords), "X"]
+  y2 <- coords[nrow(coords), "Y"]
+  atan2(x2 - x1, y2 - y1) * 180 / pi
+}
+
+find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_threshold = 20) {
+  # Filter for cycle infrastructure without maxspeed
+  cycle_infra_without_maxspeed <- cycle_net |>
+    filter(is.na(maxspeed))
+  
+  # Calculate azimuth for cycle infrastructure
+  cycle_infra_without_maxspeed$azimuth <- sapply(
+    sf::st_geometry(cycle_infra_without_maxspeed), 
+    get_azimuth
+  )
+  
+  # Buffer the cycle infrastructure
+  cycle_infra_without_maxspeed_buffer <- sf::st_buffer(cycle_infra_without_maxspeed, dist = buffer_dist)
+  
+  # Filter roads with maxspeed and calculate azimuth
+  roads_with_maxspeed <- drive_net |>
+    filter(!is.na(maxspeed))
+  
+  roads_with_maxspeed$azimuth <- sapply(
+    sf::st_geometry(roads_with_maxspeed), 
+    get_azimuth
+  )
+  
+  # Create points for spatial join
+  roads_with_maxspeed_points <- sf::st_point_on_surface(roads_with_maxspeed)
+  
+  # Join cycle infrastructure with nearby roads that have similar orientation
+  joined_data <- sf::st_join(
+    cycle_infra_without_maxspeed_buffer,
+    roads_with_maxspeed_points,
+    join = sf::st_intersects
+  ) |>
+    mutate(angle_diff = abs((azimuth.x - azimuth.y) %% 180)) |>
+    filter(angle_diff <= angle_threshold | (180 - angle_diff) <= angle_threshold) |>
+    group_by(osm_id.x) |>
+    slice(1) |>
+    ungroup()
+  
+  return(joined_data)
+}
+
+update_missing_speeds <- function(cycle_net, joined_data) {
+  # Join the original cycle network with the matched speeds
+  cycle_net_updated <- cycle_net |>
+    left_join(
+      joined_data |>
+        sf::st_drop_geometry() |>
+        select(osm_id.x, maxspeed.y),
+      by = c("osm_id" = "osm_id.x")
+    ) |>
+    mutate(maxspeed = ifelse(is.na(maxspeed), maxspeed.y, maxspeed)) |>
+    select(-maxspeed.y)
+  
+  return(cycle_net_updated)
+}
+
+# Example usage:
+joined_data <- find_nearby_speeds(cycle_net_f, drive_net_f)
+cycle_net_f_updated <- update_missing_speeds(cycle_net_f, joined_data)
+mapview(cycle_net_f_updated, zcol = "maxspeed")
+```
+
 
 ```{r edinburgh}
 osm = get_travel_network("Edinburgh")
@@ -333,3 +415,4 @@ comparison = left_join(original_na_summary, cleaned_summary, by = "highway")
 
 print(comparison)
 ```
+
