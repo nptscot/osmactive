@@ -96,18 +96,10 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
   # Calculate bearing and select necessary columns:
   target_missing$azimuth_target <- stplanr::line_bearing(target_missing, bidirectional = TRUE)
   target_missing <- target_missing |>
-    dplyr::select(osm_id, azimuth_target, !!col_sym) 
+    dplyr::select(osm_id, azimuth_target) 
   # Buffer the target features needing imputation
   target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
 
-  # --- 1. Prepare Target Network (Features needing imputation) ---
-  target_missing <- target_net |>
-    dplyr::filter(is.na(!!col_sym))
-
-  if (nrow(target_missing) == 0) {
-    message("No missing values found in column '", column, "' of target_net. Returning original data.")
-    return(target_net)
-  }
 
   target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
 
@@ -119,79 +111,76 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
     return(target_net)
   }
 
+  # Calculate bearing and select necessary columns:
+  source_with_values$azimuth_source <- stplanr::line_bearing(source_with_values, bidirectional = TRUE)
+  source_with_values <- source_with_values |>
+    dplyr::select(azimuth_source, !!col_sym) |>
+    # Rename col_sym to _source:
+    dplyr::rename(new_values = !!col_sym) 
+
   # Use points on surface for potentially faster spatial join
   source_with_values_points <- sf::st_point_on_surface(source_with_values)
+
+  source_with_values_points_near <- 
+    source_with_values_points[target_missing_buffer, ]
+  
+  # Check if any points were found within the buffer
+  if (nrow(source_with_values_points_near) == 0) {
+    warning("No nearby source features found within the buffer distance. Cannot impute.")
+    return(target_net)
+  }
 
   # --- 3. Spatial Join: Find nearby source points within target buffers ---
   # This join links each target buffer to the source points it contains
   joined_data_sf <- sf::st_join(
-      target_missing_buffer,
-      source_with_values_points,
-      join = sf::st_intersects,
-      # Ensure unique suffix if column names clash (though we selected specific ones)
-      suffix = c("", ".source")
+      target_missing_buffer |>
+        dplyr::select(osm_id, azimuth_target), # Keep only relevant columns
+      source_with_values_points
   )
-
-  # Check if any intersections were found
-  if (nrow(joined_data_sf) == 0 || all(is.na(joined_data_sf$osm_id_source))) {
-      warning("No nearby source features found within the buffer distance. Cannot impute.")
-      return(target_net)
-  }
 
   # --- 4. Filter by Angle and Calculate New Value ---
   joined_data_clean <- joined_data_sf |>
     sf::st_drop_geometry() |> # Now work with the attribute table
-    dplyr::filter(!is.na(.data$osm_id_source)) |> # Ensure join was successful
+    #       angle_diff = abs(azimuth_cycle - azimuth_road),
+    #   maxspeed_numeric = gsub(maxspeed, pattern = " mph", replacement = "") |>
+    #   as.numeric()
+    # ) |>
+    # filter(angle_diff < angle_threshold) |>
+    # group_by(osm_id) |>
+    # dplyr::summarise(
+    #   maxspeed_new = median(maxspeed_numeric, na.rm = TRUE) |>
+    #     paste0(" mph")
+    # ) |>
+    # ungroup()
     dplyr::mutate(
-      angle_diff = abs(.data$azimuth_target - .data$azimuth_source) %% 180, # Use modulo 180 for bidirectional bearing
-      angle_diff = pmin(.data$angle_diff, 180 - .data$angle_diff), # Ensure smallest angle difference (0-90)
-      # Convert value to numeric, removing pattern if specified
-      value_raw = !!col_sym,
-      value_numeric = dplyr::if_else(
-          !is.null(value_pattern) & !is.na(.data$value_raw),
-          gsub(.data$value_raw, pattern = value_pattern, replacement = value_replacement),
-          as.character(.data$value_raw) # Ensure character before as.numeric if no pattern
-      )
+      angle_diff = abs(azimuth_target - azimuth_source), 
+      new_value_numeric = gsub(new_values, pattern = value_pattern, replacement = value_replacement) |>
+        as.numeric()
     ) |>
-    # Attempt conversion to numeric, coercing errors to NA
-    dplyr::mutate(value_numeric = suppressWarnings(as.numeric(.data$value_numeric))) |>
-    # Filter by angle threshold and valid numeric value
-    dplyr::filter(.data$angle_diff < angle_threshold, !is.na(.data$value_numeric)) |>
+    dplyr::filter(angle_diff < angle_threshold) |>
     # Group by the target feature ID
-    dplyr::group_by(!!osm_id_target_sym) |>
+    dplyr::group_by(osm_id) |>
     # Calculate the median of the numeric values from parallel source features
     dplyr::summarise(
       # Use dynamic name for the summarized column
-      !!col_new_sym := stats::median(.data$value_numeric, na.rm = TRUE),
+      new_value := stats::median(new_value_numeric, na.rm = TRUE),
       .groups = 'drop' # Drop grouping
     ) |>
-    # Filter out rows where median calculation resulted in NA (e.g., no valid numeric values after filtering)
-    dplyr::filter(!is.na(!!col_new_sym)) |>
-    # Add suffix back if specified
+    # Add suffix if specified
     dplyr::mutate(
-        !!col_new_sym := dplyr::if_else(
-            !is.null(add_suffix),
-            paste0(!!col_new_sym, add_suffix),
-            # Coerce to character to be safe, as original might be character.
-            as.character(!!col_new_sym)
-        )
-    )
+      new_value = if (!is.null(add_suffix)) {
+        paste0(new_value, add_suffix)
+      } else {
+        as.character(new_value) # Ensure it's character if no suffix
+      }
+    ) 
 
-  # Check if any values were successfully calculated
-  if (nrow(joined_data_clean) == 0) {
-      warning("Could not calculate imputed values (e.g., due to angle threshold or non-numeric source values).")
-      return(target_net)
-  }
-
-  # --- 5. Join Imputed Values back to Target Network ---
-  # Ensure the target ID column name matches for the join ('osm_id')
-  # The join key in joined_data_clean is osm_id_target_sym
-
-  target_net_joined <- dplyr::left_join(
-    target_net,
-    joined_data_clean |> dplyr::rename(osm_id = !!osm_id_target_sym), # Rename join key to 'osm_id'
-    by = "osm_id" # Join by the unique ID
-  ) |>
+    target_net_joined = dplyr::left_join(
+      target_net,
+      joined_data_clean |>
+        dplyr::select(osm_id, new_value), # Select only relevant columns for join
+      by = "osm_id" # Join by the unique ID
+    ) |>
     # Update the original column where it was NA using the new value
     dplyr::mutate(
       # Coerce new value to match type of original column if necessary?
@@ -199,30 +188,11 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
       # This might fail if original column is strictly numeric and new value has suffix.
       # Consider adding type check and coercion.
       !!col_sym := dplyr::case_when(
-        is.na(!!col_sym) & !is.na(!!col_new_sym) ~ !!col_new_sym, # Impute only if original is NA and new is not NA
+        is.na(!!col_sym) & !is.na(new_value) ~ new_value, # Impute only if original is NA and new is not NA
         TRUE ~ !!col_sym
       )
     ) |>
     # Remove the temporary new value column
-    dplyr::select(-!!col_new_sym)
-
-
-  # Ensure the output is an sf object with the original geometry type
-  # The dplyr verbs should preserve the sf class and geometry column
-  # If geometry gets lost, use sf::st_sf(..., geometry = sf::st_geometry(target_net))
-
-  # Restore original geometry if lost during joins/manipulation
-  if (!inherits(target_net_joined, "sf")) {
-       target_net_joined <- sf::st_sf(target_net_joined, geometry = sf::st_geometry(target_net))
-  } else if (!identical(sf::st_geometry(target_net_joined), sf::st_geometry(target_net))) {
-      # Ensure geometry column name and content is the same if manipulations altered it
-       sf::st_geometry(target_net_joined) <- sf::st_geometry(target_net)
-  }
-
-
+    dplyr::select(-new_value) 
   return(target_net_joined)
 }
-
-# Ensure osm_id is not lost if it's part of the geometry column's attributes in some sf versions
-# This is generally not standard, osm_id should be a regular column.
-# The code assumes osm_id is a standard attribute column.

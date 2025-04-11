@@ -275,12 +275,19 @@ sum(is.na(cycle_net_f_updated$maxspeed))
 ```{r}
 # testing new get_parallel_values() function
 # devtools::load_all()
-cycle_net_f_updated = get_parallel_values(
+target_net = cycle_net_f
+source_net = drive_net_f
+cycle_net_f_updated2 = get_parallel_values(
   cycle_net,
   drive_net,
   buffer_dist = 10,
   angle_threshold = 20
 )
+
+# Check the number of NAs after imputation
+sum(is.na(cycle_net_f_updated2$maxspeed))
+# Check the number of NAs before imputation
+sum(is.na(cycle_net_f$maxspeed))
 ```
 
 
