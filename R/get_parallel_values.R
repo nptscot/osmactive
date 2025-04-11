@@ -29,12 +29,8 @@
 #' @export
 #' @importFrom sf st_buffer st_point_on_surface st_join st_drop_geometry st_sf st_geometry
 #' @importFrom dplyr filter select mutate group_by summarise ungroup left_join case_when if_else row_number inner_join rename all_of
-#' @importFrom rlang sym :=
 #' @examples
-#' \dontrun{
 #' # Assuming cycle_net_f and drive_net_f are loaded sf objects from the package
-#' data(cycle_net_f)
-#' data(drive_net_f)
 #'
 #' # Impute missing 'maxspeed' in cycle_net_f using drive_net_f
 #' cycle_net_updated_speed <- get_parallel_values(
@@ -60,7 +56,6 @@
 #'
 #' print(paste("NA maxspeed before:", sum(is.na(cycle_net_f$maxspeed))))
 #' print(paste("NA maxspeed after:", sum(is.na(cycle_net_updated_speed$maxspeed))))
-#' }
 get_parallel_values <- function(target_net, source_net, column = "maxspeed",
                                 buffer_dist = 10, angle_threshold = 20,
                                 value_pattern = " mph", value_replacement = "",
@@ -98,27 +93,31 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
     return(target_net)
   }
 
-  # Calculate bearing and select necessary columns
+  # Calculate bearing and select necessary columns:
+  target_missing$azimuth_target <- stplanr::line_bearing(target_missing, bidirectional = TRUE)
   target_missing <- target_missing |>
-    dplyr::mutate(azimuth_target = stplanr::line_bearing(.data$geometry, bidirectional = TRUE)) |>
-    dplyr::select(!!osm_id_target_sym := .data$osm_id, azimuth_target) # Keep only needed cols + geometry
-
+    dplyr::select(osm_id, azimuth_target, !!col_sym) 
   # Buffer the target features needing imputation
   target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
 
-  # --- 2. Prepare Source Network (Features with values) ---
+  # --- 1. Prepare Target Network (Features needing imputation) ---
+  target_missing <- target_net |>
+    dplyr::filter(is.na(!!col_sym))
+
+  if (nrow(target_missing) == 0) {
+    message("No missing values found in column '", column, "' of target_net. Returning original data.")
+    return(target_net)
+  }
+
+  target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
+
   source_with_values <- source_net |>
-    dplyr::filter(!is.na(!!col_sym) & !(!!col_sym %in% c("", " "))) # Also filter empty strings
+    dplyr::filter(!is.na(!!col_sym) & !(!!col_sym %in% c("", " ")))
 
   if (nrow(source_with_values) == 0) {
     warning("No non-missing values found in column '", column, "' of source_net. Cannot impute.")
     return(target_net)
   }
-
-  # Calculate bearing and select necessary columns
-  source_with_values <- source_with_values |>
-     dplyr::mutate(azimuth_source = stplanr::line_bearing(.data$geometry, bidirectional = TRUE)) |>
-     dplyr::select(osm_id_source = .data$osm_id, !!col_sym, azimuth_source) # Keep only needed cols + geometry
 
   # Use points on surface for potentially faster spatial join
   source_with_values_points <- sf::st_point_on_surface(source_with_values)

@@ -54,10 +54,7 @@ It's a generalisation of the \code{find_nearby_speeds} function previously used
 to impute missing \code{maxspeed} values in a cycle network based on nearby roads.
 }
 \examples{
-\dontrun{
 # Assuming cycle_net_f and drive_net_f are loaded sf objects from the package
-data(cycle_net_f)
-data(drive_net_f)
 
 # Impute missing 'maxspeed' in cycle_net_f using drive_net_f
 cycle_net_updated_speed <- get_parallel_values(
@@ -83,5 +80,4 @@ cycle_net_updated_speed <- get_parallel_values(
 
 print(paste("NA maxspeed before:", sum(is.na(cycle_net_f$maxspeed))))
 print(paste("NA maxspeed after:", sum(is.na(cycle_net_updated_speed$maxspeed))))
-}
 }

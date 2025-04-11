@@ -272,6 +272,17 @@ sum(is.na(cycle_net_f_updated$maxspeed))
 # We've reduced the number of NAs from 28 to 20 in the test dataset
 ```
 
+```{r}
+# testing new get_parallel_values() function
+# devtools::load_all()
+cycle_net_f_updated = get_parallel_values(
+  cycle_net,
+  drive_net,
+  buffer_dist = 10,
+  angle_threshold = 20
+)
+```
+
 
 ```{r edinburgh}
 osm = get_travel_network("Edinburgh")
