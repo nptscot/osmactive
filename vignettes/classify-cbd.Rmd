@@ -204,20 +204,16 @@ get_azimuth <- function(line) {
 }
 
 find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_threshold = 20) {
-  # Filter for cycle infrastructure without maxspeed
   cycle_infra_without_maxspeed <- cycle_net |>
     filter(is.na(maxspeed))
   
-  # Calculate azimuth for cycle infrastructure
   cycle_infra_without_maxspeed$azimuth <- sapply(
     sf::st_geometry(cycle_infra_without_maxspeed), 
     get_azimuth
   )
   
-  # Buffer the cycle infrastructure
   cycle_infra_without_maxspeed_buffer <- sf::st_buffer(cycle_infra_without_maxspeed, dist = buffer_dist)
   
-  # Filter roads with maxspeed and calculate azimuth
   roads_with_maxspeed <- drive_net |>
     filter(!is.na(maxspeed))
   
@@ -226,10 +222,8 @@ find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_thr
     get_azimuth
   )
   
-  # Create points for spatial join
   roads_with_maxspeed_points <- sf::st_point_on_surface(roads_with_maxspeed)
   
-  # Join cycle infrastructure with nearby roads that have similar orientation
   joined_data <- sf::st_join(
     cycle_infra_without_maxspeed_buffer,
     roads_with_maxspeed_points,
@@ -245,7 +239,6 @@ find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_thr
 }
 
 update_missing_speeds <- function(cycle_net, joined_data) {
-  # Join the original cycle network with the matched speeds
   cycle_net_updated <- cycle_net |>
     left_join(
       joined_data |>
@@ -259,7 +252,7 @@ update_missing_speeds <- function(cycle_net, joined_data) {
   return(cycle_net_updated)
 }
 
-# Example usage:
+
 joined_data <- find_nearby_speeds(cycle_net_f, drive_net_f)
 cycle_net_f_updated <- update_missing_speeds(cycle_net_f, joined_data)
 mapview(cycle_net_f_updated, zcol = "maxspeed")
@@ -271,13 +264,10 @@ osm = get_travel_network("Edinburgh")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 
-cycle_net <- cycle_net |>
-  mutate(maxspeed = if_else(
-    is.na(maxspeed),
-    sf::st_nearest_feature(geometry, drive_net) |>
-      (\(nearest_id) drive_net$maxspeed[nearest_id])(),
-    maxspeed
-  ))
+joined_data <- find_nearby_speeds(cycle_net, drive_net)
+cycle_net <- update_missing_speeds(cycle_net, joined_data)
+
+mapview(cycle_net[central_edinburgh, ], zcol = "maxspeed")
 
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
