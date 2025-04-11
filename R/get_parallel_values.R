@@ -30,8 +30,6 @@
 #' @importFrom sf st_buffer st_point_on_surface st_join st_drop_geometry st_sf st_geometry
 #' @importFrom dplyr filter select mutate group_by summarise ungroup left_join case_when if_else row_number inner_join rename all_of
 #' @importFrom rlang sym :=
-#' @importFrom stats median
-#' @importFrom stplanr line_bearing
 #' @examples
 #' \dontrun{
 #' # Assuming cycle_net_f and drive_net_f are loaded sf objects from the package

@@ -19,7 +19,9 @@ Imports:
     osmextract,
     sf,
     stringr,
-    tidyr
+    tidyr,
+    rlang,
+    stplanr
 Suggests: 
     knitr,
     jsonlite,
