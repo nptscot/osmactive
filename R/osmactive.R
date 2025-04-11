@@ -857,16 +857,18 @@ classify_speeds = function(speed_mph) {
 #' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
 #'
 #' @param AADT A character vector representing AADT categories. Valid categories include "0 to 1000", "0 to 2000", "1000+", "All", "1000 to 2000", "2000 to 4000", "2000+", and "4000+".
-#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 999", "1000 to 1999", "2000 to 3999", and "4000+".
 #' @export
 #' @examples
-#' npt_to_cbd_aadt_character("0 to 1000") # returns "0 to 1999"
+#' npt_to_cbd_aadt_character("0 to 1000") # returns "0 to 999"
+#' npt_to_cbd_aadt_character("1000 to 2000") # returns "1000 to 1999"
 #' npt_to_cbd_aadt_character("2000 to 4000") # returns "2000 to 3999"
 #' npt_to_cbd_aadt_character("4000+") # returns "4000+"
 npt_to_cbd_aadt_character = function(AADT) {
   dplyr::case_when(
-      AADT %in% c("0 to 1000", "0 to 2000", "1000+", "All") ~ "0 to 1999",
-      AADT %in% c("1000 to 2000", "2000 to 4000", "2000+") ~ "2000 to 3999",      
+      AADT %in% c("0 to 1000", "All", "0 to 999") ~ "0 to 999",
+      AADT %in% c("1000 to 2000", "1000+", "1000 to 1999") ~ "1000 to 1999",
+      AADT %in% c("2000 to 4000", "2000+") ~ "2000 to 3999",      
       AADT %in% c("4000+") ~ "4000+"
     )
 }
@@ -876,16 +878,16 @@ npt_to_cbd_aadt_character = function(AADT) {
 #' This function takes an AADT (Annual Average Daily Traffic) category and converts it to a ranges
 #'
 #' @param AADT A numeric vector representing AADT
-#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 1999", "2000 to 3999", and "4000+".
+#' @return A character vector with the converted CBD AADT ranges. Possible return values are "0 to 999", "1000 to 1999", "2000 to 3999", and "4000+".
 #' @export
 npt_to_cbd_aadt_numeric = function(AADT) {
   dplyr::case_when(
-    AADT < 2000 ~ "0 to 1999",
+    AADT < 1000 ~ "0 to 999",
+    AADT < 2000 ~ "1000 to 1999",
     AADT < 4000 ~ "2000 to 3999",
     AADT >= 4000 ~ "4000+"
   )
 }
-
 #' Convert AADT to CBD AADT
 #'
 #' This function converts Annual Average Daily Traffic (AADT) to Central Business District (CBD) AADT.

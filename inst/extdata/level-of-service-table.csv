@@ -1,16 +1,25 @@
-"Motor Traffic Speed (85th percentile)","Speed Limit (mph)","Two-way traffic flow (pcu per day)","Two-way traffic flow (pcu per hour)","Mixed Traffic Street","Detached or Remote Cycle Track","Cycle Track at Carriageway Level","Stepped or Footway Level Cycle Track","Light Segregation","Cycle Lane"
-"0 to 30 kph","<20 mph","0 to 2000","0 to 200","3","3","3","3","3","3"
-"0 to 30 kph","<20 mph","2000 to 4000","200 to 400","2","3","3","3","3","3"
-"0 to 30 kph","<20 mph","4000+","400+","1","3","3","3","2","2"
-"30 kph to 50 kph","20 mph","0 to 1000","0 to 100","3","3","3","3","3","3"
-"30 kph to 50 kph","20 mph","1000 to 2000","100 to 200","2","3","3","3","3","2"
-"30 kph to 50 kph","20 mph","2000 to 4000","200 to 400","1","3","3","3","3","2"
-"30 kph to 50 kph","20 mph","4000+","400+","1","3","3","2","2","1"
-"50 kph to 65 kph","30 mph","0 to 1000","0 to 100","2","3","2","2","2","2"
-"50 kph to 65 kph","30 mph","1000 to 2000","100 to 200","1","3","2","2","2","1"
-"50 kph to 65 kph","30 mph","2000+","200+","0","3","2","2","2","1"
-"65 kph to 80 kph","40 mph","0 to 1000","0 to 100","1","3","2","2","2","1"
-"65 kph to 80 kph","40 mph","1000+","100+","0","3","1","1","1","1"
-"80 kph to 95 kph","50 mph","0 to 1000","0 to 100","1","3","1","1","1","1"
-"80 kph to 95 kph","50 mph","1000+","100+","0","3","1","1","0","0"
-"95 kph to 110 kph","60+ mph","All","All","0","3","1","1","0","0"
+Motor Traffic Speed (85th percentile),Speed Limit (mph),Speed Limit (kph),Two-way traffic flow (pcu per day),Two-way traffic flow (pcu per hour),Mixed Traffic Street,Detached or Remote Cycle Track,Cycle Track at Carriageway Level,Stepped or Footway Level Cycle Track,Light Segregation,Cycle Lane
+0 to 30 kph,<20 mph,<32 kph,0 to 999,0 to 100,3,3,3,3,3,3
+0 to 30 kph,<20 mph,<32 kph,1000 to 1999,100 to 200,3,3,3,3,3,3
+0 to 30 kph,<20 mph,<32 kph,2000 to 4000,200 to 400,2,3,3,3,3,3
+0 to 30 kph,<20 mph,<32 kph,4000+,400+,1,3,3,3,2,2
+0 to 30 kph,20 mph,32 kph,0 to 999,0 to 100,3,3,3,3,3,3
+0 to 30 kph,20 mph,32 kph,1000 to 1999,100 to 200,2,3,3,3,3,2
+0 to 30 kph,20 mph,32 kph,2000 to 4000,200 to 400,1,3,3,3,3,2
+0 to 30 kph,20 mph,32 kph,4000+,400+,1,3,3,2,2,1
+50 kph to 65 kph,30 mph,48 kph,0 to 999,0 to 100,2,3,2,2,2,2
+50 kph to 65 kph,30 mph,48 kph,1000 to 1999,100 to 200,1,3,2,2,2,1
+50 kph to 65 kph,30 mph,48 kph,2000 to 4000,200 to 400,0,3,2,2,1,1
+50 kph to 65 kph,30 mph,48 kph,4000+,400+,0,3,2,2,1,1
+65 kph to 80 kph,40 mph,64 kph,0 to 999,0 to 100,1,3,2,2,2,1
+65 kph to 80 kph,40 mph,64 kph,1000 to 1999,100 to 200,0,3,1,1,1,1
+65 kph to 80 kph,40 mph,64 kph,2000 to 4000,200 to 400,0,3,1,1,1,1
+65 kph to 80 kph,40 mph,64 kph,4000+,400+,0,3,1,1,1,1
+80 kph to 95 kph,50 mph,80 kph,0 to 999,0 to 100,1,3,1,1,1,1
+80 kph to 95 kph,50 mph,80 kph,1000 to 1999,100 to 200,0,3,1,1,0,0
+80 kph to 95 kph,50 mph,80 kph,2000 to 4000,200 to 400,0,3,1,1,0,0
+80 kph to 95 kph,50 mph,80 kph,4000+,400+,0,3,1,1,0,0
+95 kph to 110 kph,60+ mph,97+ kph,0 to 999,0 to 100,0,3,1,1,0,0
+95 kph to 110 kph,60+ mph,97+ kph,1000 to 1999,100 to 200,0,3,1,1,0,0
+95 kph to 110 kph,60+ mph,97+ kph,2000 to 4000,200 to 400,0,3,1,1,0,0
+95 kph to 110 kph,60+ mph,97+ kph,4000+,400+,0,3,1,1,0,0
