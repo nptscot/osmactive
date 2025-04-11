@@ -46,8 +46,10 @@ devtools::load_all()
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
 
+# read csv from release 
+url <- "https://github.com/nptscot/osmactive/releases/download/cbd/level-of-service-table.csv"
+los_table <- read.csv(url, stringsAsFactors = FALSE)
 
-los_table = read_csv("inst/extdata/level-of-service-table.csv")
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"
