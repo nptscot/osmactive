@@ -33,7 +33,7 @@
 #' # Assuming cycle_net_f and drive_net_f are loaded sf objects from the package
 #'
 #' # Impute missing 'maxspeed' in cycle_net_f using drive_net_f
-#' cycle_net_updated_speed <- get_parallel_values(
+#' cycle_net_updated_speed = get_parallel_values(
 #'   target_net = cycle_net_f,
 #'   source_net = drive_net_f,
 #'   column = "maxspeed",
@@ -42,9 +42,9 @@
 #' )
 #'
 #' # Example imputing a hypothetical 'width' column (assuming it exists and needs imputation)
-#' # cycle_net_f$width <- as.character(cycle_net_f$width) # Ensure character if adding suffix
-#' # cycle_net_f$width[sample(1:nrow(cycle_net_f), 5)] <- NA # Add some NAs for example
-#' # cycle_net_updated_width <- get_parallel_values(
+#' # cycle_net_f$width = as.character(cycle_net_f$width) # Ensure character if adding suffix
+#' # cycle_net_f$width[sample(1:nrow(cycle_net_f), 5)] = NA # Add some NAs for example
+#' # cycle_net_updated_width = get_parallel_values(
 #' #   target_net = cycle_net_f,
 #' #   source_net = drive_net_f, # Using drive_net just for example structure
 #' #   column = "width",
@@ -56,7 +56,7 @@
 #'
 #' print(paste("NA maxspeed before:", sum(is.na(cycle_net_f$maxspeed))))
 #' print(paste("NA maxspeed after:", sum(is.na(cycle_net_updated_speed$maxspeed))))
-get_parallel_values <- function(target_net, source_net, column = "maxspeed",
+get_parallel_values = function(target_net, source_net, column = "maxspeed",
                                 buffer_dist = 10, angle_threshold = 20,
                                 value_pattern = " mph", value_replacement = "",
                                 add_suffix = " mph") {
@@ -80,12 +80,12 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
   # Check if CRS are the same, warn if not? Or transform? Assume user provides compatible CRS for now.
 
   # --- Symbol Setup ---
-  col_sym <- rlang::sym(column)
-  col_new_sym <- rlang::sym(paste0(column, "_new"))
-  osm_id_target_sym <- rlang::sym("osm_id_target") # For clarity in joins/grouping
+  col_sym = rlang::sym(column)
+  col_new_sym = rlang::sym(paste0(column, "_new"))
+  osm_id_target_sym = rlang::sym("osm_id_target") # For clarity in joins/grouping
 
   # --- 1. Prepare Target Network (Features needing imputation) ---
-  target_missing <- target_net |>
+  target_missing = target_net |>
     dplyr::filter(is.na(!!col_sym))
 
   if (nrow(target_missing) == 0) {
@@ -94,16 +94,16 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
   }
 
   # Calculate bearing and select necessary columns:
-  target_missing$azimuth_target <- stplanr::line_bearing(target_missing, bidirectional = TRUE)
-  target_missing <- target_missing |>
+  target_missing$azimuth_target = stplanr::line_bearing(target_missing, bidirectional = TRUE)
+  target_missing = target_missing |>
     dplyr::select(osm_id, azimuth_target) 
   # Buffer the target features needing imputation
-  target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
+  target_missing_buffer = sf::st_buffer(target_missing, dist = buffer_dist)
 
 
-  target_missing_buffer <- sf::st_buffer(target_missing, dist = buffer_dist)
+  target_missing_buffer = sf::st_buffer(target_missing, dist = buffer_dist)
 
-  source_with_values <- source_net |>
+  source_with_values = source_net |>
     dplyr::filter(!is.na(!!col_sym) & !(!!col_sym %in% c("", " ")))
 
   if (nrow(source_with_values) == 0) {
@@ -112,16 +112,16 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
   }
 
   # Calculate bearing and select necessary columns:
-  source_with_values$azimuth_source <- stplanr::line_bearing(source_with_values, bidirectional = TRUE)
-  source_with_values <- source_with_values |>
+  source_with_values$azimuth_source = stplanr::line_bearing(source_with_values, bidirectional = TRUE)
+  source_with_values = source_with_values |>
     dplyr::select(azimuth_source, !!col_sym) |>
     # Rename col_sym to _source:
     dplyr::rename(new_values = !!col_sym) 
 
   # Use points on surface for potentially faster spatial join
-  source_with_values_points <- sf::st_point_on_surface(source_with_values)
+  source_with_values_points = sf::st_point_on_surface(source_with_values)
 
-  source_with_values_points_near <- 
+  source_with_values_points_near = 
     source_with_values_points[target_missing_buffer, ]
   
   # Check if any points were found within the buffer
@@ -132,14 +132,14 @@ get_parallel_values <- function(target_net, source_net, column = "maxspeed",
 
   # --- 3. Spatial Join: Find nearby source points within target buffers ---
   # This join links each target buffer to the source points it contains
-  joined_data_sf <- sf::st_join(
+  joined_data_sf = sf::st_join(
       target_missing_buffer |>
         dplyr::select(osm_id, azimuth_target), # Keep only relevant columns
       source_with_values_points
   )
 
   # --- 4. Filter by Angle and Calculate New Value ---
-  joined_data_clean <- joined_data_sf |>
+  joined_data_clean = joined_data_sf |>
     sf::st_drop_geometry() |> # Now work with the attribute table
     #       angle_diff = abs(azimuth_cycle - azimuth_road),
     #   maxspeed_numeric = gsub(maxspeed, pattern = " mph", replacement = "") |>

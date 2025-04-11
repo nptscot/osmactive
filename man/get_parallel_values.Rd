@@ -57,7 +57,7 @@ to impute missing \code{maxspeed} values in a cycle network based on nearby road
 # Assuming cycle_net_f and drive_net_f are loaded sf objects from the package
 
 # Impute missing 'maxspeed' in cycle_net_f using drive_net_f
-cycle_net_updated_speed <- get_parallel_values(
+cycle_net_updated_speed = get_parallel_values(
   target_net = cycle_net_f,
   source_net = drive_net_f,
   column = "maxspeed",
@@ -66,9 +66,9 @@ cycle_net_updated_speed <- get_parallel_values(
 )
 
 # Example imputing a hypothetical 'width' column (assuming it exists and needs imputation)
-# cycle_net_f$width <- as.character(cycle_net_f$width) # Ensure character if adding suffix
-# cycle_net_f$width[sample(1:nrow(cycle_net_f), 5)] <- NA # Add some NAs for example
-# cycle_net_updated_width <- get_parallel_values(
+# cycle_net_f$width = as.character(cycle_net_f$width) # Ensure character if adding suffix
+# cycle_net_f$width[sample(1:nrow(cycle_net_f), 5)] = NA # Add some NAs for example
+# cycle_net_updated_width = get_parallel_values(
 #   target_net = cycle_net_f,
 #   source_net = drive_net_f, # Using drive_net just for example structure
 #   column = "width",

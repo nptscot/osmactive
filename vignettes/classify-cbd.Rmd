@@ -49,8 +49,8 @@ devtools::load_all()
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
 
 # read csv from release 
-url <- "https://github.com/nptscot/osmactive/releases/download/cbd/level-of-service-table.csv"
-los_table <- read.csv(url, stringsAsFactors = FALSE)
+url = "https://github.com/nptscot/osmactive/releases/download/cbd/level-of-service-table.csv"
+los_table = read.csv(url, stringsAsFactors = FALSE)
 
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
@@ -87,7 +87,7 @@ los_table_npt |>
   knitr::kable()
 
 
-los_table_npt_long <- los_table_npt |>
+los_table_npt_long = los_table_npt |>
   pivot_longer(
     cols = c("Mixed Traffic Street",
              "Off Road Cycleway",
@@ -98,7 +98,7 @@ los_table_npt_long <- los_table_npt |>
     values_to = "level_of_service"
   )
 
-output_lines <- los_table_npt_long |>
+output_lines = los_table_npt_long |>
   mutate(
     line_text = paste0(
       '"', `Speed (85th kph)`, '", ',
@@ -114,7 +114,7 @@ output_lines <- los_table_npt_long |>
 # 5. Print or write each line
 cat(output_lines, sep = "\n")
 
-header_line <- paste0(
+header_line = paste0(
   '"Speed (85th kph)",',
   ' "Speed Limit (mph)",',
   ' "Speed Limit (kph)",',
@@ -122,7 +122,7 @@ header_line <- paste0(
   ' "infrastructure",',
   ' "level_of_service"'
 )
-all_lines <- c(header_line, output_lines)
+all_lines = c(header_line, output_lines)
 # Save the formatted lines directly to a file
 writeLines(all_lines, "inst/extdata/level-of-service-all.csv")
 usethis::use_data(all_lines, overwrite = TRUE)
@@ -202,26 +202,26 @@ stplanr::line_bearing(cycle_net)
 stplanr::line_bearing(cycle_net, bidirectional = TRUE)
 
 # TODO: check implementations
-find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_threshold = 20) {
-  infra_no_maxspeed <- cycle_net |>
+find_nearby_speeds = function(cycle_net, drive_net, buffer_dist = 10, angle_threshold = 20) {
+  infra_no_maxspeed = cycle_net |>
     filter(is.na(maxspeed))
   
-  infra_no_maxspeed$azimuth_cycle <- 
+  infra_no_maxspeed$azimuth_cycle = 
       stplanr::line_bearing(infra_no_maxspeed, bidirectional = TRUE)
   
   # This should be a small datasets so OK to buffer:
-  infra_no_maxspeed_buffer <- sf::st_buffer(infra_no_maxspeed, dist = buffer_dist)
+  infra_no_maxspeed_buffer = sf::st_buffer(infra_no_maxspeed, dist = buffer_dist)
   
-  roads_with_maxspeed <- drive_net |>
+  roads_with_maxspeed = drive_net |>
     filter(!is.na(maxspeed))
   
-  roads_with_maxspeed$azimuth_road <- 
+  roads_with_maxspeed$azimuth_road = 
     stplanr::line_bearing(roads_with_maxspeed, bidirectional = TRUE)
 
-  roads_with_maxspeed_points <- sf::st_point_on_surface(roads_with_maxspeed)
-  infra_no_maxspeed_nearby <- infra_no_maxspeed_buffer[roads_with_maxspeed_points, ]
+  roads_with_maxspeed_points = sf::st_point_on_surface(roads_with_maxspeed)
+  infra_no_maxspeed_nearby = infra_no_maxspeed_buffer[roads_with_maxspeed_points, ]
   
-  joined_data <- sf::st_join(
+  joined_data = sf::st_join(
     infra_no_maxspeed_nearby |>
       dplyr::select(osm_id, azimuth_cycle),
     roads_with_maxspeed_points |>
@@ -229,7 +229,7 @@ find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_thr
     join = sf::st_intersects
   )
   
-  joined_data_clean <- joined_data |>
+  joined_data_clean = joined_data |>
     sf::st_drop_geometry() |>
     mutate(
       angle_diff = abs(azimuth_cycle - azimuth_road),
@@ -261,7 +261,7 @@ find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_thr
   return(cycle_net_joined)
 }
 
-cycle_net_f_updated <- find_nearby_speeds(cycle_net_f, drive_net_f)
+cycle_net_f_updated = find_nearby_speeds(cycle_net_f, drive_net_f)
 
 mapview(cycle_net_f_updated, zcol = "maxspeed")
 
@@ -274,7 +274,7 @@ sum(is.na(cycle_net_f_updated$maxspeed))
 
 ```{r}
 # testing new get_parallel_values() function
-# devtools::load_all()
+devtools::load_all()
 target_net = cycle_net_f
 source_net = drive_net_f
 cycle_net_f_updated2 = get_parallel_values(
@@ -296,8 +296,8 @@ osm = get_travel_network("Edinburgh")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 
-joined_data <- find_nearby_speeds(cycle_net, drive_net)
-cycle_net <- update_missing_speeds(cycle_net, joined_data)
+joined_data = find_nearby_speeds(cycle_net, drive_net)
+cycle_net = update_missing_speeds(cycle_net, joined_data)
 
 mapview(cycle_net[central_edinburgh, ], zcol = "maxspeed")
 

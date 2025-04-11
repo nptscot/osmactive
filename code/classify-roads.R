@@ -3,21 +3,21 @@ library(tmap)
 library(sf)
 tmap_mode("view")
 
-edinburgh <- zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km <- edinburgh |>
+edinburgh = zonebuilder::zb_zone("Edinburgh")
+edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
   dplyr::filter(circle_id <= 2) |>
   sf::st_union()
-osm <- get_travel_network(
+osm = get_travel_network(
   "Scotland",
   boundary = edinburgh_3km,
   boundary_type = "clipsrc"
 )
-cycle_net <- get_cycling_network(osm)
-drive_net <- get_driving_network_major(osm)
-cycle_net <- distance_to_road(cycle_net, drive_net)
-cycle_net <- classify_cycle_infrastructure(cycle_net)
-m <- plot_osm_tmap(cycle_net)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network_major(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+m = plot_osm_tmap(cycle_net)
 m
 
 tm_shape(drive_net) + tm_lines("highway", lwd = 2)
