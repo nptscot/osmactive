@@ -190,72 +190,86 @@ but let's solve speed NA problem in cycle_net first:
 
 ```{r}
 devtools::load_all() # load minimal exmaple cycle_net_f and drive_net_f
-mapview::mapview(cycle_net_f, color = "blue") + 
-  mapview::mapview(drive_net_f, color = "red") 
+cycle_net = cycle_net_f
+drive_net = drive_net_f
+mapview::mapview(cycle_net, color = "blue") + 
+  mapview::mapview(drive_net, color = "red") 
 
-get_azimuth <- function(line) {
-  coords <- sf::st_coordinates(line)
-  if (nrow(coords) < 2) return(NA)
-  x1 <- coords[1, "X"]
-  y1 <- coords[1, "Y"]
-  x2 <- coords[nrow(coords), "X"]
-  y2 <- coords[nrow(coords), "Y"]
-  atan2(x2 - x1, y2 - y1) * 180 / pi
-}
+cycle_net$maxspeed
+# Stplanr function:
+stplanr::line_bearing(cycle_net)
+# All values between -90 and 90 degrees
+stplanr::line_bearing(cycle_net, bidirectional = TRUE)
 
+# TODO: check implementations
 find_nearby_speeds <- function(cycle_net, drive_net, buffer_dist = 10, angle_threshold = 20) {
-  cycle_infra_without_maxspeed <- cycle_net |>
+  infra_no_maxspeed <- cycle_net |>
     filter(is.na(maxspeed))
   
-  cycle_infra_without_maxspeed$azimuth <- sapply(
-    sf::st_geometry(cycle_infra_without_maxspeed), 
-    get_azimuth
-  )
+  infra_no_maxspeed$azimuth_cycle <- 
+      stplanr::line_bearing(infra_no_maxspeed, bidirectional = TRUE)
   
-  cycle_infra_without_maxspeed_buffer <- sf::st_buffer(cycle_infra_without_maxspeed, dist = buffer_dist)
+  # This should be a small datasets so OK to buffer:
+  infra_no_maxspeed_buffer <- sf::st_buffer(infra_no_maxspeed, dist = buffer_dist)
   
   roads_with_maxspeed <- drive_net |>
     filter(!is.na(maxspeed))
   
-  roads_with_maxspeed$azimuth <- sapply(
-    sf::st_geometry(roads_with_maxspeed), 
-    get_azimuth
-  )
-  
+  roads_with_maxspeed$azimuth_road <- 
+    stplanr::line_bearing(roads_with_maxspeed, bidirectional = TRUE)
+
   roads_with_maxspeed_points <- sf::st_point_on_surface(roads_with_maxspeed)
+  infra_no_maxspeed_nearby <- infra_no_maxspeed_buffer[roads_with_maxspeed_points, ]
   
   joined_data <- sf::st_join(
-    cycle_infra_without_maxspeed_buffer,
-    roads_with_maxspeed_points,
+    infra_no_maxspeed_nearby |>
+      dplyr::select(osm_id, azimuth_cycle),
+    roads_with_maxspeed_points |>
+      dplyr::select(maxspeed, azimuth_road),
     join = sf::st_intersects
-  ) |>
-    mutate(angle_diff = abs((azimuth.x - azimuth.y) %% 180)) |>
-    filter(angle_diff <= angle_threshold | (180 - angle_diff) <= angle_threshold) |>
-    group_by(osm_id.x) |>
-    slice(1) |>
+  )
+  
+  joined_data_clean <- joined_data |>
+    sf::st_drop_geometry() |>
+    mutate(
+      angle_diff = abs(azimuth_cycle - azimuth_road),
+      maxspeed_numeric = gsub(maxspeed, pattern = " mph", replacement = "") |>
+      as.numeric()
+    ) |>
+    filter(angle_diff < angle_threshold) |>
+    group_by(osm_id) |>
+    dplyr::summarise(
+      maxspeed_new = median(maxspeed_numeric, na.rm = TRUE) |>
+        paste0(" mph")
+    ) |>
     ungroup()
   
-  return(joined_data)
-}
-
-update_missing_speeds <- function(cycle_net, joined_data) {
-  cycle_net_updated <- cycle_net |>
-    left_join(
-      joined_data |>
-        sf::st_drop_geometry() |>
-        select(osm_id.x, maxspeed.y),
-      by = c("osm_id" = "osm_id.x")
+  cycle_net_joined = left_join(
+    cycle_net,
+    joined_data_clean |>
+      dplyr::select(osm_id, maxspeed_new),
+  ) |>
+    mutate(
+      maxspeed = case_when(
+        is.na(maxspeed) ~ maxspeed_new,
+        TRUE ~ maxspeed
+      )
     ) |>
-    mutate(maxspeed = ifelse(is.na(maxspeed), maxspeed.y, maxspeed)) |>
-    select(-maxspeed.y)
+    select(-maxspeed_new)
   
-  return(cycle_net_updated)
+  
+  return(cycle_net_joined)
 }
 
+cycle_net_f_updated <- find_nearby_speeds(cycle_net_f, drive_net_f)
 
-joined_data <- find_nearby_speeds(cycle_net_f, drive_net_f)
-cycle_net_f_updated <- update_missing_speeds(cycle_net_f, joined_data)
 mapview(cycle_net_f_updated, zcol = "maxspeed")
+
+
+# Number of rows with NA maxspeed, before:
+sum(is.na(cycle_net_f$maxspeed))
+sum(is.na(cycle_net_f_updated$maxspeed))
+# We've reduced the number of NAs from 28 to 20 in the test dataset
 ```
 
 
