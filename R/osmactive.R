@@ -1062,3 +1062,23 @@ NULL
 #' data(los_table_complete)
 #' head(los_table_complete)
 NULL
+
+  # Undocumented code objects:
+  #   ‘cycle_net_f’ ‘drive_net_f’
+#' @name cycle_net_f
+#' @title Cycle network for Edinburgh, filtered around Leith Walk
+#' @description This dataset contains the cycle network for Edinburgh, filtered around Leith Walk.
+#' @format An sf data frame
+#' @examples
+#' head(cycle_net_f)
+#' plot(cycle_net_f)
+NULL
+
+#' @name drive_net_f
+#' @title Driving network for Edinburgh, filtered around Leith Walk
+#' @description This dataset contains the driving network for Edinburgh, filtered around Leith Walk.
+#' @format An sf data frame
+#' @examples
+#' head(drive_net_f)
+#' plot(drive_net_f)
+NULL

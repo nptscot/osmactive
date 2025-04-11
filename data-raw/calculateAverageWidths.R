@@ -13,7 +13,7 @@ get_pavement_widths = function(
 
   if (segment_length > 0) {
     # Check if the rsgeo package or specific functionality is installed
-    rsgeo_installed <- requireNamespace("rsgeo", quietly = TRUE)
+    rsgeo_installed = requireNamespace("rsgeo", quietly = TRUE)
 
     if (rsgeo_installed) {
       # rsgeo package is installed, use rsgeo-specific functionality
@@ -125,7 +125,7 @@ calculate_widths = function(
   return(average_widths)
 }
 
-n_segments <- function(line_length, max_segment_length) {
+n_segments = function(line_length, max_segment_length) {
   pmax(ceiling(line_length / max_segment_length), 1)
 }
 

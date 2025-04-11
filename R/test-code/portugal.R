@@ -76,10 +76,10 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 
 classify_cycle_infrastructure_portugal = function(osm) {
   
-  CYCLE_TRACK <- "Cycle track or lane" # PT: Ciclovia segregada
-  ADVISORY <- "Advisory lane" # PT: Via partilhada com veículos motorizados (ex. zonas 30)
-  PROTECTED_ACTIVE <- "Protected Active" # PT: Via partilhada com peões
-  MIXED_TRAFFIC <- "Mixed traffic" # PT: Via banalizada
+  CYCLE_TRACK = "Cycle track or lane" # PT: Ciclovia segregada
+  ADVISORY = "Advisory lane" # PT: Via partilhada com veículos motorizados (ex. zonas 30)
+  PROTECTED_ACTIVE = "Protected Active" # PT: Via partilhada com peões
+  MIXED_TRAFFIC = "Mixed traffic" # PT: Via banalizada
   
   osm |>
     # 1. Preliminary classification

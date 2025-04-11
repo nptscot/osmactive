@@ -1,0 +1,19 @@
+{
+	"name": "Debian",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "ghcr.io/geocompx/docker:rust",
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+		  // Add the IDs of extensions you want installed when the container is created.
+		  "extensions": ["reditorsupport.r",
+		  "GitHub.copilot-chat",
+		  "GitHub.copilot-labs",
+		  "GitHub.copilot",
+		  "yzhang.markdown-all-in-one",
+		  "quarto.quarto"
+		   ]
+		}
+	  }
+}
+    
