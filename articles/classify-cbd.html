@@ -71,6 +71,8 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://nptscot.github.io/osmactive/">osmactive</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/r-spatial/mapview" class="external-link">mapview</a></span><span class="op">)</span></span>
 <span><span class="fu">tmap</span><span class="fu">::</span><span class="fu"><a href="https://r-tmap.github.io/tmap/reference/tmap_mode.html" class="external-link">tmap_mode</a></span><span class="op">(</span><span class="st">"view"</span><span class="op">)</span></span></code></pre></div>
 <p>The default classification is the Cycling by Design guidance from the
 Scottish Government. The following code shows how we implemented it.</p>
@@ -109,18 +111,114 @@ guidance:</p>
 <span><span class="va">m</span></span></code></pre></div>
 <p>Let’s try running the code on a larger example, covering
 Edinburgh:</p>
+<p>but let’s solve speed NA problem in cycle_net first:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span> <span class="co"># load minimal exmaple cycle_net_f and drive_net_f</span></span>
+<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="va">cycle_net_f</span></span>
+<span><span class="va">drive_net</span> <span class="op">=</span> <span class="va">drive_net_f</span></span>
+<span><span class="fu">mapview</span><span class="fu">::</span><span class="fu">mapview</span><span class="op">(</span><span class="va">cycle_net</span>, color <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">mapview</span><span class="fu">::</span><span class="fu">mapview</span><span class="op">(</span><span class="va">drive_net</span>, color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">cycle_net</span><span class="op">$</span><span class="va">maxspeed</span></span>
+<span><span class="co"># Stplanr function:</span></span>
+<span><span class="fu">stplanr</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/stplanr/reference/line_bearing.html" class="external-link">line_bearing</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
+<span><span class="co"># All values between -90 and 90 degrees</span></span>
+<span><span class="fu">stplanr</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/stplanr/reference/line_bearing.html" class="external-link">line_bearing</a></span><span class="op">(</span><span class="va">cycle_net</span>, bidirectional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># TODO: check implementations</span></span>
+<span><span class="va">find_nearby_speeds</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span>, <span class="va">buffer_dist</span> <span class="op">=</span> <span class="fl">10</span>, <span class="va">angle_threshold</span> <span class="op">=</span> <span class="fl">20</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">infra_no_maxspeed</span> <span class="op">=</span> <span class="va">cycle_net</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">infra_no_maxspeed</span><span class="op">$</span><span class="va">azimuth_cycle</span> <span class="op">=</span> </span>
+<span>      <span class="fu">stplanr</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/stplanr/reference/line_bearing.html" class="external-link">line_bearing</a></span><span class="op">(</span><span class="va">infra_no_maxspeed</span>, bidirectional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># This should be a small datasets so OK to buffer:</span></span>
+<span>  <span class="va">infra_no_maxspeed_buffer</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_buffer</a></span><span class="op">(</span><span class="va">infra_no_maxspeed</span>, dist <span class="op">=</span> <span class="va">buffer_dist</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">roads_with_maxspeed</span> <span class="op">=</span> <span class="va">drive_net</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">roads_with_maxspeed</span><span class="op">$</span><span class="va">azimuth_road</span> <span class="op">=</span> </span>
+<span>    <span class="fu">stplanr</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/stplanr/reference/line_bearing.html" class="external-link">line_bearing</a></span><span class="op">(</span><span class="va">roads_with_maxspeed</span>, bidirectional <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="va">roads_with_maxspeed_points</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/geos_unary.html" class="external-link">st_point_on_surface</a></span><span class="op">(</span><span class="va">roads_with_maxspeed</span><span class="op">)</span></span>
+<span>  <span class="va">infra_no_maxspeed_nearby</span> <span class="op">=</span> <span class="va">infra_no_maxspeed_buffer</span><span class="op">[</span><span class="va">roads_with_maxspeed_points</span>, <span class="op">]</span></span>
+<span>  </span>
+<span>  <span class="va">joined_data</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_join.html" class="external-link">st_join</a></span><span class="op">(</span></span>
+<span>    <span class="va">infra_no_maxspeed_nearby</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">osm_id</span>, <span class="va">azimuth_cycle</span><span class="op">)</span>,</span>
+<span>    <span class="va">roads_with_maxspeed_points</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">maxspeed</span>, <span class="va">azimuth_road</span><span class="op">)</span>,</span>
+<span>    join <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="va"><a href="https://r-spatial.github.io/sf/reference/geos_binary_pred.html" class="external-link">st_intersects</a></span></span>
+<span>  <span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">joined_data_clean</span> <span class="op">=</span> <span class="va">joined_data</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      angle_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">azimuth_cycle</span> <span class="op">-</span> <span class="va">azimuth_road</span><span class="op">)</span>,</span>
+<span>      maxspeed_numeric <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">gsub</a></span><span class="op">(</span><span class="va">maxspeed</span>, pattern <span class="op">=</span> <span class="st">" mph"</span>, replacement <span class="op">=</span> <span class="st">""</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">angle_diff</span> <span class="op">&lt;</span> <span class="va">angle_threshold</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">osm_id</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span></span>
+<span>      maxspeed_new <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/median.html" class="external-link">median</a></span><span class="op">(</span><span class="va">maxspeed_numeric</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">" mph"</span><span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">cycle_net_joined</span> <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
+<span>    <span class="va">cycle_net</span>,</span>
+<span>    <span class="va">joined_data_clean</span> <span class="op">|&gt;</span></span>
+<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">osm_id</span>, <span class="va">maxspeed_new</span><span class="op">)</span>,</span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>      maxspeed <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>        <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">maxspeed</span><span class="op">)</span> <span class="op">~</span> <span class="va">maxspeed_new</span>,</span>
+<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">maxspeed</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">maxspeed_new</span><span class="op">)</span></span>
+<span>  </span>
+<span>  </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">cycle_net_joined</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">cycle_net_f_updated</span> <span class="op">=</span> <span class="fu">find_nearby_speeds</span><span class="op">(</span><span class="va">cycle_net_f</span>, <span class="va">drive_net_f</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">mapview</span><span class="op">(</span><span class="va">cycle_net_f_updated</span>, zcol <span class="op">=</span> <span class="st">"maxspeed"</span><span class="op">)</span></span>
+<span></span>
+<span></span>
+<span><span class="co"># Number of rows with NA maxspeed, before:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cycle_net_f</span><span class="op">$</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cycle_net_f_updated</span><span class="op">$</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># We've reduced the number of NAs from 28 to 20 in the test dataset</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># testing new get_parallel_values() function</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">target_net</span> <span class="op">=</span> <span class="va">cycle_net_f</span></span>
+<span><span class="va">source_net</span> <span class="op">=</span> <span class="va">drive_net_f</span></span>
+<span><span class="va">cycle_net_f_updated2</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_parallel_values.html">get_parallel_values</a></span><span class="op">(</span></span>
+<span>  <span class="va">cycle_net</span>,</span>
+<span>  <span class="va">drive_net</span>,</span>
+<span>  buffer_dist <span class="op">=</span> <span class="fl">10</span>,</span>
+<span>  angle_threshold <span class="op">=</span> <span class="fl">20</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check the number of NAs after imputation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cycle_net_f_updated2</span><span class="op">$</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Check the number of NAs before imputation</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">cycle_net_f</span><span class="op">$</span><span class="va">maxspeed</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_travel_network.html">get_travel_network</a></span><span class="op">(</span><span class="st">"Edinburgh"</span><span class="op">)</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_cycling_network.html">get_cycling_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span><span class="va">drive_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/get_driving_network.html">get_driving_network</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">cycle_net</span> <span class="op">&lt;-</span> <span class="va">cycle_net</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>maxspeed <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">maxspeed</span><span class="op">)</span>,</span>
-<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_nearest_feature.html" class="external-link">st_nearest_feature</a></span><span class="op">(</span><span class="va">geometry</span>, <span class="va">drive_net</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>      <span class="op">(</span>\<span class="op">(</span><span class="va">nearest_id</span><span class="op">)</span> <span class="va">drive_net</span><span class="op">$</span><span class="va">maxspeed</span><span class="op">[</span><span class="va">nearest_id</span><span class="op">]</span><span class="op">)</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    <span class="va">maxspeed</span></span>
-<span>  <span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">joined_data</span> <span class="op">=</span> <span class="fu">find_nearby_speeds</span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span><span class="op">)</span></span>
+<span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu">update_missing_speeds</span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">joined_data</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">mapview</span><span class="op">(</span><span class="va">cycle_net</span><span class="op">[</span><span class="va">central_edinburgh</span>, <span class="op">]</span>, zcol <span class="op">=</span> <span class="st">"maxspeed"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">drive_net</span><span class="op">)</span></span>
 <span><span class="va">cycle_net</span> <span class="op">=</span> <span class="fu"><a href="../reference/classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span></span>
@@ -143,7 +241,7 @@ case that doesn’t seem like off-road.</p>
 with no parallel road nearby.</p>
 </blockquote>
 <p>Let’s pull out those bits of infrastructure:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cycle_net_included</span> <span class="op">=</span> <span class="va">cycle_net</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">osm_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1137759929</span>, <span class="fl">1209807768</span>, <span class="fl">7973833</span>, <span class="fl">265320503</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">cycle_net_included</span><span class="op">)</span></span>
@@ -151,19 +249,19 @@ with no parallel road nearby.</p>
 <span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>We can also plot these as follows:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m</span> <span class="op">=</span> <span class="fu"><a href="../reference/plot_osm_tmap.html">plot_osm_tmap</a></span><span class="op">(</span><span class="va">cycle_net_included</span><span class="op">)</span></span>
 <span><span class="va">m</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="tests-for-leith-walk">Tests for Leith Walk<a class="anchor" aria-label="anchor" href="#tests-for-leith-walk"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">drive_net_speeds</span> <span class="op">=</span> <span class="fu"><a href="../reference/clean_speeds.html">clean_speeds</a></span><span class="op">(</span><span class="va">drive_net</span><span class="op">)</span></span>
 <span><span class="co"># Check for Leith Walk</span></span>
 <span><span class="va">drive_net_speeds</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">name</span> <span class="op">==</span> <span class="st">"Leith Walk"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">matches</a></span><span class="op">(</span><span class="st">"speed"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># devtools::load_all()</span></span>
 <span><span class="va">cycle_net_los</span> <span class="op">=</span> <span class="fu"><a href="../reference/level_of_service.html">level_of_service</a></span><span class="op">(</span><span class="va">cycle_net</span><span class="op">)</span> </span>
 <span><span class="co"># |&gt;</span></span>
