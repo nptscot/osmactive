@@ -6,8 +6,8 @@ cycle_net_joined = readRDS("data-raw/cycle-net-joined.Rds")
 traffic_volumes_scotland = read_sf("data-raw/final_estimates_Scotland.gpkg")
 
 # Edinburgh traffic volumes
-edinburgh <- zonebuilder::zb_zone("Edinburgh")
-edinburgh_3km <- edinburgh |>
+edinburgh = zonebuilder::zb_zone("Edinburgh")
+edinburgh_3km = edinburgh |>
   # Change number in next line to change zone size:
   dplyr::filter(circle_id <= 2) |>
   sf::st_union()
