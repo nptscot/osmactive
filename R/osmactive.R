@@ -762,7 +762,6 @@ clean_speeds = function(osm) {
   # Regex for different speeds:
   r_na = "footway|cycleway|path|pedestrian|razed"
   r20 = "residential|living_street|service"
-  r30 = "unclassified"
   # Compromise between urban being 60 default and rural 30/40:
   r40 = "primary|secondary|tertiary"
   r60 = "trunk"
