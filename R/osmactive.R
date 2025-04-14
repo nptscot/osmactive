@@ -761,8 +761,8 @@ clean_speeds = function(osm) {
   # TODO: add different rules for urban vs rural
   # Regex for different speeds:
   r_na = "footway|cycleway|path|pedestrian|razed"
-  r20 = "living_street"
-  r30 = "residential|unclassified|service"
+  r20 = "residential|living_street|service"
+  r30 = "unclassified"
   # Compromise between urban being 60 default and rural 30/40:
   r40 = "primary|secondary|tertiary"
   r60 = "trunk"
@@ -773,14 +773,14 @@ clean_speeds = function(osm) {
       maxspeed_clean = dplyr::case_when(
         !is.na(maxspeed_clean) ~ maxspeed_clean,
         # Residential areas are 30 mph by default:
-        lit == "yes" ~ 30,
+        lit == "yes" ~ 20,
         stringr::str_detect(highway, r_na) ~ NA_real_,
         stringr::str_detect(highway, r20) ~ 20,
         stringr::str_detect(highway, r30) ~ 30,
         stringr::str_detect(highway, r40) ~ 40,
         stringr::str_detect(highway, r60) ~ 60,
         stringr::str_detect(highway, r70) ~ 70,
-        TRUE ~ 30
+        TRUE ~ NA_real_
       )
     )
   osm = sf::st_sf(
