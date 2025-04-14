@@ -776,7 +776,7 @@ clean_speeds = function(osm) {
         lit == "yes" ~ 20,
         stringr::str_detect(highway, r_na) ~ NA_real_,
         stringr::str_detect(highway, r20) ~ 20,
-        stringr::str_detect(highway, r30) ~ 30,
+        # stringr::str_detect(highway, r30) ~ 30,
         stringr::str_detect(highway, r40) ~ 40,
         stringr::str_detect(highway, r60) ~ 60,
         stringr::str_detect(highway, r70) ~ 70,
