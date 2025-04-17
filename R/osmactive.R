@@ -816,9 +816,9 @@ estimate_traffic = function(osm) {
         highway == "secondary_link" ~ 5000,
         highway == "tertiary" ~ 3000,
         highway == "tertiary_link" ~ 3000,
-        highway == "residential" ~ 1000,
+        highway == "residential" ~ 500,
         highway == "service" ~ 500,
-        highway == "unclassified" ~ 1000
+        highway == "unclassified" ~ 500
       )
     )
   osm = sf::st_sf(
