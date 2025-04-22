@@ -95,6 +95,11 @@ quarto::quarto_render("gisruk2025.qmd")
 system("gh release upload v0.1 gisruk2025.pdf --clobber")
 ```
 
+# Published versions
+
+See the [pdf version](https://github.com/nptscot/osmactive/releases/download/v0.1/gisruk2025.pdf) and [html version](https://nptscot.github.io/osmactive/articles/gisruk2025.html) at [nptscot.github.io/osmactive](https://nptscot.github.io/osmactive/articles/gisruk2025.html).
+
+
 # Introduction
 
 Active travel is an accessible and cost-effective way to replace short car trips and make transport systems more sustainable.
