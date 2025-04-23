@@ -48,10 +48,6 @@ devtools::load_all()
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
 
-# read csv from release 
-url = "https://github.com/nptscot/osmactive/releases/download/cbd/level-of-service-table.csv"
-los_table = read.csv(url, stringsAsFactors = FALSE)
-
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"
@@ -122,10 +118,10 @@ header_line = paste0(
   ' "infrastructure",',
   ' "level_of_service"'
 )
-all_lines = c(header_line, output_lines)
+los_table_complete = c(header_line, output_lines)
 # Save the formatted lines directly to a file
-writeLines(all_lines, "inst/extdata/level-of-service-all.csv")
-usethis::use_data(all_lines, overwrite = TRUE)
+writeLines(los_table_complete, "inst/extdata/los_table_complete.csv")
+usethis::use_data(los_table_complete, overwrite = TRUE)
 ```
 
 # Testing the classification
