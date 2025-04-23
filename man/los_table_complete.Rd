@@ -7,7 +7,7 @@
 A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
 }
 \source{
-Generated from los_table_long and los_table_long_missing datasets
+Generated from the classify-cbd vignette
 }
 \usage{
 data(los_table_complete)
@@ -17,5 +17,7 @@ This dataset contains the complete level of service information, including missi
 }
 \examples{
 data(los_table_complete)
+cols = c("Speed Limit (mph)", "Speed (85th kph)")
+unique(los_table_complete[cols])
 head(los_table_complete)
 }

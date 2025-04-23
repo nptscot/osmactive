@@ -1056,31 +1056,16 @@ utils::globalVariables(c(
   "other_tags"
 ))
 
-#' @name los_table_long
-#' @title Long format Level of Service (LOS) table
-#' @description This dataset contains the level of service information in a long format, with columns for speed limit, AADT, infrastructure type, and level of service.
-#' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
-#' @source Generated from los_table_npt dataset
-#' @usage data(los_table_long)
-#' @examples
-#' data(los_table_long)
-#' head(los_table_long)
-#' table(
-#'   los_table_long$`Motor Traffic Speed (85th percentile)`,
-#'   los_table_long$`Speed Limit (mph)`
-#' )
-#' unique(los_table_long[c("Speed Limit (mph)", "Motor Traffic Speed (85th percentile)")])
-NULL
-
-#' 
 #' @name los_table_complete
 #' @title Complete Level of Service (LOS) table
 #' @description This dataset contains the complete level of service information, including missing categories, in a long format.
 #' @format A data frame with columns including speed limit, AADT, cycle_segregation and level_of_service
-#' @source Generated from los_table_long and los_table_long_missing datasets
+#' @source Generated from the classify-cbd vignette
 #' @usage data(los_table_complete)
 #' @examples
 #' data(los_table_complete)
+#' cols = c("Speed Limit (mph)", "Speed (85th kph)")
+#' unique(los_table_complete[cols])
 #' head(los_table_complete)
 NULL
 
