@@ -910,6 +910,8 @@ npt_to_cbd_aadt = function(AADT) {
 #' @export
 #' @examples 
 #' osm = osm_edinburgh
+#' osm = estimate_traffic(osm)
+#' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
 #' osm_los = level_of_service(osm)
 level_of_service = function(osm) {
   # Add final_speed column if not present:
@@ -918,12 +920,7 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    if ("final_traffic" %in% names(osm)) {
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
-    } else {
-      osm = estimate_traffic(osm)
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
-    }
+    stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
   }
   osm_joined = dplyr::left_join(osm, los_table_complete) |>
     dplyr::rename(los = level_of_service)

@@ -17,5 +17,7 @@ Generate Cycle by Design Level of Service
 }
 \examples{
 osm = osm_edinburgh
+osm = estimate_traffic(osm)
+osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
 osm_los = level_of_service(osm)
 }
