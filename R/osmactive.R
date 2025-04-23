@@ -904,6 +904,10 @@ npt_to_cbd_aadt = function(AADT) {
   }
 }
 #' Generate Cycle by Design Level of Service
+#' 
+#' Note: you need to have Annual Average Daily Traffic (AADT) values in the dataset
+#' These can be estimated using the `estimate_traffic()` function and converted
+#' to CbD AADT categories using the `npt_to_cbd_aadt()` function.
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
 #' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
