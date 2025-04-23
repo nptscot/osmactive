@@ -904,12 +904,18 @@ npt_to_cbd_aadt = function(AADT) {
   }
 }
 #' Generate Cycle by Design Level of Service
+#' 
+#' Note: you need to have Annual Average Daily Traffic (AADT) values in the dataset
+#' These can be estimated using the `estimate_traffic()` function and converted
+#' to CbD AADT categories using the `npt_to_cbd_aadt()` function.
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
 #' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
 #' @export
 #' @examples 
 #' osm = osm_edinburgh
+#' osm = estimate_traffic(osm)
+#' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
 #' osm_los = level_of_service(osm)
 level_of_service = function(osm) {
   # Add final_speed column if not present:
@@ -918,12 +924,7 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    if ("final_traffic" %in% names(osm)) {
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
-    } else {
-      # osm = estimate_traffic(osm)
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
-    }
+    stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
   }
   osm_joined = dplyr::left_join(osm, los_table_complete) |>
     dplyr::rename(los = level_of_service)
@@ -1048,6 +1049,11 @@ utils::globalVariables(c(
 #' @examples
 #' data(los_table_long)
 #' head(los_table_long)
+#' table(
+#'   los_table_long$`Motor Traffic Speed (85th percentile)`,
+#'   los_table_long$`Speed Limit (mph)`
+#' )
+#' unique(los_table_long[c("Speed Limit (mph)", "Motor Traffic Speed (85th percentile)")])
 NULL
 
 #' 
