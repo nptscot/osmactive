@@ -67,7 +67,7 @@ los_table_npt = los_table |>
     `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
     `Speed Limit (mph)` = `Speed Limit (mph)`,
     `Speed Limit (kph)` = `Speed Limit (kph)`,
-    AADT = `Two-way traffic flow (pcu per day)`,
+    `AADT` = `Two-way traffic flow (pcu per day)`,
     `Mixed Traffic Street`,
     `Off Road Cycleway` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,

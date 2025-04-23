@@ -917,6 +917,7 @@ npt_to_cbd_aadt = function(AADT) {
 #' osm = estimate_traffic(osm)
 #' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
 #' osm_los = level_of_service(osm)
+
 level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
