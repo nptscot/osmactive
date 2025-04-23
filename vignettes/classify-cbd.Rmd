@@ -119,8 +119,14 @@ header_line = paste0(
   ' "level_of_service"'
 )
 los_table_complete = c(header_line, output_lines)
+
 # Save the formatted lines directly to a file
 writeLines(los_table_complete, "inst/extdata/los_table_complete.csv")
+
+# Rename the data frame object to the desired name for saving
+los_table_complete = los_table_npt_long
+
+# Save the data frame object (now named los_table_complete)
 usethis::use_data(los_table_complete, overwrite = TRUE)
 ```
 

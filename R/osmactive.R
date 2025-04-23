@@ -692,7 +692,7 @@ plot_osm_tmap = function(
     tmap::tm_layout(basemap.server = basemaps()) +
     # TODO: remove this when the following issue is fixed:
     # https://github.com/r-tmap/tmap/issues/1064
-    tmap::tm_view(use_WebGL = FALSE)
+    tmap::tm_view()
 }
 
 basemaps = function() {
@@ -914,10 +914,19 @@ npt_to_cbd_aadt = function(AADT) {
 #' @export
 #' @examples 
 #' osm = osm_edinburgh
-#' osm = estimate_traffic(osm)
-#' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
-#' osm_los = level_of_service(osm)
-
+#' cycle_net = get_cycling_network(osm)             # Get cycle network
+#' driving_network = get_driving_network(osm)       # Get driving network (needed for distance)
+#' cycle_net = distance_to_road(cycle_net, driving_network) # Add distance_to_road column
+#' cycle_net = classify_cycle_infrastructure(cycle_net) # Add cycle_segregation (uses distance)
+#' cycle_net = estimate_traffic(cycle_net)          # Estimate traffic (on cycle net)
+#' cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net$assumed_volume) # Add AADT category
+#' # Ensure Speed Limit column exists:
+#' if (!"Speed Limit (mph)" %in% names(cycle_net)) {
+#'     cycle_net = clean_speeds(cycle_net)
+#'     cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net$maxspeed_clean)
+#' }
+#' cycle_net_los = level_of_service(cycle_net)        # Now calculate LoS
+#' table(cycle_net_los$`Level of Service`)
 level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
@@ -927,7 +936,7 @@ level_of_service = function(osm) {
   if (!"AADT" %in% names(osm)) {
     stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
   }
-  osm_joined = dplyr::left_join(osm, los_table_complete) |>
+  osm_joined = dplyr::left_join(osm, los_table_complete, copy = TRUE) |>
     dplyr::rename(los = level_of_service)
 
   osm_joined = osm_joined |>
@@ -1070,7 +1079,7 @@ NULL
 NULL
 
   # Undocumented code objects:
-  #   ‘cycle_net_f’ ‘drive_net_f’
+  #   'cycle_net_f' 'drive_net_f'
 #' @name cycle_net_f
 #' @title Cycle network for Edinburgh, filtered around Leith Walk
 #' @description This dataset contains the cycle network for Edinburgh, filtered around Leith Walk.

@@ -19,7 +19,17 @@ to CbD AADT categories using the \code{npt_to_cbd_aadt()} function.
 }
 \examples{
 osm = osm_edinburgh
-osm = estimate_traffic(osm)
-osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
-osm_los = level_of_service(osm)
+cycle_net = get_cycling_network(osm)             # Get cycle network
+driving_network = get_driving_network(osm)       # Get driving network (needed for distance)
+cycle_net = distance_to_road(cycle_net, driving_network) # Add distance_to_road column
+cycle_net = classify_cycle_infrastructure(cycle_net) # Add cycle_segregation (uses distance)
+cycle_net = estimate_traffic(cycle_net)          # Estimate traffic (on cycle net)
+cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net$assumed_volume) # Add AADT category
+# Ensure Speed Limit column exists:
+if (!"Speed Limit (mph)" \%in\% names(cycle_net)) {
+    cycle_net = clean_speeds(cycle_net)
+    cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net$maxspeed_clean)
+}
+cycle_net_los = level_of_service(cycle_net)        # Now calculate LoS
+table(cycle_net_los$`Level of Service`)
 }
