@@ -19,7 +19,17 @@ to CbD AADT categories using the \code{npt_to_cbd_aadt()} function.
 }
 \examples{
 osm = osm_edinburgh
+# Get infrastructure type:
+cycle_net = get_cycling_network(osm)
+# Get driving network:
+driving_net = get_driving_network(osm)
+# Get distance to road:
+osm = distance_to_road(cycle_net, driving_net)
+# Classify cycle infrastructure:
+osm = classify_cycle_infrastructure(osm)
 osm = estimate_traffic(osm)
 osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+osm$infrastructure = osm$cycle_segregation
 osm_los = level_of_service(osm)
+plot(osm_los["Level of Service"])
 }

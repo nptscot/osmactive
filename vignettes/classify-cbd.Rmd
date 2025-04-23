@@ -79,11 +79,7 @@ los_table_npt = los_table |>
     AADT = npt_to_cbd_aadt(AADT)
   )
 
-los_table_npt |>
-  knitr::kable()
-
-
-los_table_npt_long = los_table_npt |>
+los_table_complete = los_table_npt |>
   pivot_longer(
     cols = c("Mixed Traffic Street",
              "Off Road Cycleway",
@@ -92,35 +88,9 @@ los_table_npt_long = los_table_npt |>
              "Painted Cycle Lane"),
     names_to = "infrastructure",
     values_to = "level_of_service"
-  )
+  ) 
 
-output_lines = los_table_npt_long |>
-  mutate(
-    line_text = paste0(
-      '"', `Speed (85th kph)`, '", ',
-      '"', `Speed Limit (mph)`, '", ',
-      '"', `Speed Limit (kph)`, '", ',
-      '"', AADT, '", ',
-      '"', infrastructure, '", ',
-      level_of_service, ','
-    )
-  ) |>
-  pull(line_text)
-
-# 5. Print or write each line
-cat(output_lines, sep = "\n")
-
-header_line = paste0(
-  '"Speed (85th kph)",',
-  ' "Speed Limit (mph)",',
-  ' "Speed Limit (kph)",',
-  ' "AADT",',
-  ' "infrastructure",',
-  ' "level_of_service"'
-)
-los_table_complete = c(header_line, output_lines)
-# Save the formatted lines directly to a file
-writeLines(los_table_complete, "inst/extdata/los_table_complete.csv")
+write_csv(los_table_complete, "inst/extdata/los_table_complete.csv")
 usethis::use_data(los_table_complete, overwrite = TRUE)
 ```
 
