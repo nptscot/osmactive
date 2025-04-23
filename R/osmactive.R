@@ -1048,6 +1048,11 @@ utils::globalVariables(c(
 #' @examples
 #' data(los_table_long)
 #' head(los_table_long)
+#' table(
+#'   los_table_long$`Motor Traffic Speed (85th percentile)`,
+#'   los_table_long$`Speed Limit (mph)`
+#' )
+#' unique(los_table_long[c("Speed Limit (mph)", "Motor Traffic Speed (85th percentile)")])
 NULL
 
 #' 
