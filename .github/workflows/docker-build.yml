@@ -31,9 +31,9 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push Docker image
-      uses: docker/build-and-push-action@v6.1.0
-      with:
-        context: .
-        push: true
-        tags: ghcr.io/nptscot/osmactive:latest
+    - name: Build Docker image
+      run: docker build -t ghcr.io/nptscot/osmactive:latest -f app/Dockerfile .
+
+    - name: Push Docker image
+      run: docker push ghcr.io/nptscot/osmactive:latest
+
