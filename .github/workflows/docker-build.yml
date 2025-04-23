@@ -1,39 +1,71 @@
-name: Docker Build
+name: Docker Build and Push
 
 on:
   push:
     branches:
       - main
+    # Optional: Trigger on tags as well if you want to push tagged releases
+    # tags:
+    #   - 'v*.*.*'
   pull_request:
     branches:
       - main
 
 jobs:
-  build:
+  docker:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/geocompx/latest
+    permissions:
+      contents: read # Needed for checkout
+      packages: write # Needed to push to GHCR
+      id-token: write # Needed for provenance attestations
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Install osmactive package
-      run: R -e 'remotes::install_local(".")'
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Extract Docker metadata
+        id: meta # Give this step an ID to reference its outputs
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }} # Use github.repository for owner/repo
+          tags: |
+            # tag sha for specific commit reference
+            type=sha
+            # tag latest for default branch
+            type=raw,value=latest,enable={{is_default_branch}}
+            # Optional: tag based on git tag if you push git tags (e.g., v1.0.0)
+            # type=ref,event=tag
 
-    - name: Log in to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-    - name: Build Docker image
-      run: docker build -t ghcr.io/nptscot/osmactive:latest -f app/Dockerfile .
+      - name: Set up Docker Buildx
+        id: buildx # Give this step an ID if you need to reference the builder instance
+        uses: docker/setup-buildx-action@v3
 
-    - name: Push Docker image
-      run: docker push ghcr.io/nptscot/osmactive:latest
+      - name: Build and push Docker image
+        id: build-and-push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: app/Dockerfile
+          # Only push on pushes to the main branch (not PRs)
+          # Or if you uncommented the tag trigger above, it would also push on tag events
+          push: ${{ github.event_name == 'push' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha # Enable cache read from GitHub Actions cache
+          cache-to: type=gha,mode=max # Enable cache write to GitHub Actions cache (mode=max is recommended)
+          provenance: true # Generate SLSA provenance attestation
 
+      # Optional: Add a step here to output the image digest or other info if needed
+      # - name: Print image digest
+      #   if: steps.build-and-push.outputs.digest
+      #   run: echo "Image digest: ${{ steps.build-and-push.outputs.digest }}"
