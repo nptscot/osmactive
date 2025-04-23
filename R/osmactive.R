@@ -921,7 +921,7 @@ level_of_service = function(osm) {
     if ("final_traffic" %in% names(osm)) {
       osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
     } else {
-      osm = estimate_traffic(osm)
+      # osm = estimate_traffic(osm)
       osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
     }
   }
