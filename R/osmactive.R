@@ -904,13 +904,29 @@ npt_to_cbd_aadt = function(AADT) {
   }
 }
 #' Generate Cycle by Design Level of Service
+#' 
+#' Note: you need to have Annual Average Daily Traffic (AADT) values in the dataset
+#' These can be estimated using the `estimate_traffic()` function and converted
+#' to CbD AADT categories using the `npt_to_cbd_aadt()` function.
 #'
 #' @param osm An sf object with the road network including speed limits and traffic volumes
 #' @return An sf object with the Cycle by Design Level of Service in the column `Level of Service`
 #' @export
 #' @examples 
 #' osm = osm_edinburgh
+#' # Get infrastructure type:
+#' cycle_net = get_cycling_network(osm)
+#' # Get driving network:
+#' driving_net = get_driving_network(osm)
+#' # Get distance to road:
+#' osm = distance_to_road(cycle_net, driving_net)
+#' # Classify cycle infrastructure:
+#' osm = classify_cycle_infrastructure(osm)
+#' osm = estimate_traffic(osm)
+#' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+#' osm$infrastructure = osm$cycle_segregation
 #' osm_los = level_of_service(osm)
+#' plot(osm_los["Level of Service"])
 level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
@@ -918,14 +934,15 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    if ("final_traffic" %in% names(osm)) {
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$final_traffic)
-    } else {
-      osm = estimate_traffic(osm)
-      osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
-    }
+    stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
   }
-  osm_joined = dplyr::left_join(osm, los_table_complete) |>
+  # names in both:
+  names_in_both = intersect(names(osm), names(los_table_complete))
+  # (names(osm), names(los_table_complete))
+  osm_joined = dplyr::left_join(
+    osm,
+    los_table_complete
+  ) |>
     dplyr::rename(los = level_of_service)
 
   osm_joined = osm_joined |>

@@ -48,10 +48,6 @@ devtools::load_all()
 #                      3325                       522 
 los_table = read_csv("https://github.com/nptscot/osmactive/raw/refs/heads/main/inst/extdata/level-of-service-table.csv")
 
-# read csv from release 
-url = "https://github.com/nptscot/osmactive/releases/download/cbd/level-of-service-table.csv"
-los_table = read.csv(url, stringsAsFactors = FALSE)
-
 # names(los_table)
 #  [1] "Motor Traffic Speed (85th percentile)"
 #  [2] "Speed Limit (mph)"
@@ -71,7 +67,7 @@ los_table_npt = los_table |>
     `Speed (85th kph)` = `Motor Traffic Speed (85th percentile)`,
     `Speed Limit (mph)` = `Speed Limit (mph)`,
     `Speed Limit (kph)` = `Speed Limit (kph)`,
-    AADT = `Two-way traffic flow (pcu per day)`,
+    `AADT` = `Two-way traffic flow (pcu per day)`,
     `Mixed Traffic Street`,
     `Off Road Cycleway` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
@@ -83,11 +79,7 @@ los_table_npt = los_table |>
     AADT = npt_to_cbd_aadt(AADT)
   )
 
-los_table_npt |>
-  knitr::kable()
-
-
-los_table_npt_long = los_table_npt |>
+los_table_complete = los_table_npt |>
   pivot_longer(
     cols = c("Mixed Traffic Street",
              "Off Road Cycleway",
@@ -96,36 +88,10 @@ los_table_npt_long = los_table_npt |>
              "Painted Cycle Lane"),
     names_to = "infrastructure",
     values_to = "level_of_service"
-  )
+  ) 
 
-output_lines = los_table_npt_long |>
-  mutate(
-    line_text = paste0(
-      '"', `Speed (85th kph)`, '", ',
-      '"', `Speed Limit (mph)`, '", ',
-      '"', `Speed Limit (kph)`, '", ',
-      '"', AADT, '", ',
-      '"', infrastructure, '", ',
-      level_of_service, ','
-    )
-  ) |>
-  pull(line_text)
-
-# 5. Print or write each line
-cat(output_lines, sep = "\n")
-
-header_line = paste0(
-  '"Speed (85th kph)",',
-  ' "Speed Limit (mph)",',
-  ' "Speed Limit (kph)",',
-  ' "AADT",',
-  ' "infrastructure",',
-  ' "level_of_service"'
-)
-all_lines = c(header_line, output_lines)
-# Save the formatted lines directly to a file
-writeLines(all_lines, "inst/extdata/level-of-service-all.csv")
-usethis::use_data(all_lines, overwrite = TRUE)
+write_csv(los_table_complete, "inst/extdata/los_table_complete.csv")
+usethis::use_data(los_table_complete, overwrite = TRUE)
 ```
 
 # Testing the classification

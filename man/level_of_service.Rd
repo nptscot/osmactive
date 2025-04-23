@@ -13,9 +13,23 @@ level_of_service(osm)
 An sf object with the Cycle by Design Level of Service in the column \verb{Level of Service}
 }
 \description{
-Generate Cycle by Design Level of Service
+Note: you need to have Annual Average Daily Traffic (AADT) values in the dataset
+These can be estimated using the \code{estimate_traffic()} function and converted
+to CbD AADT categories using the \code{npt_to_cbd_aadt()} function.
 }
 \examples{
 osm = osm_edinburgh
+# Get infrastructure type:
+cycle_net = get_cycling_network(osm)
+# Get driving network:
+driving_net = get_driving_network(osm)
+# Get distance to road:
+osm = distance_to_road(cycle_net, driving_net)
+# Classify cycle infrastructure:
+osm = classify_cycle_infrastructure(osm)
+osm = estimate_traffic(osm)
+osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+osm$infrastructure = osm$cycle_segregation
 osm_los = level_of_service(osm)
+plot(osm_los["Level of Service"])
 }
