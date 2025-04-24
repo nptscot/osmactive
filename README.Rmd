@@ -304,7 +304,7 @@ system("gh release upload v0.1 classify_cycle_infrastructure_cambridge.html --cl
 ## Bristol example
 
 ```{r bristol}
-osm = get_travel_network("Edinburgh")
+osm = get_travel_network("Bristol")
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 cycle_net = distance_to_road(cycle_net, drive_net)
