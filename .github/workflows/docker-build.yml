@@ -55,7 +55,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: app/Dockerfile
+          file: Dockerfile
           # Only push on pushes to the main branch (not PRs)
           # Or if you uncommented the tag trigger above, it would also push on tag events
           push: ${{ github.event_name == 'push' }}
