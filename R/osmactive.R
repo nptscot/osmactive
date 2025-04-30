@@ -761,7 +761,8 @@ clean_speeds = function(osm) {
   # TODO: add different rules for urban vs rural
   # Regex for different speeds:
   r_na = "footway|cycleway|path|pedestrian|razed"
-  r20 = "residential|living_street|service"
+  r10 = "service"
+  r30 = "residential|living_street"
   # Compromise between urban being 60 default and rural 30/40:
   r40 = "primary|secondary|tertiary"
   r60 = "trunk"
@@ -771,11 +772,12 @@ clean_speeds = function(osm) {
     dplyr::mutate(
       maxspeed_clean = dplyr::case_when(
         !is.na(maxspeed_clean) ~ maxspeed_clean,
-        # Residential areas are 30 mph by default:
-        lit == "yes" ~ 20,
+        # Default speeds based on highway type for untagged roads:
+        # lit == "yes" ~ 20, # Keep lit rule commented out
         stringr::str_detect(highway, r_na) ~ NA_real_,
-        stringr::str_detect(highway, r20) ~ 20,
-        # stringr::str_detect(highway, r30) ~ 30,
+        stringr::str_detect(highway, r10) ~ 10, # Service roads default to 10 mph
+        stringr::str_detect(highway, r30) ~ 30, # Residential/living streets default to 30 mph (Using r30)
+        # stringr::str_detect(highway, r30) ~ 30, # Ensure this remains commented
         stringr::str_detect(highway, r40) ~ 40,
         stringr::str_detect(highway, r60) ~ 60,
         stringr::str_detect(highway, r70) ~ 70,
@@ -1070,7 +1072,7 @@ utils::globalVariables(c(
 NULL
 
   # Undocumented code objects:
-  #   ‘cycle_net_f’ ‘drive_net_f’
+  #   'cycle_net_f' 'drive_net_f'
 #' @name cycle_net_f
 #' @title Cycle network for Edinburgh, filtered around Leith Walk
 #' @description This dataset contains the cycle network for Edinburgh, filtered around Leith Walk.
