@@ -97,7 +97,10 @@ usethis::use_data(los_table_complete, overwrite = TRUE)
 # Testing the classification
 
 ```{r}
-osm = osm_edinburgh
+osm_net = osmactive::get_travel_network("Edinburgh") |> st_transform(crs = 27700)
+zone = zonebuilder::zb_zone("edinburgh", n_circles = 3) |> st_transform(crs = 27700)
+osm_net = osm_net[zone, ]
+osm = osmactive::get_cycling_network(osm_net)  
 cycle_net = get_cycling_network(osm)
 drive_net = get_driving_network(osm)
 drive_net_major = get_driving_network(osm)
@@ -111,7 +114,15 @@ table(cycle_net$cycle_segregation)
 We can then create the `Speed Limit (mph)` and `AADT` columns in the `cycle_net` object:
 
 ```{r}
+print("Original maxspeed for residential:")
+unique((cycle_net |> filter(highway == "residential"))$maxspeed)
+print("Original maxspeed for service:")
+unique((cycle_net |> filter(highway == "service"))$maxspeed)
+
 cycle_net_speeds = clean_speeds(cycle_net)
+unique((cycle_net_speeds |> filter(highway == "residential"))$maxspeed_clean)
+unique((cycle_net_speeds |> filter(highway == "service"))$maxspeed_clean)
+
 cycle_net_volumes = estimate_traffic(cycle_net_speeds)
 cycle_net$`Speed Limit (mph)` = classify_speeds(cycle_net_speeds$maxspeed_clean)
 cycle_net$AADT = npt_to_cbd_aadt_numeric(cycle_net_volumes$assumed_volume)
