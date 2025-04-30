@@ -775,9 +775,8 @@ clean_speeds = function(osm) {
         # Default speeds based on highway type for untagged roads:
         # lit == "yes" ~ 20, # Keep lit rule commented out
         stringr::str_detect(highway, r_na) ~ NA_real_,
-        stringr::str_detect(highway, r10) ~ 10, # Service roads default to 10 mph
-        stringr::str_detect(highway, r30) ~ 30, # Residential/living streets default to 30 mph (Using r30)
-        # stringr::str_detect(highway, r30) ~ 30, # Ensure this remains commented
+        stringr::str_detect(highway, r10) ~ 10, 
+        stringr::str_detect(highway, r30) ~ 30, 
         stringr::str_detect(highway, r40) ~ 40,
         stringr::str_detect(highway, r60) ~ 60,
         stringr::str_detect(highway, r70) ~ 70,
