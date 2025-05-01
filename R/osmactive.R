@@ -819,7 +819,12 @@ estimate_traffic = function(osm) {
         highway == "tertiary_link" ~ 3000,
         highway == "residential" ~ 500,
         highway == "service" ~ 500,
-        highway == "unclassified" ~ 500
+        highway == "unclassified" ~ 500,
+        stringr::str_detect(highway, pattern = "living") ~ 500,
+        highway == "pedestrian" ~ NA_real_,
+        highway == "footway" ~ NA_real_,
+        highway == "cycleway" ~ NA_real_,
+        highway == "path" ~ NA_real_
       )
     )
   osm = sf::st_sf(
