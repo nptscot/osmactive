@@ -819,7 +819,7 @@ estimate_traffic = function(osm) {
         highway == "residential" ~ 500,
         highway == "service" ~ 500,
         highway == "unclassified" ~ 500,
-        highway == "living" ~ 500,
+        str_detect(highway, pattern = "living") ~ 500,
         highway == "pedestrian" ~ 500,
         highway == "footway" ~ 500,
         highway == "cycleway" ~ 500,
