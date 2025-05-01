@@ -823,7 +823,7 @@ estimate_traffic = function(osm) {
         highway == "pedestrian" ~ NA_real_,
         highway == "footway" ~ NA_real_,
         highway == "cycleway" ~ NA_real_,
-        highway == "path" ~ 500
+        highway == "path" ~ NA_real_
       )
     )
   osm = sf::st_sf(
