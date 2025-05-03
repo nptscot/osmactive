@@ -64,20 +64,17 @@
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="va">osm_edinburgh</span></span></span>
 <span class="r-in"><span><span class="va">osm_traffic</span> <span class="op">=</span> <span class="fu">estimate_traffic</span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in stopifnot(!inherits(x, "sf"), !missing(sf_column_name), !missing(agr)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `pred_flows = case_when(...)`.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `case_when()`:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Failed to evaluate the right-hand side of formula 2.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'pred_flows' not found</span>
 <span class="r-in"><span><span class="co"># check NAs:</span></span></span>
 <span class="r-in"><span><span class="va">sel_nas</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">osm_traffic</span><span class="op">$</span><span class="va">assumed_volume</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'osm_traffic' not found</span>
 <span class="r-in"><span><span class="va">osm_no_traffic</span> <span class="op">=</span> <span class="va">osm_traffic</span><span class="op">[</span><span class="va">sel_nas</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"highway"</span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'osm_traffic' not found</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">osm_no_traffic</span><span class="op">$</span><span class="va">highway</span><span class="op">)</span> <span class="co"># Active travel infrastructure has no road traffic</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'osm_no_traffic' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   corridor   cycleway    footway       path pedestrian      steps </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          3         17         33          1          6         10 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">osm_traffic</span><span class="op">$</span><span class="va">assumed_volume</span>, useNA <span class="op">=</span> <span class="st">"always"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'osm_traffic' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  500 3000 5000 6000 &lt;NA&gt; </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   25   12    4   12   70 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

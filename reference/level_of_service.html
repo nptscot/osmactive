@@ -78,18 +78,12 @@ to CbD AADT categories using the <code><a href="npt_to_cbd_aadt.html">npt_to_cbd
 <span class="r-in"><span><span class="co"># Classify cycle infrastructure:</span></span></span>
 <span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="estimate_traffic.html">estimate_traffic</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in stopifnot(!inherits(x, "sf"), !missing(sf_column_name), !missing(agr)):</span> <span style="color: #00BBBB;">ℹ</span> In argument: `pred_flows = case_when(...)`.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error in `case_when()`:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> Failed to evaluate the right-hand side of formula 2.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Caused by error:</span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> object 'pred_flows' not found</span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">AADT</span> <span class="op">=</span> <span class="fu"><a href="npt_to_cbd_aadt_numeric.html">npt_to_cbd_aadt_numeric</a></span><span class="op">(</span><span class="va">osm</span><span class="op">$</span><span class="va">assumed_volume</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[[&lt;-.data.frame`(`*tmp*`, i, value = character(0)):</span> replacement has 0 rows, data has 21</span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">infrastructure</span> <span class="op">=</span> <span class="va">osm</span><span class="op">$</span><span class="va">cycle_segregation</span></span></span>
 <span class="r-in"><span><span class="va">osm_los</span> <span class="op">=</span> <span class="fu">level_of_service</span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in level_of_service(osm):</span> Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(AADT, infrastructure, `Speed Limit (mph)`)`</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">osm_los</span><span class="op">[</span><span class="st">"Level of Service"</span><span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'osm_los' not found</span>
+<span class="r-plt img"><img src="level_of_service-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
