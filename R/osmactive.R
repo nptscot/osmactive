@@ -927,12 +927,26 @@ npt_to_cbd_aadt = function(AADT) {
 #' # Get distance to road:
 #' osm = distance_to_road(cycle_net, driving_net)
 #' # Classify cycle infrastructure:
-#' osm = classify_cycle_infrastructure(osm)
+#' osm = classify_cycle_infrastructure(osm, include_mixed_traffic = TRUE)
 #' osm = estimate_traffic(osm)
 #' osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
 #' osm$infrastructure = osm$cycle_segregation
 #' osm_los = level_of_service(osm)
 #' plot(osm_los["Level of Service"])
+#' # mapview::mapview(osm_los, zcol = "Level of Service")
+#' # Test LoS on known road:
+#' mill_lane = data.frame(
+#'   # TODO: find out why highway is needed for LoS
+#'   highway = "residential",
+#'   AADT = "4000+",
+#'   maxspeed = "20 mph",
+#'   cycle_segregation = "Mixed Traffic Street"
+#' )
+#' #
+#' osm = sf::st_as_sf(mill_lane, geometry = osm$geometry[1])
+#' mill_lane_los = level_of_service(osm)
+#' mill_lane_los
+#' #
 level_of_service = function(osm) {
   # Add final_speed column if not present:
   if (!"Speed Limit (mph)" %in% names(osm)) {
@@ -942,9 +956,22 @@ level_of_service = function(osm) {
   if (!"AADT" %in% names(osm)) {
     stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
   }
+  # If the column 'infrastructure' is not present, add it:
+  if (!"infrastructure" %in% names(osm)) {
+    osm$infrastructure = osm$cycle_segregation
+    # # Remove the old column 'cycle_segregation':
+    # osm$cycle_segregation = NULL
+  }
+  
   # names in both:
   names_in_both = intersect(names(osm), names(los_table_complete))
-  # (names(osm), names(los_table_complete))
+  columns_required = c("AADT", "Speed Limit (mph)", "infrastructure")
+  # There should be 3 columns in both, fail if not:
+  if (length(names_in_both) != 3) {
+    message("Names in both columns: ", paste(names_in_both, collapse = ", "))
+    message("Columns required: ", paste(columns_required, collapse = ", "))
+    stop("Required columns not found in the input data.")
+  }
   osm_joined = dplyr::left_join(
     osm,
     los_table_complete
