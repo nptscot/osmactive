@@ -933,9 +933,8 @@ npt_to_cbd_aadt = function(AADT) {
 #' osm$infrastructure = osm$cycle_segregation
 #' osm_los = level_of_service(osm)
 #' plot(osm_los["Level of Service"])
-#' mapview::mapview(osm_los, zcol = "Level of Service")
+#' # mapview::mapview(osm_los, zcol = "Level of Service")
 #' # Test LoS on known road:
-#' devtools::load_all()
 #' mill_lane = data.frame(
 #'   # TODO: find out why highway is needed for LoS
 #'   highway = "residential",
