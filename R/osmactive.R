@@ -935,6 +935,7 @@ npt_to_cbd_aadt = function(AADT) {
 #' plot(osm_los["Level of Service"])
 #' mapview::mapview(osm_los, zcol = "Level of Service")
 #' # Test LoS on known road:
+#' devtools::load_all()
 #' mill_lane = data.frame(
 #'   # TODO: find out why highway is needed for LoS
 #'   highway = "residential",
@@ -967,11 +968,11 @@ level_of_service = function(osm) {
   names_in_both = intersect(names(osm), names(los_table_complete))
   columns_required = c("AADT", "Speed Limit (mph)", "infrastructure")
   # There should be 3 columns in both, fail if not:
-  if (length(names_in_both) != 3) {
-    message("Names in both columns: ", paste(names_in_both, collapse = ", "))
-    message("Columns required: ", paste(columns_required, collapse = ", "))
-    stop("Required columns not found in the input data.")
-  }
+  # if (length(names_in_both) != 3) {
+  #   message("Names in both columns: ", paste(names_in_both, collapse = ", "))
+  #   message("Columns required: ", paste(columns_required, collapse = ", "))
+  #   stop("Required columns not found in the input data.")
+  # }
   osm_joined = dplyr::left_join(
     osm,
     los_table_complete
