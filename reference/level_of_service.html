@@ -76,7 +76,7 @@ to CbD AADT categories using the <code><a href="npt_to_cbd_aadt.html">npt_to_cbd
 <span class="r-in"><span><span class="co"># Get distance to road:</span></span></span>
 <span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="distance_to_road.html">distance_to_road</a></span><span class="op">(</span><span class="va">cycle_net</span>, <span class="va">driving_net</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Classify cycle infrastructure:</span></span></span>
-<span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="classify_cycle_infrastructure.html">classify_cycle_infrastructure</a></span><span class="op">(</span><span class="va">osm</span>, include_mixed_traffic <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu"><a href="estimate_traffic.html">estimate_traffic</a></span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">AADT</span> <span class="op">=</span> <span class="fu"><a href="npt_to_cbd_aadt_numeric.html">npt_to_cbd_aadt_numeric</a></span><span class="op">(</span><span class="va">osm</span><span class="op">$</span><span class="va">assumed_volume</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">infrastructure</span> <span class="op">=</span> <span class="va">osm</span><span class="op">$</span><span class="va">cycle_segregation</span></span></span>
@@ -84,6 +84,32 @@ to CbD AADT categories using the <code><a href="npt_to_cbd_aadt.html">npt_to_cbd
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(AADT, infrastructure, `Speed Limit (mph)`)`</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">osm_los</span><span class="op">[</span><span class="st">"Level of Service"</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="level_of_service-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="co"># mapview::mapview(osm_los, zcol = "Level of Service")</span></span></span>
+<span class="r-in"><span><span class="co"># Test LoS on known road:</span></span></span>
+<span class="r-in"><span><span class="va">mill_lane</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="co"># TODO: find out why highway is needed for LoS</span></span></span>
+<span class="r-in"><span>  highway <span class="op">=</span> <span class="st">"residential"</span>,</span></span>
+<span class="r-in"><span>  AADT <span class="op">=</span> <span class="st">"4000+"</span>,</span></span>
+<span class="r-in"><span>  maxspeed <span class="op">=</span> <span class="st">"20 mph"</span>,</span></span>
+<span class="r-in"><span>  cycle_segregation <span class="op">=</span> <span class="st">"Mixed Traffic Street"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co">#</span></span></span>
+<span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="va">mill_lane</span>, geometry <span class="op">=</span> <span class="va">osm</span><span class="op">$</span><span class="va">geometry</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">mill_lane_los</span> <span class="op">=</span> <span class="fu">level_of_service</span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining with `by = join_by(AADT, `Speed Limit (mph)`, infrastructure)`</span>
+<span class="r-in"><span><span class="va">mill_lane_los</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 1 feature and 10 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTILINESTRING</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -3.18682 ymin: 55.95571 xmax: -3.186586 ymax: 55.95639</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Geodetic CRS:  WGS 84</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       highway  AADT maxspeed    cycle_segregation maxspeed_clean</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 residential 4000+   20 mph Mixed Traffic Street             20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Speed Limit (mph)       infrastructure Speed (85th kph) Speed Limit (kph)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            20 mph Mixed Traffic Street      0 to 30 kph            32 kph</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Level of Service                       geometry</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1              Low MULTILINESTRING ((-3.186586...</span>
+<span class="r-in"><span><span class="co">#</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
