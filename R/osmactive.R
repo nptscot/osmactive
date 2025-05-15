@@ -436,6 +436,17 @@ classify_cycle_infrastructure_scotland = function(
       )
     ) |>
     dplyr::mutate(
+      cycle_segregation = dplyr::case_when(
+        highway == "cycleway" & 
+          !is.na(segregated) & segregated == "no" & 
+          !is.na(foot) & foot == "designated" & 
+          !is.na(bicycle) & bicycle == "designated" ~ "Off Road Path",
+          !is.na(bicycle) & bicycle == "designated" & 
+          (is.na(segregated) | segregated == "no") ~ "Off Road Path",
+        TRUE ~ as.character(cycle_segregation) 
+      )
+    ) |>
+    dplyr::mutate(
       cycle_segregation = factor(
         cycle_segregation,
         levels = c(
