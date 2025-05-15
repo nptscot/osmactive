@@ -42,7 +42,7 @@ The level of service associated with each link can be calculated based on the Le
 # NOTE: run this locally
 devtools::load_all()
 # table(cycle_net$cycle_segregation)
-#   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
+#   Segregated Track (wide)         Off Road Path Segregated Track (narrow) 
 #                       214                       973                       859 
 #            Shared Footway        Painted Cycle Lane 
 #                      3325                       522 
@@ -69,7 +69,7 @@ los_table_npt = los_table |>
     `Speed Limit (kph)` = `Speed Limit (kph)`,
     `AADT` = `Two-way traffic flow (pcu per day)`,
     `Mixed Traffic Street`,
-    `Off Road Cycleway` = `Detached or Remote Cycle Track`,
+    `Off Road Path` = `Detached or Remote Cycle Track`,
     `Segregated Track (wide)` = `Cycle Track at Carriageway Level`,
     `Segregated Track (narrow)` = `Light Segregation`,
     `Painted Cycle Lane` = `Cycle Lane`
@@ -82,7 +82,7 @@ los_table_npt = los_table |>
 los_table_complete = los_table_npt |>
   pivot_longer(
     cols = c("Mixed Traffic Street",
-             "Off Road Cycleway",
+             "Off Road Path",
              "Segregated Track (wide)",
              "Segregated Track (narrow)",
              "Painted Cycle Lane"),

@@ -47,13 +47,13 @@ cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
 table(cycle_net$detailed_segregation)
 #> 
-#>          Level track Mixed Traffic Street    Off Road Cycleway 
+#>          Level track Mixed Traffic Street    Off Road Path 
 #>                   16                    1                    1 
 #>   Painted Cycle Lane 
 #>                    3
 table(cycle_net$cycle_segregation)
 #> 
-#>   Segregated Track (wide)         Off Road Cycleway Segregated Track (narrow) 
+#>   Segregated Track (wide)         Off Road Path Segregated Track (narrow) 
 #>                         7                         1                         7 
 #>            Shared Footway        Painted Cycle Lane 
 #>                         3                         3

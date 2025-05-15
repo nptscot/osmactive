@@ -356,17 +356,17 @@ classify_cycle_infrastructure_scotland = function(
         # highways named towpaths or paths are assumed to be off-road
         stringr::str_detect(name, "Path|Towpath|Railway|Trail") &
           detailed_segregation %in% segtypes ~
-          "Off Road Cycleway",
+          "Off Road Path",
         TRUE ~ detailed_segregation
       )
     ) |>
     # Add cycle_pedestrian_separation:
     classify_shared_use() |>
-    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off Road Cycleway
+    # When distance to road is more than min_distance m (and highway = cycleway|pedestrian|path), change to Off Road Path
     dplyr::mutate(
       detailed_segregation = dplyr::case_when(
         distance_to_road > min_distance & detailed_segregation %in% segtypes ~
-          "Off Road Cycleway",
+          "Off Road Path",
         TRUE ~ detailed_segregation
       )
     ) |>
@@ -417,9 +417,9 @@ classify_cycle_infrastructure_scotland = function(
         # Shared Footway:
         detailed_segregation == "Footway" ~ "Shared Footway",
         (cycle_pedestrian_separation != "Unknown" &
-          detailed_segregation != "Off Road Cycleway") |
+          detailed_segregation != "Off Road Path") |
           (cycle_pedestrian_separation == "Shared Footway (not segregated)" &
-            detailed_segregation == "Off Road Cycleway" &
+            detailed_segregation == "Off Road Path" &
             highway != "cycleway") ~
           "Shared Footway",
         TRUE ~ detailed_segregation
@@ -440,7 +440,7 @@ classify_cycle_infrastructure_scotland = function(
         cycle_segregation,
         levels = c(
           "Segregated Track (wide)",
-          "Off Road Cycleway",
+          "Off Road Path",
           "Segregated Track (narrow)",
           "Shared Footway",
           "Painted Cycle Lane",
@@ -459,7 +459,7 @@ classify_cycle_infrastructure_scotland = function(
           cycle_segregation,
           levels = c(
             "Segregated Track (wide)",
-            "Off Road Cycleway",
+            "Off Road Path",
             "Segregated Track (narrow)",
             "Shared Footway",
             "Painted Cycle Lane"
@@ -613,7 +613,7 @@ is_wide = function(x, min_width = 2) {
 get_palette_npt = function() {
   palette_npt = c(
     "Segregated Track (wide)" = "#054d05", # Dark Green
-    "Off Road Cycleway" = "#3a9120", # Medium Green
+    "Off Road Path" = "#3a9120", # Medium Green
     "Segregated Track (narrow)" = "#87d668", # Light Green
     "Shared Footway" = "#ffbf00", # Amber
     "Painted Cycle Lane" = "#FF0000" # Red
@@ -982,7 +982,7 @@ level_of_service = function(osm) {
     dplyr::mutate(
       los = dplyr::case_when(
         cycle_segregation == "Shared Footway" & is.na(los) ~ 2,
-        cycle_segregation == "Off Road Cycleway" & is.na(los) ~ 3,
+        cycle_segregation == "Off Road Path" & is.na(los) ~ 3,
         cycle_segregation == "Segregated Track (wide)" & is.na(los) ~ 3,
         cycle_segregation == "Segregated Track (narrow)" & is.na(los) ~ 2,
         TRUE ~ los
