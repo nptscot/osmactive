@@ -410,11 +410,25 @@ classify_cycle_infrastructure_scotland = function(
     clean_widths() |>
     dplyr::mutate(
       cycle_segregation = dplyr::case_when(
+        highway %in% c("primary", "secondary", "tertiary", "trunk", "unclassified") &
+          (
+            (cycleway_left == "track" & (is.na(cycleway_left_segregated) | cycleway_left_segregated == "no")) |
+            (cycleway_right == "track" & (is.na(cycleway_right_segregated) | cycleway_right_segregated == "no"))
+          ) ~ NA_character_,
+        highway == "cycleway" &
+          !is.na(footway) & tolower(trimws(footway)) == "sidewalk" ~ "Shared Footway",
+        highway %in% c("cycleway", "footway", "pedestrian") &
+          bicycle == "designated" &
+          (is.na(segregated) | segregated == "no") &
+          (is.na(footway) | tolower(trimws(footway)) != "sidewalk") ~ "Off Road Path",
+        highway == "cycleway" &
+          foot == "yes" &
+          (is.na(bicycle) | bicycle != "designated") &
+          (is.na(segregated) | segregated == "no") ~ "Shared Footway",
         detailed_segregation %in% segtypes & is_wide(width_clean) ~
           "Segregated Track (wide)",
         detailed_segregation %in% segtypes & !is_wide(width_clean) ~
           "Segregated Track (narrow)",
-        # Shared Footway:
         detailed_segregation == "Footway" ~ "Shared Footway",
         (cycle_pedestrian_separation != "Unknown" &
           detailed_segregation != "Off Road Path") |
@@ -433,17 +447,6 @@ classify_cycle_infrastructure_scotland = function(
           cycle_pedestrian_separation == "Shared Footway (not segregated)" ~
           "Shared Footway",
         TRUE ~ cycle_segregation
-      )
-    ) |>
-    dplyr::mutate(
-      cycle_segregation = dplyr::case_when(
-        highway == "cycleway" & 
-          !is.na(segregated) & segregated == "no" & 
-          !is.na(foot) & foot == "designated" & 
-          !is.na(bicycle) & bicycle == "designated" ~ "Off Road Path",
-          !is.na(bicycle) & bicycle == "designated" & 
-          (is.na(segregated) | segregated == "no") ~ "Off Road Path",
-        TRUE ~ as.character(cycle_segregation) 
       )
     ) |>
     dplyr::mutate(
