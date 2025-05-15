@@ -414,7 +414,8 @@ classify_cycle_infrastructure_scotland = function(
           (
             (cycleway_left == "track" & (is.na(cycleway_left_segregated) | cycleway_left_segregated == "no")) |
             (cycleway_right == "track" & (is.na(cycleway_right_segregated) | cycleway_right_segregated == "no"))
-          ) ~ NA_character_,
+          ) &
+          detailed_segregation != "Painted Cycle Lane" ~ NA_character_,
         highway == "cycleway" &
           !is.na(footway) & tolower(trimws(footway)) == "sidewalk" ~ "Shared Footway",
         highway %in% c("cycleway", "footway", "pedestrian") &
@@ -439,7 +440,6 @@ classify_cycle_infrastructure_scotland = function(
         TRUE ~ detailed_segregation
       )
     ) |>
-    # Switch non off-road cycleways to "Shared Footway" if they are not segregated:
     dplyr::mutate(
       cycle_segregation = dplyr::case_when(
         cycle_segregation %in%
@@ -463,7 +463,6 @@ classify_cycle_infrastructure_scotland = function(
         ordered = TRUE
       )
     )
-  # Remove mixed traffic if not required:
   if (!include_mixed_traffic) {
     osm_classified = osm_classified |>
       dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>

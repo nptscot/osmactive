@@ -280,6 +280,7 @@ mapview(cycle_net[central_edinburgh, ], zcol = "maxspeed")
 
 cycle_net = distance_to_road(cycle_net, drive_net)
 cycle_net = classify_cycle_infrastructure(cycle_net)
+mapview::mapview(cycle_net, zcol = "cycle_segregation")
 central_edinburgh = osm_edinburgh |>
   sf::st_union() |>
   sf::st_centroid() |>
