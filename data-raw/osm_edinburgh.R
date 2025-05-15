@@ -3,7 +3,7 @@
 remotes::install_github("nptscot/osmactive")
 library(osmactive)
 # Or
-# devtools::load_all()
+# devtools::load_all() # Load local package code
 library(dplyr)
 library(tmap)
 library(sf)
@@ -18,15 +18,32 @@ edinburgh_sf = sf::st_sf(
 edinburgh_3km = edinburgh_sf |>
   sf::st_buffer(3000)
 
+# Check names
+"footway" %in% names(osm_edinburgh)
 osm = get_travel_network(
-  "Scotland",
+  "edinburgh",
   boundary = edinburgh_3km,
-  boundary_type = "clipsrc"
+  boundary_type = "clipsrc",
+  force_download = TRUE
 )
 names(osm)
+"footway" %in% names(osm)
+unique(osm$name)
 
+# Rename name2 to name
+if ("name2" %in% names(osm)) {
+  osm$name = osm$name2
+  osm$name2 = NULL
+}
+# rename highway2 to highway
+if ("highway2" %in% names(osm)) {
+  osm$highway = osm$highway2
+  osm$highway2 = NULL
+}
+
+mapview::mapview(osm)
 osm_york_way = osm |>
-  filter(name == "York Place")
+  filter(stringr::str_detect(name, "York Place"))
 
 mapview::mapview(osm_york_way)
 osm_york_way_buffer = osm_york_way |>

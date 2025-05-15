@@ -3,7 +3,6 @@
 #' @export
 et_active = function() {
   c(
-    "name",
     "ref",
     "oneway",
     "maxspeed",
