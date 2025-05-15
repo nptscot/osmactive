@@ -72,28 +72,56 @@ NA values are replaced with 0, meaning that ways with no measurement are conside
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">x</span> <span class="op">=</span> <span class="va">osm_edinburgh</span><span class="op">$</span><span class="va">width</span></span></span>
 <span class="r-in"><span><span class="va">x</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "4.5"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    "4.5" NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [37] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [49] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "1"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    "2"   NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    "4"   NA    "4"   NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] NA    NA    NA    NA    NA    NA    NA    NA    "1"   NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [205] NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "2"   NA    NA    NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [229] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [241] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [253] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [265] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "2"   NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [277] "2"   NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "2"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [289] NA   </span>
 <span class="r-in"><span><span class="fu">is_wide</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [37] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [49] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [61] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] FALSE FALSE  TRUE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [97] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] FALSE FALSE FALSE  TRUE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] FALSE FALSE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [205] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE FALSE  TRUE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217]  TRUE FALSE FALSE FALSE  TRUE FALSE  TRUE  TRUE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [229] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [241] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [253] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [265] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [277]  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE  TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [289] FALSE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

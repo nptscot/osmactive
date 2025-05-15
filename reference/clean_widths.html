@@ -65,43 +65,85 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">osm</span> <span class="op">=</span> <span class="va">osm_edinburgh</span></span></span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">width</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "4.5"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    "4.5" NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [37] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [49] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "1"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    "2"   NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    "4"   NA    "4"   NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] NA    NA    NA    NA    NA    NA    NA    NA    "1"   NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [205] NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "2"   NA    NA    NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [229] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [241] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [253] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [265] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "2"   NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [277] "2"   NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "2"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [289] NA   </span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">est_width</span> <span class="op">=</span> <span class="cn">NA</span></span></span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">est_width</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span> <span class="op">=</span> <span class="fl">2</span></span></span>
 <span class="r-in"><span><span class="va">osm_cleaned</span> <span class="op">=</span> <span class="fu">clean_widths</span><span class="op">(</span><span class="va">osm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">osm</span><span class="op">$</span><span class="va">width</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "4.5"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    "4.5" NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [37] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [49] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "1"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    "2"   NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    "4"   NA    "4"   NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] NA    NA    NA    NA    NA    NA    NA    NA    "1"   NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [205] NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "2"   NA    NA    NA    "2.5" NA    "2.5" "4"   NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [229] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [241] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [253] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [265] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "2"   NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [277] "2"   NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "2"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [289] NA   </span>
 <span class="r-in"><span><span class="va">osm_cleaned</span><span class="op">$</span><span class="va">width</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   [1] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "4.5"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [13] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [25] NA    "4.5" NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [37] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [49] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    "1"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    "2"   NA    "2.5" NA    "2.5" "2"   NA    "1"   NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    "2"  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    "2"   NA    "2"   NA    NA    NA    NA    NA    NA   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    "3"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [61] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [73] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [85] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [97] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [109] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [121] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [133] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [145] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [157] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [169] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [181] NA    NA    NA    NA    NA    NA    NA    NA    "1"   NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [193] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [205] NA    NA    NA    NA    NA    "3"   "2.5" NA    "20"  NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [217] "2"   NA    NA    NA    "2.5" NA    "2.5" "2"   NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [229] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [241] NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [253] NA    "1"   NA    NA    NA    NA    NA    NA    NA    NA    NA    NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [265] NA    NA    NA    "2"   NA    NA    NA    NA    NA    NA    "2"   NA   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [277] "2"   NA    NA    NA    NA    NA    NA    NA    NA    "3"   NA    "2"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [289] NA   </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

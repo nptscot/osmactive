@@ -58,18 +58,21 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "cycleway_both"             "cycleway_left_bicycle"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "cycleway_right_bicycle"    "cycleway_both_bicycle"    </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [11] "cycleway_left_segregated"  "cycleway_right_segregated"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13] "cycleway_both_segregated"  "cycleway_surface"         </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [15] "cycleway_width"            "cycleway_est_width"       </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17] "cycleway_buffered_lane"    "bicycle"                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "lanes"                     "foot"                     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "path"                      "sidewalk"                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [23] "segregated"                "maxspeed"                 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "width"                     "lit"                      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [27] "oneway"                    "surface"                  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [29] "smoothness"                "other_tags"               </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "geometry"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] "cycleway_both_segregated"  "cycleway_lane"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] "cycleway_left_lane"        "cycleway_right_lane"      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] "cycleway_both_lane"        "cycleway_surface"         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "cycleway_width"            "cycleway_est_width"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "cycleway_buffered_lane"    "bicycle"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [23] "lanes"                     "foot"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "footway"                   "path"                     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [27] "sidewalk"                  "segregated"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29] "maxspeed"                  "width"                    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "est_width"                 "lit"                      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33] "oneway"                    "surface"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [35] "smoothness"                "other_tags"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37] "geometry"                 </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 30 fields</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Simple feature collection with 6 features and 36 fields</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Geometry type: MULTILINESTRING</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Dimension:     XY</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Bounding box:  xmin: -3.194737 ymin: 55.95514 xmax: -3.186586 ymax: 55.95921</span>
@@ -77,61 +80,68 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span>      osm_id                   name     highway cycleway cycleway_left</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 71  3992791             York Place    tertiary     &lt;NA&gt;      separate</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 185 4049896           Leith Street     primary     &lt;NA&gt;          &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197 4071161       Broughton Street   secondary     &lt;NA&gt;          &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198 4071162          Dublin Street residential     &lt;NA&gt;          &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241 4084027 North St Andrew Street  pedestrian     &lt;NA&gt;          &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242 4084028   North St Andrew Lane     service     &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199 4071161       Broughton Street   secondary     &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200 4071162          Dublin Street residential     &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248 4084027 North St Andrew Street  pedestrian     &lt;NA&gt;          &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249 4084028   North St Andrew Lane     service     &lt;NA&gt;          &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_right cycleway_both cycleway_left_bicycle cycleway_right_bicycle</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 71              no          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 185           &lt;NA&gt;      separate                  &lt;NA&gt;                   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197           &lt;NA&gt;            no                  &lt;NA&gt;                   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199           &lt;NA&gt;            no                  &lt;NA&gt;                   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249           &lt;NA&gt;          &lt;NA&gt;                  &lt;NA&gt;                   &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_both_bicycle cycleway_left_segregated cycleway_right_segregated</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 71                   &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 185                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_both_segregated cycleway_surface cycleway_width cycleway_est_width</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71                      &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185                     &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197                     &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198                     &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241                     &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242                     &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;               &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_buffered_lane bicycle lanes foot path sidewalk segregated maxspeed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71                    &lt;NA&gt;    &lt;NA&gt;     1 &lt;NA&gt; &lt;NA&gt;     &lt;NA&gt;       &lt;NA&gt;   20 mph</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185                   &lt;NA&gt;    &lt;NA&gt;     2 &lt;NA&gt; &lt;NA&gt;     &lt;NA&gt;       &lt;NA&gt;   20 mph</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197                   &lt;NA&gt;    &lt;NA&gt;     2 &lt;NA&gt; &lt;NA&gt;     both       &lt;NA&gt;   20 mph</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;     both       &lt;NA&gt;   20 mph</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;  yes &lt;NA&gt;     &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt; &lt;NA&gt;     &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     width  lit oneway surface smoothness</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71   &lt;NA&gt; &lt;NA&gt;    yes asphalt       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185  &lt;NA&gt;  yes    yes asphalt       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197  &lt;NA&gt;  yes   &lt;NA&gt; asphalt       good</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198  &lt;NA&gt;  yes   &lt;NA&gt; asphalt       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241  &lt;NA&gt;  yes   &lt;NA&gt;    sett       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242  &lt;NA&gt; &lt;NA&gt;    yes asphalt       &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                               other_tags</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 71  "embedded_rails"=&gt;"tram","sidewalk:left"=&gt;"separate","sidewalk:right"=&gt;"no","wikidata"=&gt;"Q102108491"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 185                                                            "ref"=&gt;"A900","sidewalk:both"=&gt;"separate"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197                               "incline"=&gt;"up","ref"=&gt;"B901","sidewalk:both:surface"=&gt;"paving_stones"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198                                                                                      "incline"=&gt;"up"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241                                                                                                 &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242                                                                                                 &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249                  &lt;NA&gt;                     &lt;NA&gt;                      &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_both_segregated cycleway_lane cycleway_left_lane</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71                      &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185                     &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199                     &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200                     &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248                     &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249                     &lt;NA&gt;          &lt;NA&gt;               &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_right_lane cycleway_both_lane cycleway_surface cycleway_width</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71                 &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185                &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199                &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200                &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248                &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249                &lt;NA&gt;               &lt;NA&gt;             &lt;NA&gt;           &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     cycleway_est_width cycleway_buffered_lane bicycle lanes foot footway path</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71                &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;     1 &lt;NA&gt;    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185               &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;     2 &lt;NA&gt;    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199               &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;     2 &lt;NA&gt;    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200               &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt;    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248               &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt;  yes    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249               &lt;NA&gt;                   &lt;NA&gt;    &lt;NA&gt;  &lt;NA&gt; &lt;NA&gt;    &lt;NA&gt; &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     sidewalk segregated maxspeed width est_width  lit oneway surface smoothness</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71      &lt;NA&gt;       &lt;NA&gt;   20 mph  &lt;NA&gt;      &lt;NA&gt; &lt;NA&gt;    yes asphalt       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185     &lt;NA&gt;       &lt;NA&gt;   20 mph  &lt;NA&gt;      &lt;NA&gt;  yes    yes asphalt       good</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199     both       &lt;NA&gt;   20 mph  &lt;NA&gt;      &lt;NA&gt;  yes   &lt;NA&gt; asphalt       good</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200     both       &lt;NA&gt;   20 mph  &lt;NA&gt;      &lt;NA&gt;  yes   &lt;NA&gt; asphalt       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248     &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      &lt;NA&gt;  yes   &lt;NA&gt;    sett       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249     &lt;NA&gt;       &lt;NA&gt;     &lt;NA&gt;  &lt;NA&gt;      &lt;NA&gt; &lt;NA&gt;    yes asphalt       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                                                                                     other_tags</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 71  "alt_name"=&gt;"Ceàrn Eabhraig","embedded_rails"=&gt;"tram","name:gd"=&gt;"Ceàrn Eabhraig","wikidata"=&gt;"Q102108491"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 185                                                         "alt_name"=&gt;"Sràid Lìte","destination"=&gt;"Old Town"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199                                                   "incline"=&gt;"up","sidewalk:both:surface"=&gt;"paving_stones"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200                                                                                            "incline"=&gt;"up"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248                                                                                                       &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249                                                                                                       &lt;NA&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                           geometry</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 71  MULTILINESTRING ((-3.187851...</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 185 MULTILINESTRING ((-3.186586...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 197 MULTILINESTRING ((-3.190781...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 198 MULTILINESTRING ((-3.194218...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 241 MULTILINESTRING ((-3.192841...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 242 MULTILINESTRING ((-3.194737...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199 MULTILINESTRING ((-3.190781...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200 MULTILINESTRING ((-3.194218...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 248 MULTILINESTRING ((-3.192841...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 249 MULTILINESTRING ((-3.194737...</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">osm_edinburgh</span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>plotting the first 9 out of 30 attributes; use max.plot = 30 to plot all</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>plotting the first 9 out of 36 attributes; use max.plot = 36 to plot all</span>
 <span class="r-plt img"><img src="osm_edinburgh-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
