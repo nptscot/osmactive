@@ -333,7 +333,7 @@ classify_cycle_infrastructure = function(
 
 classify_cycle_infrastructure_scotland = function(
   osm,
-  min_distance = 20,
+  min_distance = 9.9,
   include_mixed_traffic = FALSE
 ) {
   segtypes = c("Level track", "Light segregation")
