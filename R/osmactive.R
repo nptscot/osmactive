@@ -415,7 +415,7 @@ classify_cycle_infrastructure_scotland = function(
           detailed_segregation != "Painted Cycle Lane" ~ NA_character_,
         highway == "cycleway" &
           !is.na(footway) & tolower(trimws(footway)) == "sidewalk" ~ "Shared Footway",
-        highway == "cycleway" & foot == "designated" & bicycle == "designated" & (is.na(segregated) | segregated == "no") ~ "Shared Footway",
+        highway == "cycleway" & foot == "designated" & (is.na(segregated) | segregated == "no") ~ "Shared Footway",
         highway %in% c("cycleway", "footway", "pedestrian") &
           bicycle == "designated" &
           (is.na(segregated) | segregated == "no") &
