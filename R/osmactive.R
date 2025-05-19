@@ -310,7 +310,7 @@ distance_to_road = function(rnet, roads) {
 #' # tmap_mode("view")
 classify_cycle_infrastructure = function(
   osm,
-  min_distance = 20,
+  min_distance = 9.9,
   classification_type = "Scotland",
   include_mixed_traffic = FALSE
 ) {
@@ -415,6 +415,7 @@ classify_cycle_infrastructure_scotland = function(
           detailed_segregation != "Painted Cycle Lane" ~ NA_character_,
         highway == "cycleway" &
           !is.na(footway) & tolower(trimws(footway)) == "sidewalk" ~ "Shared Footway",
+        highway == "cycleway" & foot == "designated" & (is.na(segregated) | segregated == "no") ~ "Shared Footway",
         highway %in% c("cycleway", "footway", "pedestrian") &
           bicycle == "designated" &
           (is.na(segregated) | segregated == "no") &
@@ -478,6 +479,13 @@ classify_cycle_infrastructure_scotland = function(
         )
       )
   }
+  osm_classified = osm_classified |>
+    dplyr::mutate(
+      cycle_segregation = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & distance_to_road > min_distance ~ "Off Road Path",
+        TRUE ~ cycle_segregation
+      )
+    )
   osm_classified
 }
 
