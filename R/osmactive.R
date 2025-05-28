@@ -972,7 +972,13 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
+    # stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
+    message("Adding AADT column with assumed values based on highway type.")
+    osm = estimate_traffic(osm)
+    # Rename column to AADT:
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+    AADT_summary = table(osm$AADT, useNA = "always")
+    message("AADT summary: ", paste(names(AADT_summary), AADT_summary, collapse = ", "))
   }
   # If the column 'infrastructure' is not present, add it:
   if (!"infrastructure" %in% names(osm)) {

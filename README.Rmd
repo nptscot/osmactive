@@ -323,3 +323,31 @@ system("gh release upload v0.1 cycle_net_bristol.html --clobber")
 # Available:
 # https://github.com/nptscot/osmactive/releases/download/v0.1/cycle_net_bristol.html
 ```
+
+## Christchurch
+
+```{r christchurch}
+library(sf)
+zones = zonebuilder::zb_zone("Christchurch")
+zones_6km = zones |>
+  dplyr::filter(circle_id <= 3) |>
+  sf::st_union()
+mapview::mapview(zones_6km)
+osm = get_travel_network("New Zealand", boundary = zones_6km, boundary_type = "clipsrc", force_vectortranslate = TRUE)
+osm = get_travel_network("New Zealand")
+osm = osm[zones_6km, , op = sf::st_within]
+dim(osm)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+plot(cycle_net)
+m = plot_osm_tmap(cycle_net)
+m
+```
+
+```{r}
+#| include: false
+#| Save an interactive version of the map to check the resu lts as follows:
+tmap_save(m, "cycle_net_christchurch.html")
+```
