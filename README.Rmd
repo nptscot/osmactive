@@ -84,7 +84,7 @@ library(sf) # for spatial data
 
 Alternatively, you can load the package with the following for local development:
 
-```{r, eval=FALSE}
+```{r, eval=TRUE, results='hide'}
 devtools::load_all()
 ```
 
@@ -332,7 +332,7 @@ zones = zonebuilder::zb_zone("Christchurch")
 zones_6km = zones |>
   dplyr::filter(circle_id <= 3) |>
   sf::st_union()
-mapview::mapview(zones_6km)
+# mapview::mapview(zones_6km)
 osm = get_travel_network("New Zealand", boundary = zones_6km, boundary_type = "clipsrc", force_vectortranslate = TRUE, force_download = TRUE)
 # osm = get_travel_network("New Zealand")
 # osm = osm[zones_6km, , op = sf::st_within]
