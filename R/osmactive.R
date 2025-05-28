@@ -446,21 +446,15 @@ classify_cycle_infrastructure_scotland = function(
           "Shared Footway",
         TRUE ~ cycle_segregation
       )
-    ) |>
+    )
+  osm_classified = osm_classified |>
     dplyr::mutate(
-      cycle_segregation = factor(
-        cycle_segregation,
-        levels = c(
-          "Segregated Track (wide)",
-          "Off Road Path",
-          "Segregated Track (narrow)",
-          "Shared Footway",
-          "Painted Cycle Lane",
-          "Mixed Traffic Street"
-        ),
-        ordered = TRUE
+      cycle_segregation = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & distance_to_road > min_distance ~ "Off Road Path",
+        TRUE ~ cycle_segregation
       )
     )
+  # convert to factors:
   if (!include_mixed_traffic) {
     osm_classified = osm_classified |>
       dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>
@@ -478,14 +472,24 @@ classify_cycle_infrastructure_scotland = function(
           ordered = TRUE
         )
       )
-  }
-  osm_classified = osm_classified |>
-    dplyr::mutate(
-      cycle_segregation = dplyr::case_when(
-        cycle_segregation == "Shared Footway" & distance_to_road > min_distance ~ "Off Road Path",
-        TRUE ~ cycle_segregation
+  } else {
+    osm_classified = osm_classified |>
+      dplyr::mutate(cycle_segregation = as.character(cycle_segregation)) |>
+      dplyr::mutate(
+        cycle_segregation = factor(
+          cycle_segregation,
+          levels = c(
+            "Segregated Track (wide)",
+            "Off Road Path",
+            "Segregated Track (narrow)",
+            "Shared Footway",
+            "Painted Cycle Lane",
+            "Mixed Traffic Street"
+          ),
+          ordered = TRUE
+        )
       )
-    )
+  }
   osm_classified
 }
 
