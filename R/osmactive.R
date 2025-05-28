@@ -446,21 +446,15 @@ classify_cycle_infrastructure_scotland = function(
           "Shared Footway",
         TRUE ~ cycle_segregation
       )
-    ) |>
+    )
+  osm_classified = osm_classified |>
     dplyr::mutate(
-      cycle_segregation = factor(
-        cycle_segregation,
-        levels = c(
-          "Segregated Track (wide)",
-          "Off Road Path",
-          "Segregated Track (narrow)",
-          "Shared Footway",
-          "Painted Cycle Lane",
-          "Mixed Traffic Street"
-        ),
-        ordered = TRUE
+      cycle_segregation = dplyr::case_when(
+        cycle_segregation == "Shared Footway" & distance_to_road > min_distance ~ "Off Road Path",
+        TRUE ~ cycle_segregation
       )
     )
+  # convert to factors:
   if (!include_mixed_traffic) {
     osm_classified = osm_classified |>
       dplyr::filter(cycle_segregation != "Mixed Traffic Street") |>
@@ -478,14 +472,24 @@ classify_cycle_infrastructure_scotland = function(
           ordered = TRUE
         )
       )
-  }
-  osm_classified = osm_classified |>
-    dplyr::mutate(
-      cycle_segregation = dplyr::case_when(
-        cycle_segregation == "Shared Footway" & distance_to_road > min_distance ~ "Off Road Path",
-        TRUE ~ cycle_segregation
+  } else {
+    osm_classified = osm_classified |>
+      dplyr::mutate(cycle_segregation = as.character(cycle_segregation)) |>
+      dplyr::mutate(
+        cycle_segregation = factor(
+          cycle_segregation,
+          levels = c(
+            "Segregated Track (wide)",
+            "Off Road Path",
+            "Segregated Track (narrow)",
+            "Shared Footway",
+            "Painted Cycle Lane",
+            "Mixed Traffic Street"
+          ),
+          ordered = TRUE
+        )
       )
-    )
+  }
   osm_classified
 }
 
@@ -972,7 +976,13 @@ level_of_service = function(osm) {
     osm$`Speed Limit (mph)` = classify_speeds(osm$maxspeed_clean)
   }
   if (!"AADT" %in% names(osm)) {
-    stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
+    # stop("Required column AADT, with AADT categories from the Cycling by Design Guidance, not found in the input data.")
+    message("Adding AADT column with assumed values based on highway type.")
+    osm = estimate_traffic(osm)
+    # Rename column to AADT:
+    osm$AADT = npt_to_cbd_aadt_numeric(osm$assumed_volume)
+    AADT_summary = table(osm$AADT, useNA = "always")
+    message("AADT summary: ", paste(names(AADT_summary), AADT_summary, collapse = ", "))
   }
   # If the column 'infrastructure' is not present, add it:
   if (!"infrastructure" %in% names(osm)) {
