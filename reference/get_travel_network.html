@@ -46,6 +46,8 @@
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">get_travel_network</span><span class="op">(</span></span>
 <span>  <span class="va">place</span>,</span>
+<span>  boundary <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  boundary_type <span class="op">=</span> <span class="st">"clipsrc"</span>,</span>
 <span>  extra_tags <span class="op">=</span> <span class="fu"><a href="et_active.html">et_active</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  columns_to_remove <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"waterway"</span>, <span class="st">"aerialway"</span>, <span class="st">"barrier"</span>, <span class="st">"manmade"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -58,6 +60,14 @@
 
 <dl><dt id="arg-place">place<a class="anchor" aria-label="anchor" href="#arg-place"></a></dt>
 <dd><p>A place name or a bounding box passed to <code><a href="https://docs.ropensci.org/osmextract/reference/oe_get.html" class="external-link">osmextract::oe_get()</a></code></p></dd>
+
+
+<dt id="arg-boundary">boundary<a class="anchor" aria-label="anchor" href="#arg-boundary"></a></dt>
+<dd><p>An sf object used to clip the OSM data. Passed to <code><a href="https://docs.ropensci.org/osmextract/reference/oe_get.html" class="external-link">osmextract::oe_get()</a></code></p></dd>
+
+
+<dt id="arg-boundary-type">boundary_type<a class="anchor" aria-label="anchor" href="#arg-boundary-type"></a></dt>
+<dd><p>The clipping method for the boundary. Default is "clipsrc" which clips geometries to the boundary. See osmextract documentation for other options.</p></dd>
 
 
 <dt id="arg-extra-tags">extra_tags<a class="anchor" aria-label="anchor" href="#arg-extra-tags"></a></dt>
@@ -77,6 +87,20 @@
     <p>A sf object with the OSM network</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Basic usage:</span></span></span>
+<span class="r-in"><span><span class="co"># osm = get_travel_network("Edinburgh")</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using a boundary to clip data:</span></span></span>
+<span class="r-in"><span><span class="co"># library(sf)</span></span></span>
+<span class="r-in"><span><span class="co"># boundary_poly = st_buffer(st_sfc(st_point(c(-3.2, 55.9)), crs = 4326), 0.01)</span></span></span>
+<span class="r-in"><span><span class="co"># osm_clipped = get_travel_network("Edinburgh", boundary = boundary_poly)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Using different boundary types:</span></span></span>
+<span class="r-in"><span><span class="co"># osm_intersect = get_travel_network("Edinburgh", boundary = boundary_poly, boundary_type = "clipsrc")</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
