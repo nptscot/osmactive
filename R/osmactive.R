@@ -145,22 +145,35 @@ exclude_highway_driving = function() {
 #' Get the OSM network functions
 #'
 #' @param place A place name or a bounding box passed to `osmextract::oe_get()`
+#' @param boundary An sf object used to clip the OSM data. Passed to `osmextract::oe_get()`
+#' @param boundary_type The clipping method for the boundary. Default is "clipsrc" which clips geometries to the boundary. See osmextract documentation for other options.
 #' @param extra_tags A vector of extra tags to be included in the OSM extract
 #' @param columns_to_remove A vector of columns to be removed from the OSM network
 #' @param ... Additional arguments passed to `osmextract::oe_get()`
 #' @return A sf object with the OSM network
 #' @export
+#' @examples
+#' # Basic usage:
+#' # osm = get_travel_network("Edinburgh")
+#' 
+#' # Using a boundary to clip data:
+#' # library(sf)
+#' # boundary_poly = st_buffer(st_sfc(st_point(c(-3.2, 55.9)), crs = 4326), 0.01)
+#' # osm_clipped = get_travel_network("Edinburgh", boundary = boundary_poly)
+#' 
+#' # Using different boundary types:
+#' # osm_intersect = get_travel_network("Edinburgh", boundary = boundary_poly, boundary_type = "clipsrc")
 get_travel_network = function(
   place,
+  boundary = NULL,
+  boundary_type = "clipsrc",
   extra_tags = et_active(),
   columns_to_remove = c("waterway", "aerialway", "barrier", "manmade"),
   ...
 ) {
-  osm_highways = osmextract::oe_get(
-    place = place,
-    extra_tags = extra_tags,
-    ...
-  )
+  
+  osm_highways = osmextract::oe_get(place, boundary = boundary, boundary_type = boundary_type, extra_tags = extra_tags, ...)
+  
   osm_highways |>
     dplyr::filter(!is.na(highway)) |>
     # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
