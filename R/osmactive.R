@@ -171,20 +171,8 @@ get_travel_network = function(
   columns_to_remove = c("waterway", "aerialway", "barrier", "manmade"),
   ...
 ) {
-  # Build arguments for oe_get
-  oe_args = list(
-    place = place,
-    extra_tags = extra_tags,
-    ...
-  )
   
-  # Add boundary arguments if boundary is provided
-  if (!is.null(boundary)) {
-    oe_args$boundary = boundary
-    oe_args$boundary_type = boundary_type
-  }
-  
-  osm_highways = do.call(osmextract::oe_get, oe_args)
+  osm_highways = osmextract::oe_get(place, boundary, boundary_type, extra_tags, ...)
   
   osm_highways |>
     dplyr::filter(!is.na(highway)) |>
