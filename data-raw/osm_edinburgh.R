@@ -1,8 +1,9 @@
 ## code to prepare `osm_edinburgh` dataset goes here
 
-remotes::install_github("nptscot/osmactive")
-library(osmactive)
+devtools::load_all()
 # Or
+# remotes::install_github("nptscot/osmactive")
+# library(osmactive)
 # devtools::load_all() # Load local package code
 library(dplyr)
 library(tmap)
@@ -18,6 +19,7 @@ edinburgh_sf = sf::st_sf(
 edinburgh_3km = edinburgh_sf |>
   sf::st_buffer(3000)
 
+osm = get_travel_network("Edinburgh", boundary = edinburgh_3km, boundary_type = "clipsrc")
 # Check names
 "footway" %in% names(osm_edinburgh)
 osm = get_travel_network(
@@ -82,7 +84,7 @@ osm = osm |>
     other_tags
   )
 names(osm)
-
+table(osm$traffic_calming)
 
 cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
