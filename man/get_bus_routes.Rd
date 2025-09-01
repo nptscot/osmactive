@@ -37,6 +37,6 @@ for an example of the query in action.
 }
 \examples{
 # r = get_bus_routes("Edinburgh")
-r = get_bus_routes("Isle of Wight")
-plot(r["osm_id"])
+# r = get_bus_routes("Isle of Wight")
+# plot(r["osm_id"])
 }

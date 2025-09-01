@@ -1,0 +1,70 @@
+---
+title: Test Sett sections
+format: gfm
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+```
+
+The 2025-03-09 version of the package (commit `08ddafa`) excluded ways with 'Sett' surface, such as https://www.openstreetmap.org/way/4871777#map=19/55.959616/-3.194916&layers=N
+
+```{r}
+#| label: old-version
+#| eval: false
+pak::pak("nptscot/osmactive@08ddafa")
+library(osmactive)
+osm = get_travel_network("Edinburgh")
+osm_sett_example = osm |>
+  filter(osm_id %in% 4871777)
+cycle_net = get_cycling_network(osm)
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+cycle_net = classify_cycle_infrastructure(cycle_net)
+nrow(cycle_net) # 5832
+cycle_net_set_example = cycle_net |>
+  filter(osm_id %in% 4871777)
+nrow(cycle_net_set_example) # 0
+cycle_net_set = cycle_net |>
+  filter(surface %in% "sett")
+nrow(cycle_net_set)
+# 24
+mapview::mapview(cycle_net_set)
+# Unload package:
+detach("package:osmactive", unload = TRUE)
+```
+
+With dev version:
+
+```{r}
+#| label: dev-version-sett
+# pak::pak("nptscot/osmactive@87-cyclable-ways-removed")
+# library(osmactive)
+devtools::load_all()
+osm = get_travel_network("Edinburgh")
+osm_sett_example = osm |>
+  filter(osm_id %in% 4871777)
+cycle_net_set = get_cycling_network(osm_sett_example)
+nrow(cycle_net_set) # 1
+cycle_net = get_cycling_network(osm)
+nrow(cycle_net) # 65321
+table(cycle_net$highway, useNA = "always")
+drive_net = get_driving_network(osm)
+cycle_net = distance_to_road(cycle_net, drive_net)
+nrow(cycle_net) # 65321
+# Remove anything that is not cycle infrastructure:
+cycle_net = classify_cycle_infrastructure(cycle_net)
+nrow(cycle_net) # 7768
+table(cycle_net$highway, useNA = "always")
+# Plot the footways:
+cycle_net_footways = cycle_net |>
+  filter(highway %in% "footway")
+# mapview::mapview(cycle_net_footways)
+plot_osm_tmap(cycle_net_footways)
+table(cycle_net_footways$footway, cycle_net_footways$bicycle, useNA = "always")
+# Sett example
+cycle_net_set_example = cycle_net |>
+  filter(osm_id %in% 4871777)
+nrow(cycle_net_set_example) # 1
+```

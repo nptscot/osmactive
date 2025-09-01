@@ -9,3 +9,10 @@
 ^\.Rproj\.user$
 cache
 .*\.Rds$
+^\.devcontainer$
+^app$
+^code$
+^edinburgh_bus_lanes\.png$
+^street_space\.png$
+^cycle_net\.geojson$
+^osm_district\.geojson$

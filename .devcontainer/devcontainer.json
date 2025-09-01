@@ -1,0 +1,10 @@
+{
+  "name": "osmactive Dev Container",
+  "image": "ghcr.io/nptscot/osmactive",
+  "extensions": [
+    "quarto.quarto",
+    "reditorsupport.r"
+  ],
+  "remoteUser": "rstudio"
+}
+

@@ -4,6 +4,7 @@ devtools::load_all()
 # Or
 # remotes::install_github("nptscot/osmactive")
 # library(osmactive)
+# devtools::load_all() # Load local package code
 library(dplyr)
 library(tmap)
 library(sf)
@@ -19,10 +20,32 @@ edinburgh_3km = edinburgh_sf |>
   sf::st_buffer(3000)
 
 osm = get_travel_network("Edinburgh", boundary = edinburgh_3km, boundary_type = "clipsrc")
+# Check names
+"footway" %in% names(osm_edinburgh)
+osm = get_travel_network(
+  "edinburgh",
+  boundary = edinburgh_3km,
+  boundary_type = "clipsrc",
+  force_download = TRUE
+)
 names(osm)
+"footway" %in% names(osm)
+unique(osm$name)
 
+# Rename name2 to name
+if ("name2" %in% names(osm)) {
+  osm$name = osm$name2
+  osm$name2 = NULL
+}
+# rename highway2 to highway
+if ("highway2" %in% names(osm)) {
+  osm$highway = osm$highway2
+  osm$highway2 = NULL
+}
+
+mapview::mapview(osm)
 osm_york_way = osm |>
-  filter(name == "York Place")
+  filter(stringr::str_detect(name, "York Place"))
 
 mapview::mapview(osm_york_way)
 osm_york_way_buffer = osm_york_way |>
@@ -38,7 +61,28 @@ plot(osm)
 
 # # Keep only most relevant columns
 osm = osm |>
-  select(osm_id, name, highway, matches("cycleway"), bicycle, lanes, foot, path, sidewalk, segregated, maxspeed, width, lit, oneway, cycleway_surface, surface, smoothness, traffic_calming, other_tags)
+  select(
+    osm_id,
+    name,
+    highway,
+    matches("cycleway"),
+    bicycle,
+    lanes,
+    foot,
+    footway,
+    path,
+    sidewalk,
+    segregated,
+    maxspeed,
+    width,
+    est_width,
+    lit,
+    oneway,
+    cycleway_surface,
+    surface,
+    smoothness,
+    other_tags
+  )
 names(osm)
 table(osm$traffic_calming)
 
@@ -46,7 +90,9 @@ cycle_network = get_cycling_network(osm)
 cycle_network_old = cycle_network
 driving_network = get_driving_network(osm)
 edinburgh_cycle_with_distance = distance_to_road(cycle_network, driving_network)
-cycleways_classified = classify_cycle_infrastructure(edinburgh_cycle_with_distance)
+cycleways_classified = classify_cycle_infrastructure(
+  edinburgh_cycle_with_distance
+)
 # # cycleways_classified_old = cycleways_classified
 # waldo::compare(cycleways_classified, cycleways_classified_old)
 

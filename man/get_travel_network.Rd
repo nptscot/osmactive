@@ -6,6 +6,8 @@
 \usage{
 get_travel_network(
   place,
+  boundary = NULL,
+  boundary_type = "clipsrc",
   extra_tags = et_active(),
   columns_to_remove = c("waterway", "aerialway", "barrier", "manmade"),
   ...
@@ -13,6 +15,10 @@ get_travel_network(
 }
 \arguments{
 \item{place}{A place name or a bounding box passed to \code{osmextract::oe_get()}}
+
+\item{boundary}{An sf object used to clip the OSM data. Passed to \code{osmextract::oe_get()}}
+
+\item{boundary_type}{The clipping method for the boundary. Default is "clipsrc" which clips geometries to the boundary. See osmextract documentation for other options.}
 
 \item{extra_tags}{A vector of extra tags to be included in the OSM extract}
 
@@ -25,4 +31,16 @@ A sf object with the OSM network
 }
 \description{
 Get the OSM network functions
+}
+\examples{
+# Basic usage:
+# osm = get_travel_network("Edinburgh")
+
+# Using a boundary to clip data:
+# library(sf)
+# boundary_poly = st_buffer(st_sfc(st_point(c(-3.2, 55.9)), crs = 4326), 0.01)
+# osm_clipped = get_travel_network("Edinburgh", boundary = boundary_poly)
+
+# Using different boundary types:
+# osm_intersect = get_travel_network("Edinburgh", boundary = boundary_poly, boundary_type = "clipsrc")
 }
