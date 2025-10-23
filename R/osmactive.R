@@ -174,6 +174,11 @@ get_travel_network = function(
   ...
 ) {
   
+  # if place is empty but boundary is given
+  if(!is.null(boundary) && missing(place)) {
+    place <- boundary
+  }
+  
   osm_highways = osmextract::oe_get(place, boundary = boundary, boundary_type = boundary_type, extra_tags = extra_tags, ...)
   
   osm_highways |>
