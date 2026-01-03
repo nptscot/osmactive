@@ -181,11 +181,12 @@ get_travel_network = function(
   
   osm_highways = osmextract::oe_get(place, boundary = boundary, boundary_type = boundary_type, extra_tags = extra_tags, ...)
   
-  osm_highways |>
+  osm_highways = osm_highways |>
     dplyr::filter(!is.na(highway)) |>
     # Remove all service tags based on https://wiki.openstreetmap.org/wiki/Key:service
     dplyr::filter(is.na(service)) |>
     dplyr::select(-dplyr::matches(columns_to_remove))
+
   osm_highways$n_bus_lanes = count_bus_lanes(osm_highways)
   osm_highways
 }
