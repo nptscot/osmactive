@@ -60,7 +60,7 @@
       <h1>Scottish Cycling by Design classification</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/nptscot/osmactive/blob/main/vignettes/classify-cbd.Rmd" class="external-link"><code>vignettes/classify-cbd.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/nptscot/osmactive/blob/coventry-viz/vignettes/classify-cbd.Rmd" class="external-link"><code>vignettes/classify-cbd.Rmd</code></a></small>
       <div class="d-none name"><code>classify-cbd.Rmd</code></div>
     </div>
 
@@ -185,7 +185,7 @@ Edinburgh:</p>
 <span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">osm_id</span>, <span class="va">maxspeed_new</span><span class="op">)</span>,</span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      maxspeed <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>      maxspeed <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>        <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">maxspeed</span><span class="op">)</span> <span class="op">~</span> <span class="va">maxspeed_new</span>,</span>
 <span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="va">maxspeed</span></span>
 <span>      <span class="op">)</span></span>
@@ -302,7 +302,7 @@ with no parallel road nearby.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
