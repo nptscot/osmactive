@@ -38,10 +38,20 @@ highways = coventry_data |>
   filter(!is.na(highway))
 
 # Get cycle network (simplified classification)
+# Check available columns
+cat("Columns in highways:", names(highways), "\n")
+
+# Filter to cycle infrastructure - handle missing columns
 cycleways = highways |>
-  filter(highway %in% c("cycleway", "path", "footway") | 
-           grepl("cycleway", cycleway, ignore.case = TRUE) |
-           bicycle == "designated")
+  filter(highway %in% c("cycleway", "path", "footway"))
+
+# Try to add cycleway-based filtering if column exists
+if ("cycleway" %in% names(highways)) {
+  cycleways_add = highways |>
+    filter(grepl("cycleway", cycleway, ignore.case = TRUE) | bicycle == "designated")
+  cycleways = bind_rows(cycleways, cycleways_add) |>
+    distinct()
+}
 
 cat("Cycle network features:", nrow(cycleways), "\n")
 
