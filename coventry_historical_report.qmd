@@ -1,0 +1,149 @@
+---
+title: "Historical Analysis of Coventry's Cycle Network (2017-2026)"
+author: "Gemini CLI Analysis"
+date: "2026-02-23"
+format:
+  html:
+    self-contained: true
+    code-fold: true
+    toc: true
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+library(sf)
+library(dplyr)
+library(ggplot2)
+library(osmactive)
+library(tidyr)
+
+# Load the saved data
+if (!file.exists("coventry-cycleways-2017-2026.gpkg")) {
+  stop("Data file not found. Please run the data generation script first.")
+}
+cycle_data = st_read("coventry-cycleways-2017-2026.gpkg", quiet = TRUE)
+
+# GeoPackage might have converted factors to characters
+# Re-apply factor levels from get_palette_npt() keys or osmactive standards
+infra_levels = c(
+  "Segregated Track (wide)",
+  "Off Road Path",
+  "Segregated Track (narrow)",
+  "Shared Footway",
+  "Painted Cycle Lane"
+)
+cycle_data$cycle_segregation = factor(cycle_data$cycle_segregation, levels = infra_levels)
+```
+
+# Introduction
+
+This report provides a detailed analysis of the growth of cycling infrastructure in Coventry from 2017 to 2026. We compare a simple metric based solely on the `highway=cycleway` OpenStreetMap (OSM) tag with a more sophisticated classification system provided by the `osmactive` R package.
+
+# Detailed Infrastructure Growth
+
+The following plot shows the cumulative growth of the Coventry cycle network, broken down by the `osmactive` infrastructure types. We use the ordered factors returned by the package to ensure that high-quality infrastructure is prioritized in the visualization.
+
+```{r stacked-bar}
+# Prepare data for stacked bar chart: cumulative length per year per type
+years = 2017:2026
+
+# Calculate cumulative lengths for each type in each year
+stacked_data_list = lapply(years, function(yr) {
+  # Get all segments constructed in or before the current year
+  sub_year = cycle_data %>% filter(year <= yr)
+  
+  if (nrow(sub_year) == 0) return(NULL)
+  
+  # Calculate lengths first
+  sub_year$seg_length = as.numeric(st_length(sub_year))
+  
+  # Group by type and calculate length
+  sub_year %>%
+    st_drop_geometry() %>%
+    group_by(cycle_segregation) %>%
+    summarise(
+      length_km = sum(seg_length, na.rm = TRUE) / 1000,
+      .groups = "drop"
+    ) %>%
+    mutate(year = yr)
+})
+
+# Combine all years and ensure we have all levels represented for consistent plotting
+stacked_data = bind_rows(stacked_data_list) %>%
+  complete(year, cycle_segregation, fill = list(length_km = 0))
+
+# Ensure factor order
+stacked_data$cycle_segregation = factor(stacked_data$cycle_segregation, levels = rev(infra_levels))
+
+ggplot(stacked_data, aes(x = factor(year), y = length_km, fill = cycle_segregation)) +
+  geom_bar(stat = "identity", position = "stack") +
+  # We want the legend and stack to be: Wide at top, then Path, then Narrow, then Shared, then Painted at bottom
+  scale_fill_manual(values = rev(get_palette_npt()), name = "Infrastructure Type") +
+  labs(
+    title = "Coventry Cycle Network Growth by Type",
+    subtitle = "Cumulative growth using osmactive classification (2017-2026)",
+    y = "Total Length (km)",
+    x = "Year"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)
+  )
+```
+
+## Animated Growth Map
+
+The expansion of the network can be seen spatially in the animation below:
+
+![Animation showing Coventry Cycle Network Growth from 2017 to 2026.](coventry_historical_growth.gif)
+
+# Simple Metric: `highway=cycleway`
+
+A common but limited approach to quantifying cycling infrastructure is to filter for segments where the `highway` tag is explicitly set to `cycleway`.
+
+```{r simple-metric}
+# Calculate cumulative growth for highway=cycleway
+simple_growth = lapply(2017:2026, function(yr) {
+  sub = cycle_data %>% 
+    filter(year <= yr, highway == "cycleway")
+  if (nrow(sub) == 0) return(data.frame(year = yr, total_length_km = 0))
+  len = as.numeric(sum(st_length(sub))) / 1000
+  data.frame(year = yr, total_length_km = len)
+}) %>% bind_rows()
+
+ggplot(simple_growth, aes(x = year, y = total_length_km)) +
+  geom_line(color = "blue", linewidth = 1) +
+  geom_point(color = "red", size = 2) +
+  labs(
+    title = "Growth of 'highway=cycleway' in Coventry",
+    subtitle = "Simple tag-based metric (2017-2026)",
+    y = "Total Length (km)",
+    x = "Year"
+  ) +
+  theme_minimal()
+```
+
+### Limitations of the Simple Approach
+
+1.  **Underestimation**: Many cycle paths are tagged as `highway=path`, `highway=footway`, or even `highway=service` with additional tags like `bicycle=designated`.
+2.  **Overestimation**: Some segments tagged `highway=cycleway` may be substandard (e.g., extremely narrow or poorly maintained) but are treated the same as high-quality segregated tracks.
+3.  **Missing Context**: This metric fails to distinguish between segregated tracks, shared-use paths, and painted lanes on the road.
+
+# The `osmactive` Classification System
+
+The `osmactive` package uses a multi-layered classification logic that is currently used in **production environments** for active travel planning and auditing. Instead of relying on a single tag, it analyzes a combination of:
+- `highway` type
+- `segregated` status
+- `bicycle` and `foot` access tags
+- Proximity to the driving network (via `distance_to_road()`)
+- Physical dimensions (via `clean_widths()`)
+
+This system classifies infrastructure into meaningful levels of service, ranging from "Segregated Track (wide)" to "Painted Cycle Lane".
+
+# Conclusion
+
+The analysis reveals a significant expansion of the cycle network in Coventry, particularly in the last few years. While the simple `highway=cycleway` metric shows growth, the `osmactive` classification provides a much clearer picture of the *quality* of the infrastructure being delivered, highlighting a shift towards more segregated and shared-use provision.
+
+---
+*Report generated on `r Sys.Date()` using historical OSM snapshots from the ohsome API.*
