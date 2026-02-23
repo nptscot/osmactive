@@ -1,6 +1,6 @@
 ---
 title: "Historical Analysis of Coventry's Cycle Network (2017-2026)"
-author: "Gemini CLI Analysis"
+author: "Robin Lovelace"
 date: "2026-02-23"
 format:
   html:
