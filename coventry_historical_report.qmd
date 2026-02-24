@@ -102,27 +102,52 @@ The expansion of the network can be seen spatially in the animation below:
 
 A common but limited approach to quantifying cycling infrastructure is to filter for segments where the `highway` tag is explicitly set to `cycleway`.
 
-```{r simple-metric}
-# Calculate cumulative growth for highway=cycleway
-simple_growth = lapply(2017:2026, function(yr) {
-  sub = cycle_data %>% 
-    filter(year <= yr, highway == "cycleway")
-  if (nrow(sub) == 0) return(data.frame(year = yr, total_length_km = 0))
-  len = as.numeric(sum(st_length(sub))) / 1000
-  data.frame(year = yr, total_length_km = len)
+## National Comparison (England)
+
+To provide context for Coventry's progress, we compare its `highway=cycleway` growth with the national trend for England.
+
+```{r national-comparison}
+# Load national data
+if (!file.exists("england_cycleway_growth.rds")) {
+  stop("National data not found.")
+}
+england_growth = readRDS("england_cycleway_growth.rds")
+
+# Calculate relative growth (indexed to 2017 = 100)
+england_growth = england_growth %>%
+  mutate(index = length_km / first(length_km) * 100, region = "England")
+
+# Calculate Coventry growth (simple metric)
+cov_simple = lapply(2017:2026, function(yr) {
+  sub = cycle_data %>% filter(year <= yr, highway == "cycleway")
+  if (nrow(sub) == 0) return(data.frame(year = yr, length_km = 0))
+  data.frame(year = yr, length_km = as.numeric(sum(st_length(sub))) / 1000)
 }) %>% bind_rows()
 
-ggplot(simple_growth, aes(x = year, y = total_length_km)) +
-  geom_line(color = "blue", linewidth = 1) +
-  geom_point(color = "red", size = 2) +
+cov_simple = cov_simple %>%
+  mutate(index = length_km / first(length_km) * 100, region = "Coventry")
+
+# Combine for comparison
+comparison = bind_rows(
+  england_growth %>% select(year, index, region),
+  cov_simple %>% select(year, index, region)
+)
+
+ggplot(comparison, aes(x = year, y = index, color = region)) +
+  geom_line(linewidth = 1) +
+  geom_point() +
+  scale_y_continuous(limits = c(100, NA)) +
   labs(
-    title = "Growth of 'highway=cycleway' in Coventry",
-    subtitle = "Simple tag-based metric (2017-2026)",
-    y = "Total Length (km)",
-    x = "Year"
+    title = "Relative Growth of Cycling Infrastructure: Coventry vs. England",
+    subtitle = "Index (2017 = 100) based on highway=cycleway length",
+    y = "Growth Index (2017 = 100)",
+    x = "Year",
+    color = "Region"
   ) +
   theme_minimal()
 ```
+
+The comparison shows that Coventry's cycling infrastructure (as measured by the `highway=cycleway` tag) has grown significantly more than the national average, especially since 2022. While England's network grew by approximately `r round(last(england_growth$index) - 100)`% over the period, Coventry's growth was `r round(last(cov_simple$index) - 100)`%.
 
 ### Limitations of the Simple Approach
 
