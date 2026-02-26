@@ -7,6 +7,7 @@ et_active = function() {
     "oneway",
     "maxspeed",
     "bicycle",
+    "bicycle_road",
     "cycleway",
     "cycleway:left",
     "cycleway:right",
@@ -358,6 +359,7 @@ classify_cycle_infrastructure_scotland = function(
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
     dplyr::mutate(
       detailed_segregation = dplyr::case_when(
+        bicycle_road == "yes" ~ "Level track",
         highway == "cycleway" ~ "Level track",
         highway %in%
           c("footway", "path", "Pedestrian") &
