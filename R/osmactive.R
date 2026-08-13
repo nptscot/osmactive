@@ -25,8 +25,17 @@ et_active = function() {
     "cycleway:width",
     "cycleway:est_width",
     "cycleway:buffered_lane",
-    # Use relations not tags for networks:
-    # "lcn",
+    "lcn",
+    "lcn:left",
+    "lcn:right",
+    "mcn",
+    "mcn:left",
+    "mcn:right",
+    "ncn",
+    "ncn:left",
+    "ncn:right",
+    "rcn",
+    "icn",
     "lanes",
     "lanes:both_ways",
     "lanes:forward",
@@ -353,6 +362,20 @@ classify_cycle_infrastructure_scotland = function(
   min_distance = 9.9,
   include_mixed_traffic = FALSE
 ) {
+  needed_cols = c(
+    "segregated", "foot", "bicycle", "footway", "width", "distance_to_road",
+    "name", "highway", "cycleway", "cycleway_left", "cycleway_right", "cycleway_both",
+    "cycleway_left_segregated", "cycleway_right_segregated",
+    "cycleway_left_lane", "cycleway_right_lane", "cycleway_both_lane",
+    "mcn", "lcn", "ncn", "rcn", "icn",
+    "lcn_left", "lcn_right", "mcn_left", "mcn_right", "ncn_left", "ncn_right"
+  )
+  for (col in needed_cols) {
+    if (!col %in% names(osm)) {
+      osm[[col]] = NA_character_
+    }
+  }
+
   segtypes = c("Level track", "Light segregation")
   osm_classified = osm |>
     # If highway == cycleway|pedestrian|path, detailed_segregation can be defined in most cases...
@@ -398,7 +421,7 @@ classify_cycle_infrastructure_scotland = function(
         stringr::str_detect(cycleway_chars, "lane|share_") &
           detailed_segregation == "Mixed Traffic Street" ~
           "Painted Cycle Lane",
-        stringr::str_detect(cycleway_chars, "track") &
+        stringr::str_detect(cycleway_chars, "track|separate") &
           detailed_segregation == "Mixed Traffic Street" ~
           "Light segregation",
         stringr::str_detect(cycleway_chars, "segregated") &
@@ -429,8 +452,8 @@ classify_cycle_infrastructure_scotland = function(
       cycle_segregation = dplyr::case_when(
         highway %in% c("primary", "secondary", "tertiary", "trunk", "unclassified") &
           (
-            (cycleway_left == "track" & (is.na(cycleway_left_segregated) | cycleway_left_segregated == "no")) |
-            (cycleway_right == "track" & (is.na(cycleway_right_segregated) | cycleway_right_segregated == "no"))
+            (cycleway_left %in% c("track", "separate") & (is.na(cycleway_left_segregated) | cycleway_left_segregated == "no")) |
+            (cycleway_right %in% c("track", "separate") & (is.na(cycleway_right_segregated) | cycleway_right_segregated == "no"))
           ) &
           detailed_segregation != "Painted Cycle Lane" ~ NA_character_,
         highway == "cycleway" &
