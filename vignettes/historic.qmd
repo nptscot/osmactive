@@ -1,0 +1,134 @@
+---
+title: "Scottish Cycling by Design classification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Scottish Cycling by Design classification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+execute: 
+  eval: false
+---
+
+
+# Getting additional tags with osmextract
+
+```{r}
+pak::pak("ropensci/osmextract")
+library(osmextract)
+library(tidyverse)
+library(sf)
+
+# Define vectortranslate options
+city_zones = zonebuilder::zb_zone("Leeds")
+city_zones = city_zones |>
+  filter(circle_id <= 2)
+mapview::mapview(city_zones)
+
+city_perimeter = sf::st_union(city_zones)
+mapview::mapview(city_perimeter)
+
+# Fetch the data for the specific city and year
+# city_infras_160101 = oe_get(city_perimeter, version = "160101",
+# vectortranslate_options = my_vectortranslate, quiet = FALSE, boundary =
+# city_perimeter, boundary_type = "clipsrc")
+extra_tags = c(
+    "traffic_calming",
+    "crossing"
+)
+city_infras = oe_get(
+    city_perimeter,
+    boundary = city_perimeter,
+    boundary_type = "clipsrc",
+    extra_tags = extra_tags
+)
+plot(city_infras$geometry)
+
+# Let's try to get the historic data:
+city_infras_160101 = oe_get(
+    city_perimeter,
+    version = "160101",
+    quiet = FALSE,
+    boundary = city_perimeter,
+    boundary_type = "clipsrc"
+)
+
+nrow(city_infras_160101) / nrow(city_infras)
+
+# Creat a variable for infrastructure type
+city_infras_160101 = city_infras_160101 %>%
+     mutate(highway_aggr = case_when(
+     highway == "cycleway" ~ "cycleway",
+     highway == "pedestrian" ~ "pedestrian",
+     highway == "living_street" ~ "living street",
+     TRUE ~ "others"  # Ensures NA values are included in "others"
+   ))
+names_orignal = names(city_infras_160101)
+```
+
+To get additional tags you can use the `extra_tags` argument in `oe_get()`.
+
+```{r}
+
+city_infras_160101_with_tags = oe_get(
+    city_perimeter,
+    version = "160101",
+    quiet = FALSE,
+    boundary = city_perimeter,
+    boundary_type = "clipsrc",
+    # Add extra tags:
+    extra_tags = extra_tags,
+    force_vectortranslate = TRUE
+    )
+names_new = names(city_infras_160101_with_tags)
+waldo::compare(names_orignal, names_new)
+# Only a single traffic calming result in 2016
+table(city_infras_160101_with_tags$traffic_calming)
+# For the recent data # 50x
+table(city_infras$traffic_calming)
+city_infras = city_infras_160101_with_tags |>
+  filter(!is.na(traffic_calming))
+plot(city_infras$geometry)
+```
+
+```{r}
+city_infras_points = oe_get(
+    city_perimeter,
+    version = "160101",
+    quiet = FALSE,
+    boundary = city_perimeter,
+    boundary_type = "clipsrc",
+    extra_tags = extra_tags,
+    force_vectortranslate = TRUE,
+    layer = "points"
+)
+table(city_infras_points$traffic_calming)
+plot(city_infras_points["traffic_calming"])
+```
+
+# Using osmactive to get historic data
+
+Let's try to do the same with the `osmactive` package.
+
+```{r}
+city_osmactive = osmactive::get_travel_network(
+    city_perimeter,
+    version = "160101"
+)
+names(city_osmactive)
+# Let's check if traffic calming is in there:
+table(city_osmactive$traffic_calming)
+table(city_osmactive)
+```
+
+We could add functionality to `osmactive` to get additional tags for pedestrian infrastructure.
+TODO: Add a feature request to the `osmactive` package: https://github.com/nptscot/osmactive/issues.
+
+
+# Use of OSM for historic changes
+
+OSM datasets are limited because they depend on volunteers.
+Changes sometimes reflect simply when a volunteer has time to update the map, rather than when the change actually occurred.
+
+There are a couple of approaches for dealing with this limitation:
+
+- The [Ohsome API](https://heigit.org/ohsome-quality-api-new-features-2/), which contains functionality for assessing OSM quality. The term "saturation" is useful here to describe the completeness of the data.
